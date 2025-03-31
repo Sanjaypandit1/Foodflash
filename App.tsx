@@ -13,6 +13,7 @@ import CartScreen from './src/screens/CartScreen';
 import OrdersScreen from './src/screens/OrdersScreen';
 import MenuScreen from './src/screens/MenuScreen';
 import LanguageSelectionScreen from './src/FirstPage/Language';
+import OnboardingScreen from './src/FirstPage/OnboardingScreen';
 
 // Type for bottom tab navigator
 type TabParamList = {
@@ -92,13 +93,18 @@ function MainApp() {
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [showLanguageScreen, setShowLanguageScreen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     const checkFirstLaunch = async () => {
       try {
         const hasSelectedLanguage = await AsyncStorage.getItem('selectedLanguage');
+        const hasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
+
         if (!hasSelectedLanguage) {
           setShowLanguageScreen(true);
+        } else if (!hasSeenOnboarding) {
+          setShowOnboarding(true);
         }
       } catch (error) {
         console.error('Error reading AsyncStorage:', error);
@@ -109,6 +115,17 @@ export default function App() {
 
     checkFirstLaunch();
   }, []);
+
+  const handleLanguageSelection = async () => {
+    await AsyncStorage.setItem('selectedLanguage', 'true');
+    setShowLanguageScreen(false);
+    setShowOnboarding(true); // After selecting language, show onboarding if needed
+  };
+
+  const handleOnboardingFinish = async () => {
+    await AsyncStorage.setItem('hasSeenOnboarding', 'true');
+    setShowOnboarding(false);
+  };
 
   if (isLoading) {
     return (
@@ -121,7 +138,9 @@ export default function App() {
   return (
     <NavigationContainer>
       {showLanguageScreen ? (
-        <LanguageSelectionScreen onLanguageSelect={() => setShowLanguageScreen(false)} />
+        <LanguageSelectionScreen onLanguageSelect={handleLanguageSelection} />
+      ) : showOnboarding ? (
+        <OnboardingScreen onFinish={handleOnboardingFinish} />
       ) : (
         <MainApp />
       )}
@@ -159,3 +178,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
 });
+
