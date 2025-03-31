@@ -6,7 +6,6 @@ import LinearGradient from 'react-native-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
-// Define Props
 type OnboardingScreenProps = {
   onFinish: () => void;
 };
@@ -17,17 +16,20 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onFinish }) => {
       loop={false}
       dot={<View style={styles.dot} />}
       activeDot={<View style={styles.activeDot} />}
+      paginationStyle={styles.paginationStyle}
     >
-      {/* First Screen */}
       <View style={styles.slide}>
         <Image
-          source={require('../Assets/breakfast.jpg')} // Replace with actual path
+          source={require('../Assets/breakfast.jpg')} // Replace with actual image path
           style={styles.image}
+          resizeMode="contain"
         />
-        <Text style={styles.title}>Choose Yummy Food</Text>
-        <Text style={styles.description}>
-          Purchase your favorite food with addons and proceed to easy checkout.
-        </Text>
+        <View style={styles.textContainer}>
+          <Text style={styles.title}>Choose Yummy Food</Text>
+          <Text style={styles.description}>
+            Purchase your favorite food with addons and proceed to easy checkout.
+          </Text>
+        </View>
         <TouchableOpacity style={styles.skipButton} onPress={onFinish}>
           <Text style={styles.skipText}>Skip</Text>
         </TouchableOpacity>
@@ -44,31 +46,37 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onFinish }) => {
 const styles = StyleSheet.create({
   slide: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: '#F8F4EF',
+    alignItems: 'center',
     paddingHorizontal: 20,
+    paddingBottom: 60,
+    paddingTop: 80,
   },
   image: {
-    width: width * 0.8,
+    width: width * 0.85,
     height: height * 0.4,
-    resizeMode: 'contain',
+    marginBottom: 30,
+  },
+  textContainer: {
+    alignItems: 'center',
+    marginHorizontal: 20,
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginTop: 20,
-    color: '#000',
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 10,
   },
   description: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#666',
     textAlign: 'center',
-    marginTop: 10,
+    lineHeight: 22,
   },
   skipButton: {
     position: 'absolute',
-    top: 50,
+    top: 40,
     right: 20,
   },
   skipText: {
@@ -77,12 +85,13 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     position: 'absolute',
-    bottom: 40,
+    bottom: 30,
     right: 20,
     width: 60,
     height: 60,
     borderRadius: 30,
     overflow: 'hidden',
+    elevation: 5,
   },
   gradient: {
     flex: 1,
@@ -94,14 +103,17 @@ const styles = StyleSheet.create({
     height: 8,
     backgroundColor: '#ddd',
     borderRadius: 4,
-    marginHorizontal: 5,
+    marginHorizontal: 4,
   },
   activeDot: {
     width: 16,
     height: 8,
     backgroundColor: '#FF6600',
     borderRadius: 4,
-    marginHorizontal: 5,
+    marginHorizontal: 4,
+  },
+  paginationStyle: {
+    bottom: 100,
   },
 });
 

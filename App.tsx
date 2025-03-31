@@ -14,6 +14,7 @@ import OrdersScreen from './src/screens/OrdersScreen';
 import MenuScreen from './src/screens/MenuScreen';
 import LanguageSelectionScreen from './src/FirstPage/Language';
 import OnboardingScreen from './src/FirstPage/OnboardingScreen';
+import OnboardingScreen2 from './src/FirstPage/onboardingscreen2';
 
 // Type for bottom tab navigator
 type TabParamList = {
@@ -94,6 +95,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [showLanguageScreen, setShowLanguageScreen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showOnboarding2, setShowOnboarding2] = useState(false);
 
   useEffect(() => {
     const checkFirstLaunch = async () => {
@@ -104,6 +106,7 @@ export default function App() {
         if (!hasSelectedLanguage) {
           setShowLanguageScreen(true);
         } else if (!hasSeenOnboarding) {
+          // Initially, show the first onboarding screen
           setShowOnboarding(true);
         }
       } catch (error) {
@@ -119,12 +122,23 @@ export default function App() {
   const handleLanguageSelection = async () => {
     await AsyncStorage.setItem('selectedLanguage', 'true');
     setShowLanguageScreen(false);
-    setShowOnboarding(true); // After selecting language, show onboarding if needed
+    setShowOnboarding(true); // Show onboarding after selecting language
   };
 
+  // Handler for finishing OnboardingScreen1:
   const handleOnboardingFinish = async () => {
-    await AsyncStorage.setItem('hasSeenOnboarding', 'true');
+    // Option 1: If you want two separate onboarding flows, update state:
     setShowOnboarding(false);
+    setShowOnboarding2(true);
+    // Option 2: If you want to finish onboarding completely:
+    // await AsyncStorage.setItem('hasSeenOnboarding', 'true');
+    // setShowOnboarding(false);
+  };
+
+  // Handler for finishing OnboardingScreen2:
+  const handleOnboardingFinish2 = async () => {
+    await AsyncStorage.setItem('hasSeenOnboarding', 'true');
+    setShowOnboarding2(false);
   };
 
   if (isLoading) {
@@ -141,6 +155,8 @@ export default function App() {
         <LanguageSelectionScreen onLanguageSelect={handleLanguageSelection} />
       ) : showOnboarding ? (
         <OnboardingScreen onFinish={handleOnboardingFinish} />
+      ) : showOnboarding2 ? (
+        <OnboardingScreen2 onFinish={handleOnboardingFinish2} />
       ) : (
         <MainApp />
       )}
@@ -178,4 +194,3 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
 });
-
