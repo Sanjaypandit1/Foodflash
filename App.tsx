@@ -62,6 +62,7 @@ const FloatingCartButton = ({ onPress }: { onPress?: (event: GestureResponderEve
 );
 
 // Main App Component
+// Main App Component
 function MainApp() {
   return (
     <Tab.Navigator
@@ -71,6 +72,7 @@ function MainApp() {
         tabBarInactiveTintColor: 'gray',
         tabBarStyle: styles.tabBarStyle,
         tabBarLabel: () => null,
+        headerShown: false, // Hide the top header
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
@@ -89,6 +91,7 @@ function MainApp() {
     </Tab.Navigator>
   );
 }
+
 
 // Wrapper App Component
 export default function App() {
