@@ -1,40 +1,35 @@
 import React from 'react';
-import { View, Text, StyleSheet, StatusBar, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import Headerbar from '../components/Headerbar';
 import Categories from '../components/Categories';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import OfferSlider from '../components/OfferSlider';
+import TodayTrends from '../components/trend';
 
 const HomeScreen = () => {
   return (
-    <View style={styles.mainContainer}>
-      <StatusBar backgroundColor={'#FF3F00'} />
-
-      <Headerbar />
-
-      <GestureHandlerRootView style={{ flex: 1 }}>
-     <OfferSlider /> 
-      <Categories />
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ScrollView 
+        style={styles.mainContainer} 
+        showsVerticalScrollIndicator={false} 
+        contentContainerStyle={{ paddingBottom: 80 }} // Added padding at the bottom
+      >
+        <StatusBar backgroundColor={'#FF3F00'} />
+        <Headerbar />
+        <OfferSlider />
+        <Categories />
+        <TodayTrends />
+        
+      </ScrollView>
     </GestureHandlerRootView>
-  
-    
-   
-
-      <View>
-        <Text>Foods</Text>
-      </View>
-    </View>
   );
 };
 
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    height: '100%',
     backgroundColor: '#F5F5F5',
   },
- 
- 
 });
 
 export default HomeScreen;
