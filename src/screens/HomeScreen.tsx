@@ -13,7 +13,7 @@ const HomeScreen = () => {
       <Headerbar />
 
       <GestureHandlerRootView style={{ flex: 1 }}>
-      <OfferSlider />
+     <OfferSlider /> 
       <Categories />
     </GestureHandlerRootView>
   

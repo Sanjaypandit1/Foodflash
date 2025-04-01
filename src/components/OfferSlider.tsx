@@ -16,13 +16,22 @@ const OfferSlider = () => {
         prevButton={<MaterialIcons name="arrow-back-ios" size={30} color="black" />}
       >
         <View style={styles.slide}>
-          <Image source={require('../Assets/biryani/chickenbiryani.jpeg')} style={styles.image} />
+          <Image source={require('../Assets/poster/poster1.jpg')} style={styles.image} />
         </View>
         <View style={styles.slide}>
-          <Image source={require('../Assets/Chowmin/vegchowmin.webp')} style={styles.image} />
+          <Image source={require('../Assets/poster/poster2.jpg')} style={styles.image} />
         </View>
         <View style={styles.slide}>
-          <Image source={require('../Assets/pizza/chickenpizza.jpg')} style={styles.image} />
+          <Image source={require('../Assets/poster/poster7.jpg')} style={styles.image} />
+        </View>
+        <View style={styles.slide}>
+          <Image source={require('../Assets/poster/poster4.jpg')} style={styles.image} />
+        </View>
+        <View style={styles.slide}>
+          <Image source={require('../Assets/poster/poster5.jpg')} style={styles.image} />
+        </View>
+        <View style={styles.slide}>
+          <Image source={require('../Assets/poster/poster6.jpeg')} style={styles.image} />
         </View>
       </Swiper>
     </View>
@@ -35,7 +44,7 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: 150,
-    backgroundColor: 'red',
+   // backgroundColor: 'red',
   },
   image: {
     height: '100%',
