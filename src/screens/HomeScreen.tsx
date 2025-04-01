@@ -5,8 +5,23 @@ import Categories from '../components/Categories';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import OfferSlider from '../components/OfferSlider';
 import TodayTrends from '../components/trend';
+import HighlightsForYou from '../components/HighLights';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NavigationProp } from '@react-navigation/native';
 
-const HomeScreen = () => {
+
+// Define stack param list (adjust based on your app structure)
+type RootStackParamList = {
+  Home: undefined;
+  ProductScreen: undefined; // Add other screens if needed
+};
+
+type HomeScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
+};
+
+const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView 
@@ -18,7 +33,8 @@ const HomeScreen = () => {
         <Headerbar />
         <OfferSlider />
         <Categories />
-        <TodayTrends />
+        <TodayTrends navigation={navigation} />
+        <HighlightsForYou />
         
       </ScrollView>
     </GestureHandlerRootView>
