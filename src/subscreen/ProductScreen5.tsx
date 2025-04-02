@@ -8,35 +8,35 @@ import { useCart } from "../components/CartContext"
 
 const biryaniOptions = [
   {
-    id: "vegmomo",
-    name: "Veg Momo",
-    price: "Rs.90",
-    image: require("../Assets/momo/vegmomo.jpg"),
-    description: "Soft dumplings stuffed with a flavorful mix of fresh veggies and spices.",
+    id: "vegburger",
+    name: "Veg Burger",
+    price: "Rs.100",
+    image: require("../Assets/Burger/vegburger.jpg"),
+    description: "A crispy veggie patty with fresh lettuce and creamy mayo in a soft bun",
     tag: "Vegetarian",
-    rating: 4.2,
+    rating: 4.7,
   },
   {
-    id: "chickenmomo",
-    name: "Chicken Momo",
-    price: "Rs.120",
-    image: require("../Assets/momo/chickenmomo.jpeg"),
-    description: "Juicy and tender chicken-filled dumplings with rich seasoning.",
-    tag: "Chicken",
-    rating: 4.1,
-  },
-  {
-    id: "mixedmomo",
-    name: "Fry Veg Momo",
+    id: "chickenburger",
+    name: "Chicken Burger",
     price: "Rs.150",
-    image: require("../Assets/momo/frypaneermomo.webp"),
-    description: "Deliciously soft dumplings packed with spiced paneer and herbs.",
+    image: require("../Assets/Burger/chickenburger.jpeg"),
+    description: "A juicy chicken patty layered with cheese, lettuce, and tangy sauces.",
+    tag: "Chicken",
+    rating: 4.5,
+  },
+  {
+    id: "mixedburger",
+    name: "Egg Burger",
+    price: "Rs.180",
+    image: require("../Assets/Burger/specialburger.jpeg"),
+    description: "Spiced paneer patty with crunchy veggies and flavorful sauces in a bun.",
     tag: "Mixed",
-    rating: 4.8,
+    rating: 4.1,
   },
 ]
 
-const ProductScreen2 = () => {
+const ProductScreen5 = () => {
   const navigation = useNavigation()
   const { addToCart } = useCart()
   const [selectedBiryani, setSelectedBiryani] = useState(biryaniOptions[1]) // Default to Chicken Biryani
@@ -125,7 +125,7 @@ const ProductScreen2 = () => {
   )
 }
 
-export default ProductScreen2
+export default ProductScreen5
 
 const styles = StyleSheet.create({
   container: {
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   },
   buyButton: {
     flex: 1,
-    backgroundColor: "red",
+    backgroundColor: "#FF3f00",
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   closeButton: {
-    backgroundColor: "red",
+    backgroundColor: "#d32f2f",
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",

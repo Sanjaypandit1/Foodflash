@@ -8,35 +8,35 @@ import { useCart } from "../components/CartContext"
 
 const biryaniOptions = [
   {
-    id: "vegmomo",
-    name: "Veg Momo",
-    price: "Rs.90",
-    image: require("../Assets/momo/vegmomo.jpg"),
-    description: "Soft dumplings stuffed with a flavorful mix of fresh veggies and spices.",
+    id: "vegpizza",
+    name: "Veg Pizza",
+    price: "Rs.300",
+    image: require("../Assets/pizza/vegpizza.jpg"),
+    description: "A cheesy delight loaded with fresh veggies and flavorful herbs.",
     tag: "Vegetarian",
     rating: 4.2,
   },
   {
-    id: "chickenmomo",
-    name: "Chicken Momo",
-    price: "Rs.120",
-    image: require("../Assets/momo/chickenmomo.jpeg"),
-    description: "Juicy and tender chicken-filled dumplings with rich seasoning.",
+    id: "chickenpizza",
+    name: "Chicken Pizza",
+    price: "Rs.350",
+    image: require("../Assets/pizza/chickenpizza.jpg"),
+    description: "Juicy chicken chunks on a crispy crust with rich, melty cheese.",
     tag: "Chicken",
     rating: 4.1,
   },
   {
-    id: "mixedmomo",
-    name: "Fry Veg Momo",
-    price: "Rs.150",
-    image: require("../Assets/momo/frypaneermomo.webp"),
-    description: "Deliciously soft dumplings packed with spiced paneer and herbs.",
+    id: "mixedpizza",
+    name: "Mixed Pizza",
+    price: "Rs.400",
+    image: require("../Assets/pizza/mixedpizza.jpeg"),
+    description: "Deliciously mixed of chicken, egg pizza",
     tag: "Mixed",
     rating: 4.8,
   },
 ]
 
-const ProductScreen2 = () => {
+const ProductScreen4 = () => {
   const navigation = useNavigation()
   const { addToCart } = useCart()
   const [selectedBiryani, setSelectedBiryani] = useState(biryaniOptions[1]) // Default to Chicken Biryani
@@ -125,7 +125,7 @@ const ProductScreen2 = () => {
   )
 }
 
-export default ProductScreen2
+export default ProductScreen4
 
 const styles = StyleSheet.create({
   container: {
