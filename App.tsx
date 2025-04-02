@@ -8,6 +8,7 @@ import { GestureResponderEvent } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 
+
 // Importing Screens
 import HomeScreen from './src/screens/HomeScreen';
 import FavoritesScreen from './src/screens/FavoritesScreen';
@@ -38,7 +39,11 @@ const HomeStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Homescreen" component={HomeScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="ProductScreen" component={ProductScreen} options={{ headerShown: false }} />
+      <Stack.Screen 
+        name="ProductScreen" 
+        component={ProductScreen as React.ComponentType<any>} 
+        options={{ headerShown: false }} 
+      />
     </Stack.Navigator>
   );
 };
