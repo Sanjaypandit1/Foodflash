@@ -32,7 +32,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <StatusBar backgroundColor={'#FF3F00'} />
         <Headerbar />
         <OfferSlider />
-        <Categories />
+        <Categories navigation={navigation}/>
         <TodayTrends navigation={navigation} />
         <HighlightsForYou />
         
