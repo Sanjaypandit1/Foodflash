@@ -23,7 +23,7 @@ const TodayTrends: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.500</Text> Rs.450</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress = {() =>navigation.navigate('ProductScreen2')} >
           <Image source={require('../Assets/momo/chickenmomo.jpeg')} style={styles.image} />
           <View style={styles.discountTag}><Text style={styles.discountText}>30.0% OFF</Text></View>
           <Text style={styles.restaurant}>Hotel Planet</Text>
@@ -31,7 +31,7 @@ const TodayTrends: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.200</Text> Rs. 140</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress = {() =>navigation.navigate('ProductScreen3')}>
           <Image source={require('../Assets/Chowmin/chickenchowmin.jpg')} style={styles.image} />
           <View style={styles.discountTag}><Text style={styles.discountText}>10.0% OFF</Text></View>
           <Text style={styles.restaurant}>Hotel Swad</Text>
@@ -39,18 +39,18 @@ const TodayTrends: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.200</Text> Rs. 180</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card}onPress = {() =>navigation.navigate('Samosa')}>
           <Image source={require('../Assets/Extra/samosa.jpg')} style={styles.image} />
           <View style={styles.discountTag}><Text style={styles.discountText}>10.0% OFF</Text></View>
           <Text style={styles.restaurant}>Parnam Cafe</Text>
           <Text style={styles.itemName}>Samosa Chat</Text>
           <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.110</Text> Rs. 100</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress = {() =>navigation.navigate('Pakoda')}>
           <Image source={require('../Assets/Extra/vegpakoda.jpg')} style={styles.image} />
           <View style={styles.discountTag}><Text style={styles.discountText}>40.0% OFF</Text></View>
           <Text style={styles.restaurant}>Parnam Cafe</Text>
-          <Text style={styles.itemName}>Samosa Chat</Text>
+          <Text style={styles.itemName}>Pakoda</Text>
           <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.100</Text> Rs. 60</Text>
         </TouchableOpacity>
       </ScrollView>

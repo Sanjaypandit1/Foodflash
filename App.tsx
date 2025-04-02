@@ -20,6 +20,13 @@ import LanguageSelectionScreen from "./src/FirstPage/Language"
 import OnboardingScreen from "./src/FirstPage/OnboardingScreen"
 import OnboardingScreen2 from "./src/FirstPage/onboardingscreen2"
 import ProductScreen from "./src/subscreen/ProductScreen"
+import ProductScreen2 from "./src/subscreen/ProductScreen2"
+import ProductScreen3 from "./src/subscreen/ProductScreen3"
+import ProductScreen4 from "./src/subscreen/ProductScreen4"
+import ProductScreen5 from "./src/subscreen/ProductScreen5"
+import Samosa from "./src/subscreen/Samosa"
+import Pakoda from "./src/subscreen/Pakoda"
+
 
 // Type for bottom tab navigator
 type TabParamList = {
@@ -40,6 +47,12 @@ const HomeStack = () => {
     <Stack.Navigator>
       <Stack.Screen name="Homescreen" component={HomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="ProductScreen" component={ProductScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="ProductScreen2" component={ProductScreen2} options={{ headerShown: false }} />
+      <Stack.Screen name="ProductScreen3" component={ProductScreen3} options={{ headerShown: false }} />
+      <Stack.Screen name="ProductScreen4" component={ProductScreen4} options={{ headerShown: false }} />
+      <Stack.Screen name="ProductScreen5" component={ProductScreen5} options={{ headerShown: false }} />
+      <Stack.Screen name="Samosa" component={Samosa} options={{ headerShown: false }} />
+      <Stack.Screen name="Pakoda" component={Pakoda} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }
@@ -99,7 +112,7 @@ function MainApp() {
           }
           return <Icon name={iconName} size={size} color={color} />
         },
-        tabBarActiveTintColor: "#F7931A",
+        tabBarActiveTintColor: "red",
         tabBarInactiveTintColor: "gray",
         tabBarStyle: styles.tabBarStyle,
         tabBarLabel: () => null,
@@ -208,7 +221,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "#F7931A",
+    backgroundColor: "red",
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",

@@ -1,5 +1,3 @@
-
-
 import { useState } from "react"
 import { View, Text, TouchableOpacity, StatusBar, StyleSheet, Image, Alert } from "react-native"
 import { useNavigation } from "@react-navigation/native"
@@ -8,38 +6,20 @@ import { useCart } from "../components/CartContext"
 
 const biryaniOptions = [
   {
-    id: "vegmomo",
-    name: "Veg Momo",
-    price: "Rs.90",
-    image: require("../Assets/momo/vegmomo.jpg"),
-    description: "Soft dumplings stuffed with a flavorful mix of fresh veggies and spices.",
+    id: "samosa",
+    name: "Veg Samosa",
+    price: "Rs.100",
+    image: require("../Assets/Extra/samosa.jpg"),
+    description: "A crispy Samosa with soup",
     tag: "Vegetarian",
-    rating: 4.2,
-  },
-  {
-    id: "chickenmomo",
-    name: "Chicken Momo",
-    price: "Rs.120",
-    image: require("../Assets/momo/chickenmomo.jpeg"),
-    description: "Juicy and tender chicken-filled dumplings with rich seasoning.",
-    tag: "Chicken",
-    rating: 4.1,
-  },
-  {
-    id: "mixedmomo",
-    name: "Fry Veg Momo",
-    price: "Rs.150",
-    image: require("../Assets/momo/frypaneermomo.webp"),
-    description: "Deliciously soft dumplings packed with spiced paneer and herbs.",
-    tag: "Mixed",
-    rating: 4.8,
+    rating: 4.7,
   },
 ]
 
-const ProductScreen2 = () => {
+const Samosa = () => {
   const navigation = useNavigation()
   const { addToCart } = useCart()
-  const [selectedBiryani, setSelectedBiryani] = useState(biryaniOptions[1]) // Default to Chicken Biryani
+  const [selectedBiryani, setSelectedBiryani] = useState(biryaniOptions[0]) // Changed to index 0
 
   const handleAddToCart = () => {
     addToCart(selectedBiryani)
@@ -81,21 +61,7 @@ const ProductScreen2 = () => {
           </View>
         </View>
 
-        {/* Product Selection Buttons */}
-        <View style={styles.selectionContainer}>
-          {biryaniOptions.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={[styles.selectionButton, selectedBiryani.id === item.id && styles.activeSelection]}
-              onPress={() => setSelectedBiryani(item)}
-            >
-              <Text style={[styles.selectionText, selectedBiryani.id === item.id && styles.activeText]}>
-                {item.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
+        {/* Since there's only one product, we can remove the selection buttons section */}
         {/* Restaurant Name */}
         <View style={styles.restaurantContainer}>
           <Text style={styles.restaurantTitle}>Restaurant Name</Text>
@@ -125,7 +91,7 @@ const ProductScreen2 = () => {
   )
 }
 
-export default ProductScreen2
+export default Samosa
 
 const styles = StyleSheet.create({
   container: {
@@ -261,7 +227,7 @@ const styles = StyleSheet.create({
   },
   buyButton: {
     flex: 1,
-    backgroundColor: "red",
+    backgroundColor: "#FF3f00",
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -269,7 +235,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   closeButton: {
-    backgroundColor: "red",
+    backgroundColor: "#d32f2f",
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -283,4 +249,3 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
 })
-

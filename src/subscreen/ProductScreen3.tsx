@@ -8,35 +8,35 @@ import { useCart } from "../components/CartContext"
 
 const biryaniOptions = [
   {
-    id: "vegmomo",
-    name: "Veg Momo",
-    price: "Rs.90",
-    image: require("../Assets/momo/vegmomo.jpg"),
-    description: "Soft dumplings stuffed with a flavorful mix of fresh veggies and spices.",
+    id: "vegchowmin",
+    name: "Veg Chowmin",
+    price: "Rs.100",
+    image: require("../Assets/Chowmin/vegchowmin.webp"),
+    description: "Stir-fried noodles loaded with crunchy veggies and savory spices.",
     tag: "Vegetarian",
     rating: 4.2,
   },
   {
-    id: "chickenmomo",
-    name: "Chicken Momo",
-    price: "Rs.120",
-    image: require("../Assets/momo/chickenmomo.jpeg"),
-    description: "Juicy and tender chicken-filled dumplings with rich seasoning.",
+    id: "chickenchowmin",
+    name: "Chicken Chowmin",
+    price: "Rs.140",
+    image: require("../Assets/Chowmin/chickenchowmin.jpg"),
+    description: "Flavorful noodles tossed with tender chicken and aromatic seasonings.",
     tag: "Chicken",
     rating: 4.1,
   },
   {
-    id: "mixedmomo",
-    name: "Fry Veg Momo",
+    id: "mixedchowmin",
+    name: "Mixed Chowmin",
     price: "Rs.150",
-    image: require("../Assets/momo/frypaneermomo.webp"),
-    description: "Deliciously soft dumplings packed with spiced paneer and herbs.",
+    image: require("../Assets/Chowmin/mixedchowmin.jpeg"),
+    description: "Spicy and saucy noodles mixed with soft paneer and fresh veggies.",
     tag: "Mixed",
     rating: 4.8,
   },
 ]
 
-const ProductScreen2 = () => {
+const ProductScreen3 = () => {
   const navigation = useNavigation()
   const { addToCart } = useCart()
   const [selectedBiryani, setSelectedBiryani] = useState(biryaniOptions[1]) // Default to Chicken Biryani
@@ -125,7 +125,7 @@ const ProductScreen2 = () => {
   )
 }
 
-export default ProductScreen2
+export default ProductScreen3
 
 const styles = StyleSheet.create({
   container: {
@@ -174,10 +174,10 @@ const styles = StyleSheet.create({
   },
   selectionButton: {
     paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: 8,
     backgroundColor: "#e0e0e0",
     borderRadius: 20,
-    marginHorizontal: 5,
+    marginHorizontal: 4,
   },
   activeSelection: {
     backgroundColor: "#FF3f00",

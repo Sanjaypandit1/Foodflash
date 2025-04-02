@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingTop: 50,
     paddingBottom: 10,
-    backgroundColor: '#F7931A',
+    backgroundColor: 'red',
     paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderColor: 'grey',
@@ -82,6 +82,6 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: 16,
-    color: '#F7931A',
+    color: 'red',
   },
 });
