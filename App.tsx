@@ -5,6 +5,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { GestureResponderEvent } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+
 
 // Importing Screens
 import HomeScreen from './src/screens/HomeScreen';
@@ -15,6 +18,7 @@ import MenuScreen from './src/screens/MenuScreen';
 import LanguageSelectionScreen from './src/FirstPage/Language';
 import OnboardingScreen from './src/FirstPage/OnboardingScreen';
 import OnboardingScreen2 from './src/FirstPage/onboardingscreen2';
+import ProductScreen from './src/subscreen/ProductScreen';
 
 // Type for bottom tab navigator
 type TabParamList = {
@@ -23,10 +27,27 @@ type TabParamList = {
   Cart: undefined;
   Orders: undefined;
   Menu: undefined;
+  
 };
+
+const Stack = createNativeStackNavigator();
 
 // Bottom Tab Navigator
 const Tab = createBottomTabNavigator<TabParamList>();
+
+const HomeStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Homescreen" component={HomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen 
+        name="ProductScreen" 
+        component={ProductScreen as React.ComponentType<any>} 
+        options={{ headerShown: false }} 
+      />
+    </Stack.Navigator>
+  );
+};
+
 
 // Navicons configuration
 const tabBarIcon = (route: keyof TabParamList) => ({ color, size }: { color: string; size: number }) => {
@@ -75,7 +96,8 @@ function MainApp() {
         headerShown: false, // Hide the top header
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Home" component={HomeStack} />
+
       <Tab.Screen name="Favorites" component={FavoritesScreen} />
       <Tab.Screen
         name="Cart"

@@ -1,13 +1,21 @@
 import { StyleSheet, Text, TouchableOpacity, View, Image, ScrollView } from 'react-native';
 import React from 'react';
+import { NavigationProp } from '@react-navigation/native';
 
-const TodayTrends = () => {
+// Define prop types
+type Props = {
+    navigation: NavigationProp<any>; // 'any' can be replaced with your stack param list if available
+  };
+  
+
+const TodayTrends: React.FC<Props> = ({ navigation }) => {
+
   return (
     <View style={styles.container}>
       <Text style={styles.head}>Today's Trends</Text>
       <Text style={styles.subhead}>Here's what you might like to taste</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollView}>
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress = {() =>navigation.navigate('ProductScreen')}>
           <Image source={require('../Assets/biryani/chickenbiryani.jpeg')} style={styles.image} />
           <View style={styles.discountTag}><Text style={styles.discountText}>10.0% OFF</Text></View>
           <Text style={styles.restaurant}>Swad Restaurant</Text>
