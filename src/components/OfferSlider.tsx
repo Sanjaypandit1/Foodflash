@@ -113,8 +113,10 @@ export default OfferSlider;
 const styles = StyleSheet.create({
   container: {
     top:15,
-    width: '100%',
-    height: 220, // Increased height to accommodate pagination
+    width: '95%',
+    height: 200, // Increased height to accommodate pagination
+    alignItems:'center',
+    margin:12,
    
   },
   slide: {

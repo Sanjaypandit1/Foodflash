@@ -26,7 +26,7 @@ import ProductScreen4 from "./src/subscreen/ProductScreen4"
 import ProductScreen5 from "./src/subscreen/ProductScreen5"
 import Samosa from "./src/subscreen/Samosa"
 import Pakoda from "./src/subscreen/Pakoda"
-
+import SignInScreen from "./src/signinpage/Signin" // Import SignInScreen
 
 // Type for bottom tab navigator
 type TabParamList = {
@@ -37,23 +37,31 @@ type TabParamList = {
   Menu: undefined
 }
 
-const Stack = createNativeStackNavigator()
+// Type for stack navigator
+type RootStackParamList = {
+  MainTabs: undefined
+  SignIn: undefined
+  // Add other root-level screens here
+}
+
+const Stack = createNativeStackNavigator<RootStackParamList>()
+const HomeStack = createNativeStackNavigator()
 
 // Bottom Tab Navigator
 const Tab = createBottomTabNavigator<TabParamList>()
 
-const HomeStack = () => {
+const HomeStackNavigator = () => {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Homescreen" component={HomeScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="ProductScreen" component={ProductScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="ProductScreen2" component={ProductScreen2} options={{ headerShown: false }} />
-      <Stack.Screen name="ProductScreen3" component={ProductScreen3} options={{ headerShown: false }} />
-      <Stack.Screen name="ProductScreen4" component={ProductScreen4} options={{ headerShown: false }} />
-      <Stack.Screen name="ProductScreen5" component={ProductScreen5} options={{ headerShown: false }} />
-      <Stack.Screen name="Samosa" component={Samosa} options={{ headerShown: false }} />
-      <Stack.Screen name="Pakoda" component={Pakoda} options={{ headerShown: false }} />
-    </Stack.Navigator>
+    <HomeStack.Navigator>
+      <HomeStack.Screen name="Homescreen" component={HomeScreen} options={{ headerShown: false }} />
+      <HomeStack.Screen name="ProductScreen" component={ProductScreen} options={{ headerShown: false }} />
+      <HomeStack.Screen name="ProductScreen2" component={ProductScreen2} options={{ headerShown: false }} />
+      <HomeStack.Screen name="ProductScreen3" component={ProductScreen3} options={{ headerShown: false }} />
+      <HomeStack.Screen name="ProductScreen4" component={ProductScreen4} options={{ headerShown: false }} />
+      <HomeStack.Screen name="ProductScreen5" component={ProductScreen5} options={{ headerShown: false }} />
+      <HomeStack.Screen name="Samosa" component={Samosa} options={{ headerShown: false }} />
+      <HomeStack.Screen name="Pakoda" component={Pakoda} options={{ headerShown: false }} />
+    </HomeStack.Navigator>
   )
 }
 
@@ -74,17 +82,8 @@ const FloatingCartButton = ({ onPress }: { onPress?: (event: GestureResponderEve
   )
 }
 
-// Main App Component with Cart Provider
-function MainAppWithProvider() {
-  return (
-    <CartProvider>
-      <MainApp />
-    </CartProvider>
-  )
-}
-
-// Main App Component
-function MainApp() {
+// Main Tab Navigator
+const MainTabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -119,7 +118,7 @@ function MainApp() {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="Home" component={HomeStack} />
+      <Tab.Screen name="Home" component={HomeStackNavigator} />
       <Tab.Screen name="Favorites" component={FavoritesScreen} />
       <Tab.Screen
         name="Cart"
@@ -131,6 +130,25 @@ function MainApp() {
       <Tab.Screen name="Orders" component={OrdersScreen} />
       <Tab.Screen name="Menu" component={MenuScreen} />
     </Tab.Navigator>
+  )
+}
+
+// Main App Component with Cart Provider
+function MainAppWithProvider() {
+  return (
+    <CartProvider>
+      <MainApp />
+    </CartProvider>
+  )
+}
+
+// Main App Component with Root Stack
+function MainApp() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+      <Stack.Screen name="SignIn" component={SignInScreen} />
+    </Stack.Navigator>
   )
 }
 
@@ -253,4 +271,3 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
 })
-
