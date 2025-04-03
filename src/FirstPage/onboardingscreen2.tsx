@@ -42,13 +42,12 @@ const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({ navigation, onFin
         <Text style={styles.title}>{onboardingData[currentIndex].title}</Text>
         <Text style={styles.description}>{onboardingData[currentIndex].description}</Text>
       </View>
-      <View style={styles.pagination}>
-        {onboardingData.map((_, index) => (
-          <View key={index} style={[styles.dot, currentIndex === index && styles.activeDot]} />
-        ))}
-      </View>
+          <TouchableOpacity style={styles.skipButton} onPress={onFinish}>
+                <Text style={styles.skipText}>Skip</Text>
+              </TouchableOpacity>
+      
         <TouchableOpacity style={styles.nextButton} onPress={onFinish}>
-              <LinearGradient colors={['#FF8C00', '#FF6600']} style={styles.gradient}>
+              <LinearGradient colors={['red', 'red']} style={styles.gradient}>
                 <Icon name="arrow-forward" size={24} color="#fff" />
               </LinearGradient>
             </TouchableOpacity>
@@ -72,7 +71,7 @@ const styles = StyleSheet.create({
   textContainer: {
     alignItems: "center",
     paddingHorizontal: 20,
-    marginBottom: 20,
+    marginBottom: 200,
   },
   title: {
     fontSize: 24,
@@ -115,6 +114,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     overflow: 'hidden',
     elevation: 5,
+  
   },
   gradient: {
     flex: 1,
@@ -124,6 +124,16 @@ const styles = StyleSheet.create({
   paginationStyle: {
     bottom: 100,
   },
+  skipButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+  },
+  skipText: {
+    fontSize: 16,
+    color: '#888',
+  },
+
 });
 
 export default OnboardingScreen2;

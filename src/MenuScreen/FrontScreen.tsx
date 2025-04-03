@@ -105,16 +105,20 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, items }) => {
 
 // Profile Header Component
 const ProfileHeader: React.FC = () => {
+  const navigation = useNavigation<NavigationProps>();
+  
   return (
-    <View style={styles.header}>
-      <View style={styles.profileContainer}>
-      <Image source={require('../Assets/logo.jpg')} style={styles.profileImage} />
-        <View style={styles.profileInfo}>
-          <Text style={styles.profileName}>Guest User</Text>
-          <Text style={styles.profileSubtitle}>Login to view all the features</Text>
+    <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
+      <View style={styles.header}>
+        <View style={styles.profileContainer}>
+          <Image source={require('../Assets/logo.jpg')} style={styles.profileImage} />
+          <View style={styles.profileInfo}>
+            <Text style={styles.profileName}>Guest User</Text>
+            <Text style={styles.profileSubtitle}>Login to view all the features</Text>
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -228,7 +232,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '500',
-    color: 'red', 
+    color: 'red', // Changed from red to match the theme
     marginBottom: 10,
     paddingHorizontal: 15,
   },
