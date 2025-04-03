@@ -18,35 +18,35 @@ const Categories: React.FC<Props> = ({ navigation }) => {
       name: 'Pizza',
       image: require('../Assets/pizza/chickenpizza.jpg'),
       screen: 'ProductScreen4',
-      color: '#FF416C'
+      color: '#E96A1C'
     },
     {
       id: 2,
       name: 'Momo',
       image: require('../Assets/momo/chickenmomo.jpeg'),
       screen: 'ProductScreen2',
-      color: '#4776E6'
+      color: '#E96A1C',
     },
     {
       id: 3,
       name: 'Chowmin',
       image: require('../Assets/Chowmin/vegchowmin.webp'),
       screen: 'ProductScreen3',
-      color: '#11998e'
+      color: '#E96A1C'
     },
     {
       id: 4,
       name: 'Burger',
       image: require('../Assets/Burger/vegburger.jpg'),
       screen: 'ProductScreen5',
-      color: '#FF8008'
+      color: '#E96A1C'
     },
     {
       id: 5,
       name: 'Biryani',
       image: require('../Assets/biryani/chickenbiryani.jpeg'),
       screen: 'ProductScreen',
-      color: '#FF3F00'
+      color: '#E96A1C'
     }
   ];
 
