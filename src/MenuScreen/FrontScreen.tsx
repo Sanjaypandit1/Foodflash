@@ -108,10 +108,7 @@ const ProfileHeader: React.FC = () => {
   return (
     <View style={styles.header}>
       <View style={styles.profileContainer}>
-        <Image
-          source={{ uri: 'https://via.placeholder.com/100' }}
-          style={styles.profileImage}
-        />
+      <Image source={require('../Assets/logo.jpg')} style={styles.profileImage} />
         <View style={styles.profileInfo}>
           <Text style={styles.profileName}>Guest User</Text>
           <Text style={styles.profileSubtitle}>Login to view all the features</Text>
@@ -231,7 +228,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '500',
-    color: '#FF8C00', // Changed from #E96A1C to match the theme
+    color: 'red', 
     marginBottom: 10,
     paddingHorizontal: 15,
   },

@@ -114,13 +114,9 @@ const SignInScreen: React.FC = () => {
           keyboardShouldPersistTaps="handled"
         >
           {/* Header */}
-          <View style={styles.header}>
-            <Image
-              source={{ uri: 'https://via.placeholder.com/100' }}
-              style={styles.logo}
-            />
-            <Text style={styles.appName}>FoodFlash</Text>
-            <Text style={styles.tagline}>Delicious food delivered fast</Text>
+          <View >
+          <Image source={require('../Assets/logo.jpg')} style={styles.logo} />
+           
           </View>
 
           {/* Form */}
@@ -218,9 +214,9 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 30,
   },
   logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: '100%',
+    height: 300,
+    borderRadius: 20,
     backgroundColor: '#fff',
     marginBottom: 10,
   },
