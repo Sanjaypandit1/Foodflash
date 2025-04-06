@@ -31,6 +31,7 @@ import DeliciousBite from "./src/Resturant/DelicioueBite"
 import BurgerJoint from "./src/Resturant/BurgerJoint"
 import SpiceGarden from "./src/Resturant/SpiceGarden"
 import SushilPalace from "./src/Resturant/SushiPalace"
+import FoodItemDetail from "./src/components/ProductDetails"
 
 // Type for bottom tab navigator
 type TabParamList = {
@@ -84,6 +85,11 @@ const HomeStackNavigator = () => {
   name="SushilPalace" 
   component={SushilPalace} 
   options={{ headerShown: true, title: "" }}
+/>
+<HomeStack.Screen
+name="FoodItemDetail"
+component={FoodItemDetail}
+options={{ headerShown: true }}
 />
     </HomeStack.Navigator>
   )

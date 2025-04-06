@@ -1,12 +1,13 @@
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useState } from 'react'
-import { RouteProp, useRoute } from '@react-navigation/native';
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navigation/native'
+
 
 // Define types
 type RootStackParamList = {
   Home: undefined;
   RestaurantDetails: { restaurant: Restaurant };
+  FoodItemDetail: { item: FoodItem };
 };
 
 type Restaurant = {
@@ -32,13 +33,14 @@ type FoodItem = {
 type FilterOption = 'all' | 'veg' | 'nonVeg';
 
 
+
+
 // Sample food items data
 const foodItems: FoodItem[] = [
   {
-    
     id: '1',
-    name: 'Margherita Pizza',
-    price: '$12.99',
+    name: 'Pizza',
+    price: '12.99',
     description: 'Classic pizza with tomato sauce, mozzarella, and basil',
     image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
     isVeg: true,
@@ -48,7 +50,7 @@ const foodItems: FoodItem[] = [
   {
     id: '2',
     name: 'Chicken Alfredo Pasta',
-    price: '$14.99',
+    price: '14.99',
     description: 'Creamy pasta with grilled chicken and parmesan',
     image: 'https://images.unsplash.com/photo-1645112411341-6c4fd023882c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
     isVeg: false,
@@ -58,7 +60,7 @@ const foodItems: FoodItem[] = [
   {
     id: '3',
     name: 'Garden Salad',
-    price: '$8.99',
+    price: '8.99',
     description: 'Fresh mixed greens with seasonal vegetables and vinaigrette',
     image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
     isVeg: true,
@@ -122,6 +124,9 @@ export default function BurgerJoint() {
   const { restaurant } = route.params;
   const [filter, setFilter] = useState<FilterOption>('all');
   
+  // Properly type the navigation object
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  
   // Filter food items based on selected filter
   const filteredFoodItems = foodItems.filter(item => {
     if (filter === 'all') return true;
@@ -131,7 +136,11 @@ export default function BurgerJoint() {
   });
 
   const renderFoodItem = ({ item }: { item: FoodItem }) => (
-    <TouchableOpacity style={styles.foodCard} activeOpacity={0.9}>
+    <TouchableOpacity 
+      style={styles.foodCard} 
+      activeOpacity={0.9}
+      onPress={() => navigation.navigate('FoodItemDetail', { item })}
+    >
       <View style={styles.foodInfo}>
         <View style={styles.foodHeader}>
           <Text style={styles.foodName}>{item.name}</Text>
@@ -148,7 +157,10 @@ export default function BurgerJoint() {
           <Text style={styles.foodTime}>{item.preparationTime}</Text>
         </View>
         
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity 
+          style={styles.addButton}
+          onPress={() => navigation.navigate('FoodItemDetail', { item })}
+        >
           <Text style={styles.addButtonText}>ADD</Text>
         </TouchableOpacity>
       </View>
@@ -209,7 +221,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5F5F5',
-    padding: 15,
+    padding: 1,
   },
   header: {
     marginBottom: 20,
