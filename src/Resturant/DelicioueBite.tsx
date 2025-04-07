@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navigation/native'
+import {ImageSourcePropType} from 'react-native';
 // Define types
 type RootStackParamList = {
   Home: undefined;
@@ -22,7 +23,7 @@ type FoodItem = {
   name: string;
   price: string;
   description: string;
-  image: string;
+  image: ImageSourcePropType;
   isVeg: boolean;
   rating: string;
   preparationTime: string;
@@ -34,60 +35,80 @@ type FilterOption = 'all' | 'veg' | 'nonVeg';
 const foodItems: FoodItem[] = [
   {
     id: '1',
-    name: 'Margherita Pizza',
-    price: '$12.99',
+    name: 'Veg Momo',
+    price: '120',
     description: 'Classic pizza with tomato sauce, mozzarella, and basil',
-    image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+    image: require('../Assets/DeliciousBite/veg-momo.jpg'),
     isVeg: true,
     rating: '4.5',
     preparationTime: '20 min'
   },
   {
     id: '2',
-    name: 'Chicken Alfredo Pasta',
-    price: '$14.99',
+    name: 'Samosa',
+    price: '120',
     description: 'Creamy pasta with grilled chicken and parmesan',
-    image: 'https://images.unsplash.com/photo-1645112411341-6c4fd023882c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-    isVeg: false,
+    image: require('../Assets/DeliciousBite/veg-momo.jpg'),
+    isVeg: true,
     rating: '4.7',
     preparationTime: '25 min'
   },
   {
     id: '3',
-    name: 'Garden Salad',
-    price: '$8.99',
+    name: 'Paneer Chowmin',
+    price: '120',
     description: 'Fresh mixed greens with seasonal vegetables and vinaigrette',
-    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+    image: require('../Assets/DeliciousBite/paneer-chowmin.jpg'),
     isVeg: true,
     rating: '4.2',
     preparationTime: '10 min'
   },
   {
     id: '4',
-    name: 'Beef Burger',
-    price: '$13.99',
+    name: 'Mushroom Pizza',
+    price: '350',
     description: 'Juicy beef patty with lettuce, tomato, and special sauce',
-    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1299&q=80',
-    isVeg: false,
+    image: require('../Assets/DeliciousBite/mushroom-pizza.jpg'),
+    isVeg: true,
     rating: '4.6',
     preparationTime: '15 min'
   },
   {
     id: '5',
-    name: 'Mushroom Risotto',
-    price: '$15.99',
+    name: 'Mixed Pizza',
+    price: '500',
     description: 'Creamy arborio rice with wild mushrooms and parmesan',
-    image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-    isVeg: true,
+    image: require('../Assets/DeliciousBite/mushroom-pizza.jpg'),
+    isVeg: false,
     rating: '4.4',
     preparationTime: '30 min'
   },
   {
     id: '6',
-    name: 'Grilled Salmon',
-    price: '$18.99',
-    description: 'Fresh salmon fillet with lemon herb butter and vegetables',
-    image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+    name: 'Chicekn Pizza',
+    price: '$15.99',
+    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    image: require('../Assets/DeliciousBite/chicken-pizza.jpeg'),
+    isVeg: false,
+    rating: '4.4',
+    preparationTime: '30 min'
+  },
+  {
+    id: '7',
+    name: 'Chicekn Momo',
+    price: '200',
+    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    image: require('../Assets/DeliciousBite/chicken-momo.jpg'),
+    isVeg: false,
+    rating: '4.4',
+    preparationTime: '30 min'
+  },
+  {
+    id: '8',
+    name: 'Chiceken Chowmin',
+    price: '180',
+    description: 'Fresh salmon fil',
+    image: require('../Assets/DeliciousBite/chicken-chowmin.jpg'),
     isVeg: false,
     rating: '4.8',
     preparationTime: '25 min'
@@ -141,10 +162,11 @@ export default function DeliciousBite() {
        </View>
        
        <Image 
-         source={{ uri: item.image }} 
-         style={styles.foodImage}
-         resizeMode="cover"
-       />
+  source={item.image} 
+  style={styles.foodImage}
+  resizeMode="cover"
+/>
+
      </TouchableOpacity>
    );
  

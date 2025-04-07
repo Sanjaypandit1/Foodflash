@@ -1,13 +1,26 @@
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useState } from 'react'
-import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navigation/native'
-
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  FlatList,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
+import React, {useState} from 'react';
+import {
+  RouteProp,
+  useNavigation,
+  useRoute,
+  NavigationProp,
+} from '@react-navigation/native';
+import {ImageSourcePropType} from 'react-native';
 
 // Define types
 type RootStackParamList = {
   Home: undefined;
-  RestaurantDetails: { restaurant: Restaurant };
-  FoodItemDetail: { item: FoodItem };
+  RestaurantDetails: {restaurant: Restaurant};
+  FoodItemDetail: {item: FoodItem};
 };
 
 type Restaurant = {
@@ -17,116 +30,114 @@ type Restaurant = {
   cuisine: string;
   deliveryTime: string;
   image: string;
-}
+};
 
 type FoodItem = {
   id: string;
   name: string;
   price: string;
   description: string;
-  image: string;
+  image: ImageSourcePropType;
   isVeg: boolean;
   rating: string;
   preparationTime: string;
-}
+};
 
 type FilterOption = 'all' | 'veg' | 'nonVeg';
-
-
-
 
 // Sample food items data
 const foodItems: FoodItem[] = [
   {
     id: '1',
-    name: 'Pizza',
-    price: '12.99',
+    name: 'Veg Pizza',
+    price: '300',
     description: 'Classic pizza with tomato sauce, mozzarella, and basil',
-    image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+    image: require('../Assets/BurgerJoint/veg-pizza.jpeg'),
     isVeg: true,
     rating: '4.5',
-    preparationTime: '20 min'
+    preparationTime: '20 min',
   },
   {
     id: '2',
-    name: 'Chicken Alfredo Pasta',
-    price: '14.99',
+    name: 'Chicken Pizza',
+    price: '400',
     description: 'Creamy pasta with grilled chicken and parmesan',
-    image: 'https://images.unsplash.com/photo-1645112411341-6c4fd023882c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+    image: require('../Assets/BurgerJoint/chicken-pizza.jpg'),
     isVeg: false,
     rating: '4.7',
-    preparationTime: '25 min'
+    preparationTime: '25 min',
   },
   {
     id: '3',
-    name: 'Garden Salad',
-    price: '8.99',
-    description: 'Fresh mixed greens with seasonal vegetables and vinaigrette',
-    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+    name: 'Veg Momo',
+    price: '100',
+    description: 'Freshly Made Best Momo',
+    image: require('../Assets/BurgerJoint/Veg-momo.jpg'),
     isVeg: true,
     rating: '4.2',
-    preparationTime: '10 min'
+    preparationTime: '10 min',
   },
   {
     id: '4',
-    name: 'Beef Burger',
-    price: '$13.99',
-    description: 'Juicy beef patty with lettuce, tomato, and special sauce',
-    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1299&q=80',
-    isVeg: false,
+    name: 'Veg Burger',
+    price: '120',
+    description: 'Our Special Burger',
+    image: require('../Assets/BurgerJoint/veg-burger.webp'),
+    isVeg: true,
     rating: '4.6',
-    preparationTime: '15 min'
+    preparationTime: '15 min',
   },
   {
     id: '5',
-    name: 'Mushroom Risotto',
-    price: '$15.99',
+    name: 'Veg Biryani',
+    price: '250',
     description: 'Creamy arborio rice with wild mushrooms and parmesan',
-    image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+    image: require('../Assets/BurgerJoint/veg-biryani.jpg'),
     isVeg: true,
     rating: '4.4',
-    preparationTime: '30 min'
+    preparationTime: '30 min',
   },
   {
     id: '6',
-    name: 'Grilled Salmon',
-    price: '$18.99',
+    name: 'Chicken Momo',
+    price: '150',
     description: 'Fresh salmon fillet with lemon herb butter and vegetables',
-    image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+    image: require('../Assets/BurgerJoint/chicken-momo.jpg'),
     isVeg: false,
     rating: '4.8',
-    preparationTime: '25 min'
+    preparationTime: '25 min',
   },
   {
     id: '7',
-    name: 'Butter Chicken',
-    price: '$15.99',
-    description: 'Tender chicken in a rich, creamy tomato sauce with Indian spices',
-    image: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+    name: 'Chicken Burger',
+    price: '180',
+    description:
+      'Tender chicken in a rich, creamy tomato sauce with Indian spices',
+    image: require('../Assets/BurgerJoint/chicken-burger.jpg'),
     isVeg: false,
     rating: '4.8',
-    preparationTime: '25 min'
+    preparationTime: '25 min',
   },
   {
     id: '8',
-    name: 'Paneer Tikka Masala',
-    price: '$14.99',
+    name: 'Chicken Biryani',
+    price: '450',
     description: 'Grilled cottage cheese cubes in a spiced tomato gravy',
-    image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1371&q=80',
+    image: require('../Assets/BurgerJoint/chicken-biryani.jpg'),
     isVeg: true,
     rating: '4.7',
-    preparationTime: '20 min'
+    preparationTime: '20 min',
   },
 ];
 
 export default function BurgerJoint() {
   const route = useRoute<RouteProp<RootStackParamList, 'RestaurantDetails'>>();
-  const { restaurant } = route.params;
+  const {restaurant} = route.params;
   const [filter, setFilter] = useState<FilterOption>('all');
-  
+
   // Properly type the navigation object
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  
+
   // Filter food items based on selected filter
   const filteredFoodItems = foodItems.filter(item => {
     if (filter === 'all') return true;
@@ -135,41 +146,43 @@ export default function BurgerJoint() {
     return true;
   });
 
-  const renderFoodItem = ({ item }: { item: FoodItem }) => (
-    <TouchableOpacity 
-      style={styles.foodCard} 
+  const renderFoodItem = ({item}: {item: FoodItem}) => (
+    <TouchableOpacity
+      style={styles.foodCard}
       activeOpacity={0.9}
-      onPress={() => navigation.navigate('FoodItemDetail', { item })}
-    >
+      onPress={() => navigation.navigate('FoodItemDetail', {item})}>
       <View style={styles.foodInfo}>
         <View style={styles.foodHeader}>
           <Text style={styles.foodName}>{item.name}</Text>
-          <View style={[styles.vegBadge, { backgroundColor: item.isVeg ? '#0f8a0f' : '#b30000' }]}>
-            <Text style={styles.vegBadgeText}>{item.isVeg ? 'VEG' : 'NON-VEG'}</Text>
+          <View
+            style={[
+              styles.vegBadge,
+              {backgroundColor: item.isVeg ? '#0f8a0f' : '#b30000'},
+            ]}>
+            <Text style={styles.vegBadgeText}>
+              {item.isVeg ? 'VEG' : 'NON-VEG'}
+            </Text>
           </View>
         </View>
-        
+
         <Text style={styles.foodPrice}>{item.price}</Text>
-        <Text style={styles.foodDescription} numberOfLines={2}>{item.description}</Text>
-        
+        <Text style={styles.foodDescription} numberOfLines={2}>
+          {item.description}
+        </Text>
+
         <View style={styles.foodMeta}>
           <Text style={styles.foodRating}>★ {item.rating}</Text>
           <Text style={styles.foodTime}>{item.preparationTime}</Text>
         </View>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={styles.addButton}
-          onPress={() => navigation.navigate('FoodItemDetail', { item })}
-        >
+          onPress={() => navigation.navigate('FoodItemDetail', {item})}>
           <Text style={styles.addButtonText}>ADD</Text>
         </TouchableOpacity>
       </View>
-      
-      <Image 
-        source={{ uri: item.image }} 
-        style={styles.foodImage}
-        resizeMode="cover"
-      />
+
+      <Image source={item.image} style={styles.foodImage} resizeMode="cover" />
     </TouchableOpacity>
   );
 
@@ -177,35 +190,62 @@ export default function BurgerJoint() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.restaurantName}>{restaurant.name}</Text>
-        <Text style={styles.restaurantInfo}>{restaurant.cuisine} • {restaurant.rating} ★ • {restaurant.deliveryTime}</Text>
+        <Text style={styles.restaurantInfo}>
+          {restaurant.cuisine} • {restaurant.rating} ★ •{' '}
+          {restaurant.deliveryTime}
+        </Text>
       </View>
-      
+
       <View style={styles.filterContainer}>
         <Text style={styles.filterLabel}>Filter:</Text>
         <View style={styles.filterOptions}>
-          <TouchableOpacity 
-            style={[styles.filterOption, filter === 'all' && styles.filterOptionActive]}
-            onPress={() => setFilter('all')}
-          >
-            <Text style={[styles.filterText, filter === 'all' && styles.filterTextActive]}>All</Text>
+          <TouchableOpacity
+            style={[
+              styles.filterOption,
+              filter === 'all' && styles.filterOptionActive,
+            ]}
+            onPress={() => setFilter('all')}>
+            <Text
+              style={[
+                styles.filterText,
+                filter === 'all' && styles.filterTextActive,
+              ]}>
+              All
+            </Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.filterOption, filter === 'veg' && styles.filterOptionActive]}
-            onPress={() => setFilter('veg')}
-          >
-            <Text style={[styles.filterText, filter === 'veg' && styles.filterTextActive]}>Vegetarian</Text>
+
+          <TouchableOpacity
+            style={[
+              styles.filterOption,
+              filter === 'veg' && styles.filterOptionActive,
+            ]}
+            onPress={() => setFilter('veg')}>
+            <Text
+              style={[
+                styles.filterText,
+                filter === 'veg' && styles.filterTextActive,
+              ]}>
+              Vegetarian
+            </Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.filterOption, filter === 'nonVeg' && styles.filterOptionActive]}
-            onPress={() => setFilter('nonVeg')}
-          >
-            <Text style={[styles.filterText, filter === 'nonVeg' && styles.filterTextActive]}>Non-Vegetarian</Text>
+
+          <TouchableOpacity
+            style={[
+              styles.filterOption,
+              filter === 'nonVeg' && styles.filterOptionActive,
+            ]}
+            onPress={() => setFilter('nonVeg')}>
+            <Text
+              style={[
+                styles.filterText,
+                filter === 'nonVeg' && styles.filterTextActive,
+              ]}>
+              Non-Vegetarian
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
-      
+
       <FlatList
         data={filteredFoodItems}
         renderItem={renderFoodItem}
@@ -276,7 +316,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     padding: 15,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,

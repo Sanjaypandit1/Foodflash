@@ -3,6 +3,8 @@ import React, { useState } from 'react'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { useCart } from './CartContext'
 import Icon from 'react-native-vector-icons/MaterialIcons'
+import {ImageSourcePropType} from 'react-native';
+
 
 // Get screen dimensions
 const { width, height } = Dimensions.get('window');
@@ -22,7 +24,7 @@ type FoodItem = {
   name: string;
   price: string;
   description: string;
-  image: string;
+   image: ImageSourcePropType;
   isVeg: boolean;
   rating: string;
   preparationTime: string;
@@ -36,7 +38,7 @@ const FoodItemDetail = () => {
   const navigation = useNavigation();
 
   // Convert price string to number for calculations
-  const priceValue = parseFloat(item.price.replace('$', ''));
+  const priceValue = parseFloat(item.price.replace('Rs', ''));
   
   // Calculate total price based on quantity
   const totalPrice = (priceValue * quantity).toFixed(2);
@@ -47,7 +49,7 @@ const FoodItemDetail = () => {
       id: item.id,
       name: item.name,
       price: `Rs.${priceValue}`,
-      image: { uri: item.image },
+      image: item.image, 
       description: item.description,
       tag: item.isVeg ? 'Vegetarian' : 'Non-Vegetarian',
       rating: parseFloat(item.rating)
@@ -80,11 +82,12 @@ const FoodItemDetail = () => {
       >
         {/* Hero Image */}
         <View style={styles.imageContainer}>
-          <Image 
-            source={{ uri: item.image }} 
-            style={styles.heroImage}
-            resizeMode="cover"
-          />
+            <Image 
+                   source={item.image} 
+                   style={styles.heroImage}
+                   resizeMode="cover"
+                 />
+  
           
           <View style={[styles.badgeContainer, { backgroundColor: item.isVeg ? '#0f8a0f' : '#b30000' }]}>
             <Text style={styles.badgeText}>{item.isVeg ? 'VEG' : 'NON-VEG'}</Text>
@@ -104,7 +107,7 @@ const FoodItemDetail = () => {
           
           {/* Price and Preparation Time */}
           <View style={styles.metaSection}>
-            <Text style={styles.price}>{item.price}</Text>
+            <Text style={styles.price}>Rs. {item.price}</Text>
             <View style={styles.prepTimeContainer}>
               <Icon name="access-time" size={16} color="#666" />
               <Text style={styles.prepTime}>{item.preparationTime}</Text>
@@ -140,36 +143,6 @@ const FoodItemDetail = () => {
             </View>
           </View>
           
-          {/* Nutritional Info (Placeholder) */}
-          <View style={styles.nutritionSection}>
-            <Text style={styles.sectionTitle}>Nutritional Information</Text>
-            <View style={styles.nutritionGrid}>
-              <View style={styles.nutritionItem}>
-                <Text style={styles.nutritionValue}>320</Text>
-                <Text style={styles.nutritionLabel}>Calories</Text>
-              </View>
-              <View style={styles.nutritionItem}>
-                <Text style={styles.nutritionValue}>12g</Text>
-                <Text style={styles.nutritionLabel}>Protein</Text>
-              </View>
-              <View style={styles.nutritionItem}>
-                <Text style={styles.nutritionValue}>24g</Text>
-                <Text style={styles.nutritionLabel}>Carbs</Text>
-              </View>
-              <View style={styles.nutritionItem}>
-                <Text style={styles.nutritionValue}>18g</Text>
-                <Text style={styles.nutritionLabel}>Fat</Text>
-              </View>
-            </View>
-          </View>
-          
-          {/* Ingredients (Placeholder) */}
-          <View style={styles.ingredientsSection}>
-            <Text style={styles.sectionTitle}>Ingredients</Text>
-            <Text style={styles.ingredients}>
-              Premium quality ingredients sourced from local farms. All ingredients are fresh and prepared daily.
-            </Text>
-          </View>
           
           {/* Reviews (Placeholder) */}
           <View style={styles.reviewsSection}>
@@ -197,7 +170,7 @@ const FoodItemDetail = () => {
           {/* Total */}
           <View style={styles.totalSection}>
             <Text style={styles.totalLabel}>Total:</Text>
-            <Text style={styles.totalPrice}>${totalPrice}</Text>
+            <Text style={styles.totalPrice}>Rs. {totalPrice}</Text>
           </View>
           
           {/* Extra space at bottom to ensure content isn't hidden behind action buttons */}

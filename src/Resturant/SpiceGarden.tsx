@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navigation/native'
+import {ImageSourcePropType} from 'react-native';
 
 
 // Define types
@@ -24,7 +25,7 @@ type FoodItem = {
   name: string;
   price: string;
   description: string;
-  image: string;
+  image: ImageSourcePropType;
   isVeg: boolean;
   rating: string;
   preparationTime: string;
@@ -36,66 +37,86 @@ type FilterOption = 'all' | 'veg' | 'nonVeg';
 // Sample food items data
 // For SpiceGarden.tsx - Indian cuisine food items
 const foodItems: FoodItem[] = [
-    {
-      id: '1',
-      name: 'Butter Chicken',
-      price: '$15.99',
-      description: 'Tender chicken in a rich, creamy tomato sauce with Indian spices',
-      image: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-      isVeg: false,
-      rating: '4.8',
-      preparationTime: '25 min'
-    },
-    {
-      id: '2',
-      name: 'Paneer Tikka Masala',
-      price: '$14.99',
-      description: 'Grilled cottage cheese cubes in a spiced tomato gravy',
-      image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1371&q=80',
-      isVeg: true,
-      rating: '4.7',
-      preparationTime: '20 min'
-    },
-    {
-      id: '3',
-      name: 'Vegetable Biryani',
-      price: '$13.99',
-      description: 'Fragrant basmati rice cooked with mixed vegetables and aromatic spices',
-      image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80',
-      isVeg: true,
-      rating: '4.5',
-      preparationTime: '30 min'
-    },
-    {
-      id: '4',
-      name: 'Chicken Tikka',
-      price: '$12.99',
-      description: 'Marinated chicken pieces grilled in a tandoor with Indian spices',
-      image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1450&q=80',
-      isVeg: false,
-      rating: '4.6',
-      preparationTime: '20 min'
-    },
-    {
-      id: '5',
-      name: 'Garlic Naan',
-      price: '$3.99',
-      description: 'Soft Indian bread topped with garlic and butter, baked in tandoor',
-      image: 'https://images.unsplash.com/photo-1596797038530-2c107aa8e1fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1475&q=80',
-      isVeg: true,
-      rating: '4.9',
-      preparationTime: '10 min'
-    },
-    {
-      id: '6',
-      name: 'Mango Lassi',
-      price: '$4.99',
-      description: 'Refreshing yogurt drink blended with mango pulp and cardamom',
-      image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1496&q=80',
-      isVeg: true,
-      rating: '4.7',
-      preparationTime: '5 min'
-    }
+  {
+    id: '1',
+    name: 'Veg Biryani',
+    price: '225',
+    description: 'Classic pizza with tomato sauce, mozzarella, and basil',
+    image: require('../Assets/SpiceGarden/Veg-biryani.jpeg'),
+    isVeg: true,
+    rating: '4.5',
+    preparationTime: '20 min'
+  },
+  {
+    id: '2',
+    name: 'Paneer Pakoda',
+    price: '280',
+    description: 'Creamy pasta with grilled chicken and parmesan',
+    image: require('../Assets/SpiceGarden/Paneer-Pakoda.jpg'),
+    isVeg: true,
+    rating: '4.7',
+    preparationTime: '25 min'
+  },
+  {
+    id: '3',
+    name: 'Mushroom hilly',
+    price: '225',
+    description: 'Fresh mixed greens with seasonal vegetables and vinaigrette',
+    image: require('../Assets/SpiceGarden/mushroom-chilly.webp'),
+    isVeg: true,
+    rating: '4.2',
+    preparationTime: '10 min'
+  },
+  {
+    id: '4',
+    name: 'Grilled Chicken',
+    price: '600',
+    description: 'Juicy beef patty with lettuce, tomato, and special sauce',
+    image: require('../Assets/SpiceGarden/Grilled-chicken.jpg'),
+    isVeg: false,
+    rating: '4.6',
+    preparationTime: '15 min'
+  },
+  {
+    id: '5',
+    name: 'French Fry',
+    price: '100',
+    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    image: require('../Assets/SpiceGarden/French-fry.webp'),
+    isVeg: true,
+    rating: '4.4',
+    preparationTime: '30 min'
+  },
+  {
+    id: '6',
+    name: 'Chicken Biryani',
+    price: '490',
+    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    image: require('../Assets/SpiceGarden/chicken-biryani.jpg'),
+    isVeg: false,
+    rating: '4.4',
+    preparationTime: '30 min'
+  },
+  {
+    id: '7',
+    name: 'Chicken Pakoda',
+    price: '300',
+    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    image: require('../Assets/SpiceGarden/chicken-pakoda.jpg'),
+    isVeg: false,
+    rating: '4.4',
+    preparationTime: '30 min'
+  },
+  {
+    id: '8',
+    name: 'Butter Chicken',
+    price: '330',
+    description: 'Fresh salmon fil',
+    image: require('../Assets/SpiceGarden/Butter-Chicken.jpeg'),
+    isVeg: false,
+    rating: '4.8',
+    preparationTime: '25 min'
+  }
   ];
 
 export default function SpiceGarden() {
@@ -144,11 +165,11 @@ export default function SpiceGarden() {
           </TouchableOpacity>
         </View>
         
-        <Image 
-          source={{ uri: item.image }} 
-          style={styles.foodImage}
-          resizeMode="cover"
-        />
+          <Image 
+         source={item.image} 
+         style={styles.foodImage}
+         resizeMode="cover"
+       />
       </TouchableOpacity>
     );
   

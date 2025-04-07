@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navigation/native'
+import {ImageSourcePropType} from 'react-native';
 
 
 // Define types
@@ -24,7 +25,7 @@ type FoodItem = {
   name: string;
   price: string;
   description: string;
-  image: string;
+  image: ImageSourcePropType;
   isVeg: boolean;
   rating: string;
   preparationTime: string;
@@ -35,66 +36,86 @@ type FilterOption = 'all' | 'veg' | 'nonVeg';
 
 // For SushilPalace.tsx - Japanese cuisine food items
 const foodItems: FoodItem[] = [
-    {
-      id: '1',
-      name: 'Salmon Nigiri (2 pcs)',
-      price: '$6.99',
-      description: 'Fresh salmon slices over pressed vinegared rice',
-      image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-      isVeg: false,
-      rating: '4.8',
-      preparationTime: '10 min'
-    },
-    {
-      id: '2',
-      name: 'California Roll (8 pcs)',
-      price: '$9.99',
-      description: 'Crab, avocado and cucumber rolled in seaweed and rice',
-      image: 'https://images.unsplash.com/photo-1617196034183-421b4917c92d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-      isVeg: false,
-      rating: '4.5',
-      preparationTime: '15 min'
-    },
-    {
-      id: '3',
-      name: 'Vegetable Tempura',
-      price: '$8.99',
-      description: 'Assorted vegetables lightly battered and deep-fried',
-      image: 'https://images.unsplash.com/photo-1615361200141-f45961bc0d4c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1364&q=80',
-      isVeg: true,
-      rating: '4.4',
-      preparationTime: '12 min'
-    },
-    {
-      id: '4',
-      name: 'Chicken Teriyaki',
-      price: '$14.99',
-      description: 'Grilled chicken glazed with sweet teriyaki sauce, served with rice',
-      image: 'https://images.unsplash.com/photo-1598514983318-2f64f55b2b36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-      isVeg: false,
-      rating: '4.6',
-      preparationTime: '20 min'
-    },
-    {
-      id: '5',
-      name: 'Miso Soup',
-      price: '$3.99',
-      description: 'Traditional Japanese soup with tofu, seaweed, and green onions',
-      image: 'https://images.unsplash.com/photo-1607301406259-dfb186e15de8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-      isVeg: true,
-      rating: '4.3',
-      preparationTime: '8 min'
-    },
-    {
-      id: '6',
-      name: 'Dragon Roll (8 pcs)',
-      price: '$16.99',
-      description: 'Eel and cucumber inside, avocado and tobiko on top',
-      image: 'https://images.unsplash.com/photo-1553621042-f6e147245754?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1325&q=80',
-      isVeg: false,
-      rating: '4.9',
-      preparationTime: '18 min'
-    }
+  {
+    id: '1',
+    name: 'Aalu Nimki',
+    price: '80',
+    description: 'Classic pizza with tomato sauce, mozzarella, and basil',
+    image: require('../Assets/SusiPalace/aalu-nimki.jpeg'),
+    isVeg: true,
+    rating: '4.5',
+    preparationTime: '20 min'
+  },
+  {
+    id: '2',
+    name: 'Chicken Khana',
+    price: '250',
+    description: 'Creamy pasta with grilled chicken and parmesan',
+    image: require('../Assets/SusiPalace/chicken-khana.jpeg'),
+    isVeg: false,
+    rating: '4.7',
+    preparationTime: '25 min'
+  },
+  {
+    id: '3',
+    name: 'Sekewa chicken',
+    price: '180',
+    description: 'Fresh mixed greens with seasonal vegetables and vinaigrette',
+    image: require('../Assets/SusiPalace/chicken-sekewa.jpeg'),
+    isVeg: false,
+    rating: '4.2',
+    preparationTime: '10 min'
+  },
+  {
+    id: '4',
+    name: 'Mutton Khana',
+    price: '300',
+    description: 'Juicy beef patty with lettuce, tomato, and special sauce',
+    image: require('../Assets/SusiPalace/mutton-khana.jpeg'),
+    isVeg: false,
+    rating: '4.6',
+    preparationTime: '15 min'
+  },
+  {
+    id: '5',
+    name: 'Mutton Momo',
+    price: '220',
+    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    image: require('../Assets/SusiPalace/mutton-momo.jpg'),
+    isVeg: false,
+    rating: '4.4',
+    preparationTime: '30 min'
+  },
+  {
+    id: '6',
+    name: 'Veg Khana',
+    price: '280',
+    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    image: require('../Assets/SusiPalace/veg-khana.jpg'),
+    isVeg: true,
+    rating: '4.4',
+    preparationTime: '30 min'
+  },
+  {
+    id: '7',
+    name: 'Veg Momo',
+    price: '100',
+    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    image: require('../Assets/SusiPalace/veg-momo.jpeg'),
+    isVeg: true,
+    rating: '4.4',
+    preparationTime: '30 min'
+  },
+  {
+    id: '8',
+    name: 'Veg Pakoda',
+    price: '115',
+    description: 'Fresh salmon fil',
+    image: require('../Assets/SusiPalace/veg-pakoda.jpg'),
+    isVeg: true,
+    rating: '4.8',
+    preparationTime: '25 min'
+  }
   ];
 export default function SushilPalace() {
    const route = useRoute<RouteProp<RootStackParamList, 'RestaurantDetails'>>();
@@ -142,11 +163,11 @@ export default function SushilPalace() {
            </TouchableOpacity>
          </View>
          
-         <Image 
-           source={{ uri: item.image }} 
-           style={styles.foodImage}
-           resizeMode="cover"
-         />
+          <Image 
+         source={item.image} 
+         style={styles.foodImage}
+         resizeMode="cover"
+       />
        </TouchableOpacity>
      );
    
