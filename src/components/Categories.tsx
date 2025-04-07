@@ -1,51 +1,125 @@
+// Modified Categories.tsx with TypeScript fixes
 import { StyleSheet, Text, TouchableOpacity, View, Image, Dimensions } from 'react-native';
 import React from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
 import { NavigationProp } from '@react-navigation/native';
+import { ImageSourcePropType } from 'react-native';
 
 // Define prop types
 type Props = {
   navigation: NavigationProp<any>;
 };
 
+// Define FoodItem type
+type FoodItem = {
+  id: string;
+  name: string;
+  price: string;
+  description: string;
+  image: ImageSourcePropType;
+  isVeg: boolean;
+  rating: string;
+  preparationTime: string;
+};
+
+// Define CategoryName type to ensure type safety
+type CategoryName = 'Pizza' | 'Momo' | 'Chowmin' | 'Burger' | 'Biryani';
+
+// Define Category type
+type Category = {
+  id: number;
+  name: CategoryName;
+  image: ImageSourcePropType;
+  color: string;
+};
+
 const { width } = Dimensions.get('window');
 const ITEM_WIDTH = width * 0.28;
 
 const Categories: React.FC<Props> = ({ navigation }) => {
-  const categories = [
+  // Sample food items for each category
+  const foodItems: Record<CategoryName, FoodItem> = {
+    Pizza: {
+      id: '1',
+      name: 'Veg Pizza',
+      price: '300',
+      description: 'Classic pizza with tomato sauce, mozzarella, and basil',
+      image: require('../Assets/pizza/vegpizza.jpg'),
+      isVeg: true,
+      rating: '4.5',
+      preparationTime: '20 min',
+    },
+    Momo: {
+      id: '2',
+      name: 'Chicken Momo',
+      price: '150',
+      description: 'Steamed dumplings filled with spiced chicken',
+      image: require('../Assets/momo/chickenmomo.jpeg'),
+      isVeg: false,
+      rating: '4.7',
+      preparationTime: '15 min',
+    },
+    Chowmin: {
+      id: '3',
+      name: 'Veg Chowmin',
+      price: '120',
+      description: 'Stir-fried noodles with mixed vegetables',
+      image: require('../Assets/Chowmin/vegchowmin.webp'),
+      isVeg: true,
+      rating: '4.3',
+      preparationTime: '12 min',
+    },
+    Burger: {
+      id: '4',
+      name: 'Veg Burger',
+      price: '120',
+      description: 'Delicious burger with vegetable patty',
+      image: require('../Assets/Burger/vegburger.jpg'),
+      isVeg: true,
+      rating: '4.2',
+      preparationTime: '10 min',
+    },
+    Biryani: {
+      id: '5',
+      name: 'Chicken Biryani',
+      price: '250',
+      description: 'Aromatic rice dish with chicken and spices',
+      image: require('../Assets/biryani/chickenbiryani.jpeg'),
+      isVeg: false,
+      rating: '4.8',
+      preparationTime: '25 min',
+    }
+  };
+
+  const categories: Category[] = [
     {
       id: 1,
       name: 'Pizza',
-      image: require('../Assets/pizza/chickenpizza.jpg'),
-      screen: 'ProductScreen4',
+      image: require('../Assets/pizza/vegpizza.jpg'),
       color: '#E96A1C'
     },
     {
       id: 2,
       name: 'Momo',
       image: require('../Assets/momo/chickenmomo.jpeg'),
-      screen: 'ProductScreen2',
       color: '#E96A1C',
     },
     {
       id: 3,
       name: 'Chowmin',
       image: require('../Assets/Chowmin/vegchowmin.webp'),
-      screen: 'ProductScreen3',
       color: '#E96A1C'
     },
     {
       id: 4,
       name: 'Burger',
       image: require('../Assets/Burger/vegburger.jpg'),
-      screen: 'ProductScreen5',
       color: '#E96A1C'
     },
     {
       id: 5,
       name: 'Biryani',
       image: require('../Assets/biryani/chickenbiryani.jpeg'),
-      screen: 'ProductScreen',
       color: '#E96A1C'
     }
   ];
@@ -69,7 +143,7 @@ const Categories: React.FC<Props> = ({ navigation }) => {
           <TouchableOpacity 
             key={category.id}
             style={[styles.boxContainer, { backgroundColor: category.color }]} 
-            onPress={() => navigation.navigate(category.screen)}
+            onPress={() => navigation.navigate('FoodItemDetail', { item: foodItems[category.name] })}
             activeOpacity={0.8}
           >
             <View style={styles.imageContainer}>
@@ -135,7 +209,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   imageContainer: {
-    width: '85%',
+    width: '100%',
     aspectRatio: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 12,

@@ -1,58 +1,113 @@
+// Modified TodayTrends.tsx
 import { StyleSheet, Text, TouchableOpacity, View, Image, ScrollView } from 'react-native';
 import React from 'react';
 import { NavigationProp } from '@react-navigation/native';
 
 // Define prop types
 type Props = {
-    navigation: NavigationProp<any>; // 'any' can be replaced with your stack param list if available
-  };
-  
+  navigation: NavigationProp<any>;
+};
 
 const TodayTrends: React.FC<Props> = ({ navigation }) => {
+  const trendingItems = [
+    {
+      id: '1',
+      name: 'Chicken Biryani',
+      restaurant: 'Swad Restaurant',
+      originalPrice: '500',
+      discountedPrice: '450',
+      discount: '10.0',
+      image: require('../Assets/biryani/chickenbiryani.jpeg'),
+      description: 'Aromatic rice dish with chicken and spices',
+      isVeg: false,
+      rating: '4.5',
+      preparationTime: '30 min'
+    },
+    {
+      id: '2',
+      name: 'Chicken Momo',
+      restaurant: 'Hotel Planet',
+      originalPrice: '200',
+      discountedPrice: '140',
+      discount: '30.0',
+      image: require('../Assets/momo/chickenmomo.jpeg'),
+      description: 'Steamed dumplings filled with spiced chicken',
+      isVeg: false,
+      rating: '4.7',
+      preparationTime: '15 min'
+    },
+    {
+      id: '3',
+      name: 'Chicken Chowmin',
+      restaurant: 'Hotel Swad',
+      originalPrice: '200',
+      discountedPrice: '180',
+      discount: '10.0',
+      image: require('../Assets/Chowmin/chickenchowmin.jpg'),
+      description: 'Stir-fried noodles with chicken and vegetables',
+      isVeg: false,
+      rating: '4.3',
+      preparationTime: '12 min'
+    },
+    {
+      id: '4',
+      name: 'Samosa Chat',
+      restaurant: 'Parnam Cafe',
+      originalPrice: '110',
+      discountedPrice: '100',
+      discount: '10.0',
+      image: require('../Assets/Extra/samosa.jpg'),
+      description: 'Crispy samosa topped with yogurt, chutneys and spices',
+      isVeg: true,
+      rating: '4.2',
+      preparationTime: '10 min'
+    },
+    {
+      id: '5',
+      name: 'Pakoda',
+      restaurant: 'Parnam Cafe',
+      originalPrice: '100',
+      discountedPrice: '60',
+      discount: '40.0',
+      image: require('../Assets/Extra/vegpakoda.jpg'),
+      description: 'Crispy vegetable fritters served with chutney',
+      isVeg: true,
+      rating: '4.0',
+      preparationTime: '8 min'
+    }
+  ];
 
   return (
     <View style={styles.container}>
       <Text style={styles.head}>Today's Trends</Text>
       <Text style={styles.subhead}>Here's what you might like to taste</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollView}>
-        <TouchableOpacity style={styles.card} onPress = {() =>navigation.navigate('ProductScreen')}>
-          <Image source={require('../Assets/biryani/chickenbiryani.jpeg')} style={styles.image} />
-          <View style={styles.discountTag}><Text style={styles.discountText}>10.0% OFF</Text></View>
-          <Text style={styles.restaurant}>Swad Restaurant</Text>
-          <Text style={styles.itemName}>Chicken Biryani</Text>
-          <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.500</Text> Rs.450</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.card} onPress = {() =>navigation.navigate('ProductScreen2')} >
-          <Image source={require('../Assets/momo/chickenmomo.jpeg')} style={styles.image} />
-          <View style={styles.discountTag}><Text style={styles.discountText}>30.0% OFF</Text></View>
-          <Text style={styles.restaurant}>Hotel Planet</Text>
-          <Text style={styles.itemName}>Chicken Momo</Text>
-          <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.200</Text> Rs. 140</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card} onPress = {() =>navigation.navigate('ProductScreen3')}>
-          <Image source={require('../Assets/Chowmin/chickenchowmin.jpg')} style={styles.image} />
-          <View style={styles.discountTag}><Text style={styles.discountText}>10.0% OFF</Text></View>
-          <Text style={styles.restaurant}>Hotel Swad</Text>
-          <Text style={styles.itemName}>Chicken Chowmin</Text>
-          <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.200</Text> Rs. 180</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card}onPress = {() =>navigation.navigate('Samosa')}>
-          <Image source={require('../Assets/Extra/samosa.jpg')} style={styles.image} />
-          <View style={styles.discountTag}><Text style={styles.discountText}>10.0% OFF</Text></View>
-          <Text style={styles.restaurant}>Parnam Cafe</Text>
-          <Text style={styles.itemName}>Samosa Chat</Text>
-          <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.110</Text> Rs. 100</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress = {() =>navigation.navigate('Pakoda')}>
-          <Image source={require('../Assets/Extra/vegpakoda.jpg')} style={styles.image} />
-          <View style={styles.discountTag}><Text style={styles.discountText}>40.0% OFF</Text></View>
-          <Text style={styles.restaurant}>Parnam Cafe</Text>
-          <Text style={styles.itemName}>Pakoda</Text>
-          <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.100</Text> Rs. 60</Text>
-        </TouchableOpacity>
+        {trendingItems.map((item) => (
+          <TouchableOpacity 
+            key={item.id}
+            style={styles.card} 
+            onPress={() => navigation.navigate('FoodItemDetail', { 
+              item: {
+                id: item.id,
+                name: item.name,
+                price: item.discountedPrice,
+                description: item.description,
+                image: item.image,
+                isVeg: item.isVeg,
+                rating: item.rating,
+                preparationTime: item.preparationTime
+              }
+            })}
+          >
+            <Image source={item.image} style={styles.image} />
+            <View style={styles.discountTag}><Text style={styles.discountText}>{item.discount}% OFF</Text></View>
+            <Text style={styles.restaurant}>{item.restaurant}</Text>
+            <Text style={styles.itemName}>{item.name}</Text>
+            <Text style={styles.price}>
+              <Text style={styles.strikeThrough}>Rs.{item.originalPrice}</Text> Rs.{item.discountedPrice}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
     </View>
   );

@@ -40,7 +40,7 @@ const foodItems: FoodItem[] = [
     id: '1',
     name: 'Aalu Nimki',
     price: '80',
-    description: 'Classic pizza with tomato sauce, mozzarella, and basil',
+    description: 'Crispy Nepali snack made with spiced mashed potatoes shaped into small discs and deep-fried until golden. Served with tomato achar (pickle) and a sprinkle of chat masala.',
     image: require('../Assets/SusiPalace/aalu-nimki.jpeg'),
     isVeg: true,
     rating: '4.5',
@@ -50,7 +50,7 @@ const foodItems: FoodItem[] = [
     id: '2',
     name: 'Chicken Khana',
     price: '250',
-    description: 'Creamy pasta with grilled chicken and parmesan',
+    description: 'Traditional Nepali thali with grilled chicken, steamed rice, lentil soup (dal), seasonal vegetables, pickles, and papadum. A complete balanced meal with authentic flavors.',
     image: require('../Assets/SusiPalace/chicken-khana.jpeg'),
     isVeg: false,
     rating: '4.7',
@@ -58,9 +58,9 @@ const foodItems: FoodItem[] = [
   },
   {
     id: '3',
-    name: 'Sekewa chicken',
+    name: 'Sekewa Chicken',
     price: '180',
-    description: 'Fresh mixed greens with seasonal vegetables and vinaigrette',
+    description: 'Traditional Nepali-style grilled chicken marinated with timur (Nepali pepper), garlic, and local herbs. Skewered and slow-cooked over charcoal for a smoky flavor.',
     image: require('../Assets/SusiPalace/chicken-sekewa.jpeg'),
     isVeg: false,
     rating: '4.2',
@@ -70,7 +70,7 @@ const foodItems: FoodItem[] = [
     id: '4',
     name: 'Mutton Khana',
     price: '300',
-    description: 'Juicy beef patty with lettuce, tomato, and special sauce',
+    description: 'Hearty Nepali thali featuring tender mutton curry, steamed rice, black lentils, seasonal vegetables, gundruk (fermented leafy greens), and homemade pickles.',
     image: require('../Assets/SusiPalace/mutton-khana.jpeg'),
     isVeg: false,
     rating: '4.6',
@@ -80,7 +80,7 @@ const foodItems: FoodItem[] = [
     id: '5',
     name: 'Mutton Momo',
     price: '220',
-    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    description: 'Juicy dumplings filled with minced mutton, ginger, garlic, onions, and Himalayan herbs. Steamed to perfection and served with spicy tomato achar and sesame chutney.',
     image: require('../Assets/SusiPalace/mutton-momo.jpg'),
     isVeg: false,
     rating: '4.4',
@@ -90,7 +90,7 @@ const foodItems: FoodItem[] = [
     id: '6',
     name: 'Veg Khana',
     price: '280',
-    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    description: 'Traditional vegetarian Nepali thali with steamed rice, mixed vegetable curry, dal (lentil soup), saag (leafy greens), achar (pickle), and papadum. A complete meal with authentic flavors.',
     image: require('../Assets/SusiPalace/veg-khana.jpg'),
     isVeg: true,
     rating: '4.4',
@@ -100,7 +100,7 @@ const foodItems: FoodItem[] = [
     id: '7',
     name: 'Veg Momo',
     price: '100',
-    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    description: 'Soft dumplings filled with a mixture of finely chopped cabbage, carrots, onions, and Himalayan spices. Steamed and served with homemade tomato-sesame chutney.',
     image: require('../Assets/SusiPalace/veg-momo.jpeg'),
     isVeg: true,
     rating: '4.4',
@@ -110,13 +110,13 @@ const foodItems: FoodItem[] = [
     id: '8',
     name: 'Veg Pakoda',
     price: '115',
-    description: 'Fresh salmon fil',
+    description: 'Crispy fritters made with assorted vegetables (onions, potatoes, spinach) dipped in gram flour batter with cumin, coriander, and chili. Served with mint-coriander chutney.',
     image: require('../Assets/SusiPalace/veg-pakoda.jpg'),
     isVeg: true,
     rating: '4.8',
     preparationTime: '25 min'
   }
-  ];
+];
 export default function SushilPalace() {
    const route = useRoute<RouteProp<RootStackParamList, 'RestaurantDetails'>>();
     const { restaurant } = route.params;
