@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20, // Add padding to the bottom of the screen
   },
   header: {
-    backgroundColor: "#F7931A",
+    backgroundColor: "red",
     padding: 15,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     color: "#F7931A",
   },
   checkoutButton: {
-    backgroundColor: "#0288D1",
+    backgroundColor: "red",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   addToCartButton: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#F7931A",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",

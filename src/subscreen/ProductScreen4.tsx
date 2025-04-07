@@ -25,15 +25,7 @@ const biryaniOptions = [
     tag: "Chicken",
     rating: 4.1,
   },
-  {
-    id: "mixedpizza",
-    name: "Mixed Pizza",
-    price: "Rs.400",
-    image: require("../Assets/pizza/mixedpizza.jpeg"),
-    description: "Deliciously mixed of chicken, egg pizza",
-    tag: "Mixed",
-    rating: 4.8,
-  },
+  
 ]
 
 const ProductScreen4 = () => {

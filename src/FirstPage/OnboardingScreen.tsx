@@ -34,7 +34,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onFinish }) => {
           <Text style={styles.skipText}>Skip</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.nextButton} onPress={onFinish}>
-          <LinearGradient colors={['#FF8C00', '#FF6600']} style={styles.gradient}>
+          <LinearGradient colors={['red', 'red']} style={styles.gradient}>
             <Icon name="arrow-forward" size={24} color="#fff" />
           </LinearGradient>
         </TouchableOpacity>
@@ -92,6 +92,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     overflow: 'hidden',
     elevation: 5,
+    backgroundColor:'red',
   },
   gradient: {
     flex: 1,
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
   dot: {
     width: 8,
     height: 8,
-    backgroundColor: '#ddd',
+    backgroundColor: 'red',
     borderRadius: 4,
     marginHorizontal: 4,
   },

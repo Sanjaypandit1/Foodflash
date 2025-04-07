@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     color: '#F7931A',
   },
   nextButton: {
-    backgroundColor: '#F7931A',
+    backgroundColor: 'red',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',

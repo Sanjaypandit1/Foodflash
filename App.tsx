@@ -27,6 +27,11 @@ import ProductScreen5 from "./src/subscreen/ProductScreen5"
 import Samosa from "./src/subscreen/Samosa"
 import Pakoda from "./src/subscreen/Pakoda"
 import SignInScreen from "./src/signinpage/Signin" // Import SignInScreen
+import DeliciousBite from "./src/Resturant/DelicioueBite"
+import BurgerJoint from "./src/Resturant/BurgerJoint"
+import SpiceGarden from "./src/Resturant/SpiceGarden"
+import SushilPalace from "./src/Resturant/SushiPalace"
+import FoodItemDetail from "./src/components/ProductDetails"
 
 // Type for bottom tab navigator
 type TabParamList = {
@@ -61,6 +66,31 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen name="ProductScreen5" component={ProductScreen5} options={{ headerShown: false }} />
       <HomeStack.Screen name="Samosa" component={Samosa} options={{ headerShown: false }} />
       <HomeStack.Screen name="Pakoda" component={Pakoda} options={{ headerShown: false }} />
+      <HomeStack.Screen 
+  name="DeliciousBite" 
+  component={DeliciousBite} 
+  options={{ headerShown: true, title: "" }}
+/>
+<HomeStack.Screen 
+  name="BurgerJoint" 
+  component={BurgerJoint} 
+  options={{ headerShown: true, title: "" }}
+/>
+<HomeStack.Screen 
+  name="SpiceGarden" 
+  component={SpiceGarden} 
+  options={{ headerShown: true, title: "" }}
+/>
+<HomeStack.Screen 
+  name="SushilPalace" 
+  component={SushilPalace} 
+  options={{ headerShown: true, title: "" }}
+/>
+<HomeStack.Screen
+name="FoodItemDetail"
+component={FoodItemDetail}
+options={{ headerShown: true }}
+/>
     </HomeStack.Navigator>
   )
 }
