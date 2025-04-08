@@ -1,155 +1,124 @@
-// Modified Categories.tsx with TypeScript fixes
-import { StyleSheet, Text, TouchableOpacity, View, Image, Dimensions } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Image, ScrollView } from 'react-native';
 import React from 'react';
-import { ScrollView } from 'react-native-gesture-handler';
 import { NavigationProp } from '@react-navigation/native';
-import { ImageSourcePropType } from 'react-native';
 
 // Define prop types
 type Props = {
   navigation: NavigationProp<any>;
 };
 
-// Define FoodItem type
-type FoodItem = {
-  id: string;
-  name: string;
-  price: string;
-  description: string;
-  image: ImageSourcePropType;
-  isVeg: boolean;
-  rating: string;
-  preparationTime: string;
-};
-
-// Define CategoryName type to ensure type safety
-type CategoryName = 'Pizza' | 'Momo' | 'Chowmin' | 'Burger' | 'Biryani';
-
-// Define Category type
-type Category = {
-  id: number;
-  name: CategoryName;
-  image: ImageSourcePropType;
-  color: string;
-};
-
-const { width } = Dimensions.get('window');
-const ITEM_WIDTH = width * 0.28;
-
 const Categories: React.FC<Props> = ({ navigation }) => {
-  // Sample food items for each category
-  const foodItems: Record<CategoryName, FoodItem> = {
-    Pizza: {
+  // Category data with restaurant-specific food items
+  const categoryItems = [
+    {
       id: '1',
-      name: 'Veg Pizza',
-      price: '300',
-      description: 'Classic pizza with tomato sauce, mozzarella, and basil',
-      image: require('../Assets/pizza/vegpizza.jpg'),
-      isVeg: true,
-      rating: '4.5',
-      preparationTime: '20 min',
-    },
-    Momo: {
-      id: '2',
-      name: 'Chicken Momo',
-      price: '150',
-      description: 'Steamed dumplings filled with spiced chicken',
-      image: require('../Assets/momo/chickenmomo.jpeg'),
+      name: 'Pizza',
+      restaurant: 'Burger Joint',
+      image: require('../Assets/BurgerJoint/chicken-pizza.jpg'),
+      price: '400',
+      description: 'Delicious pizza topped with grilled chicken pieces, bell peppers, onions, and a blend of mozzarella and cheddar cheese. Finished with our signature herb seasoning.',
       isVeg: false,
       rating: '4.7',
-      preparationTime: '15 min',
+      preparationTime: '25 min'
     },
-    Chowmin: {
+    {
+      id: '2',
+      name: 'Momo',
+      restaurant: 'Delicious Bites',
+      image: require('../Assets/DeliciousBite/chicken-momo.jpg'),
+      price: '200',
+      description: 'Juicy dumplings filled with minced chicken, onions, garlic, and ginger. Steamed to perfection and served with spicy red chili dipping sauce.',
+      isVeg: false,
+      rating: '4.4',
+      preparationTime: '30 min'
+    },
+    {
       id: '3',
-      name: 'Veg Chowmin',
-      price: '120',
-      description: 'Stir-fried noodles with mixed vegetables',
-      image: require('../Assets/Chowmin/vegchowmin.webp'),
-      isVeg: true,
-      rating: '4.3',
-      preparationTime: '12 min',
+      name: 'Biryani',
+      restaurant: 'Spice Garden',
+      image: require('../Assets/SpiceGarden/chicken-biryani.jpg'),
+      price: '490',
+      description: 'Fragrant long-grain basmati rice layered with tender chicken pieces, caramelized onions, and traditional spices. Slow-cooked in a sealed pot and garnished with fresh herbs.',
+      isVeg: false,
+      rating: '4.4',
+      preparationTime: '30 min'
     },
-    Burger: {
+    {
       id: '4',
-      name: 'Veg Burger',
-      price: '120',
-      description: 'Delicious burger with vegetable patty',
-      image: require('../Assets/Burger/vegburger.jpg'),
-      isVeg: true,
-      rating: '4.2',
-      preparationTime: '10 min',
-    },
-    Biryani: {
-      id: '5',
-      name: 'Chicken Biryani',
-      price: '250',
-      description: 'Aromatic rice dish with chicken and spices',
-      image: require('../Assets/biryani/chickenbiryani.jpeg'),
+      name: 'Burger',
+      restaurant: 'Burger Joint',
+      image: require('../Assets/BurgerJoint/chicken-burger.jpg'),
+      price: '180',
+      description: 'Grilled chicken breast with crisp lettuce, tomato, cheese, and our signature mayo in a toasted brioche bun. Served with seasoned fries and coleslaw.',
       isVeg: false,
       rating: '4.8',
-      preparationTime: '25 min',
-    }
-  };
-
-  const categories: Category[] = [
-    {
-      id: 1,
-      name: 'Pizza',
-      image: require('../Assets/pizza/vegpizza.jpg'),
-      color: '#E96A1C'
+      preparationTime: '25 min'
     },
     {
-      id: 2,
-      name: 'Momo',
-      image: require('../Assets/momo/chickenmomo.jpeg'),
-      color: '#E96A1C',
+      id: '5',
+      name: 'Butter Chicken',
+      restaurant: 'Spice Garden',
+      image: require('../Assets/SpiceGarden/Butter-Chicken.jpeg'),
+      price: '330',
+      description: 'Tender chicken pieces cooked in a rich, creamy tomato sauce with butter, cream, and aromatic spices. Served with naan bread or steamed rice.',
+      isVeg: false,
+      rating: '4.8',
+      preparationTime: '25 min'
     },
     {
-      id: 3,
+      id: '6',
       name: 'Chowmin',
-      image: require('../Assets/Chowmin/vegchowmin.webp'),
-      color: '#E96A1C'
-    },
-    {
-      id: 4,
-      name: 'Burger',
-      image: require('../Assets/Burger/vegburger.jpg'),
-      color: '#E96A1C'
-    },
-    {
-      id: 5,
-      name: 'Biryani',
-      image: require('../Assets/biryani/chickenbiryani.jpeg'),
-      color: '#E96A1C'
+      restaurant: 'Delicious Bites',
+      image: require('../Assets/DeliciousBite/chicken-chowmin.jpg'),
+      price: '180',
+      description: 'Wok-tossed noodles with tender chicken strips, crunchy vegetables, and our house special sauce. Garnished with spring onions and sesame seeds.',
+      isVeg: false,
+      rating: '4.8',
+      preparationTime: '25 min'
     }
   ];
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.head}>What's on Your Mind</Text>
-        <TouchableOpacity>
-          <Text style={styles.viewAll}>View All</Text>
-        </TouchableOpacity>
-      </View>
-      
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
-        contentContainerStyle={styles.scrollView}
-        decelerationRate="fast"
-      >
-        {categories.map((category) => (
+      <Text style={styles.head}>Categories</Text>
+      <Text style={styles.subhead}>Explore food by category</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollView}>
+        {categoryItems.map((item) => (
           <TouchableOpacity 
-            key={category.id}
-            style={[styles.boxContainer, { backgroundColor: category.color }]} 
-            onPress={() => navigation.navigate('FoodItemDetail', { item: foodItems[category.name] })}
-            activeOpacity={0.8}
+            key={item.id}
+            style={styles.card} 
+            onPress={() => navigation.navigate('FoodItemDetail', { 
+              item: {
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                description: item.description,
+                image: item.image,
+                isVeg: item.isVeg,
+                rating: item.rating,
+                preparationTime: item.preparationTime
+              },
+              restaurantName: item.restaurant // Pass restaurant name to FoodItemDetail
+            })}
           >
-            <View style={styles.imageContainer}>
-              <Image source={category.image} style={styles.image} />
+            <Image source={item.image} style={styles.image} />
+            
+            {/* Category name overlay */}
+            <View style={styles.categoryOverlay}>
+              <Text style={styles.categoryName}>{item.name}</Text>
             </View>
-            <Text style={styles.label}>{category.name}</Text>
+            
+            {/* Restaurant name */}
+            <View style={styles.restaurantContainer}>
+              <Text style={styles.restaurant}>{item.restaurant}</Text>
+            </View>
+            
+            <View style={styles.priceRatingContainer}>
+              <Text style={styles.price}>Rs. {item.price}</Text>
+              <View style={styles.ratingContainer}>
+                <Text style={styles.rating}>★ {item.rating}</Text>
+              </View>
+            </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -161,78 +130,91 @@ export default Categories;
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    paddingVertical: 20,
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    marginVertical: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
-  },
-  headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    marginBottom: 15,
+    backgroundColor: '#FFF',
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    marginTop: 10,
   },
   head: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
+    marginBottom: 5,
   },
-  viewAll: {
+  subhead: {
     fontSize: 14,
-    color: '#FF3F00',
-    fontWeight: '600',
+    color: '#666',
+    marginBottom: 10,
   },
   scrollView: {
-    paddingHorizontal: 16,
-    paddingBottom: 10,
+    flexDirection: 'row',
+    paddingVertical: 5,
   },
-  boxContainer: {
-    width: ITEM_WIDTH,
-    aspectRatio: 0.9,
-    marginRight: 16,
-    borderRadius: 16,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 12,
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 10,
+    marginRight: 15,
+    width: 150,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  imageContainer: {
-    width: '100%',
-    aspectRatio: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginTop: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 5,
+    shadowOffset: { width: 2, height: 2 },
     elevation: 3,
   },
   image: {
     width: '100%',
-    height: '100%',
-    borderRadius: 12,
+    height: 100,
+    borderRadius: 10,
   },
-  label: {
+  categoryOverlay: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    right: 10,
+    backgroundColor: 'red',
+    paddingVertical: 0,
+    paddingHorizontal: 3,
+    borderRadius: 5,
+  },
+  categoryName: {
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#fff',
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+    textAlign: 'center',
+  },
+  restaurantContainer: {
+    backgroundColor: '#FFF8EE',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+    marginTop: 8,
     marginBottom: 5,
+  },
+  restaurant: {
+    fontSize: 12,
+    color: '#E96A1C',
+    fontWeight: '600',
+  },
+  priceRatingContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  price: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#E96A1C',
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rating: {
+    fontSize: 12,
+    color: '#E96A1C',
+    fontWeight: '500',
   },
 });

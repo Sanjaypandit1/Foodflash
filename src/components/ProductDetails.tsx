@@ -5,7 +5,6 @@ import { useCart } from './CartContext'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import {ImageSourcePropType} from 'react-native';
 
-
 // Get screen dimensions
 const { width, height } = Dimensions.get('window');
 // Calculate bottom padding to avoid navigation bar
@@ -16,6 +15,7 @@ const BOTTOM_PADDING = Platform.OS === 'ios' ? 34 : 60;
 type RootStackParamList = {
   FoodItemDetail: { 
     item: FoodItem;
+    restaurantName?: string; // Add restaurant name to params
   };
 };
 
@@ -24,7 +24,7 @@ type FoodItem = {
   name: string;
   price: string;
   description: string;
-   image: ImageSourcePropType;
+  image: ImageSourcePropType;
   isVeg: boolean;
   rating: string;
   preparationTime: string;
@@ -32,7 +32,7 @@ type FoodItem = {
 
 const FoodItemDetail = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'FoodItemDetail'>>();
-  const { item } = route.params;
+  const { item, restaurantName } = route.params; // Extract restaurant name from params
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const navigation = useNavigation();
@@ -52,14 +52,14 @@ const FoodItemDetail = () => {
       image: item.image, 
       description: item.description,
       tag: item.isVeg ? 'Vegetarian' : 'Non-Vegetarian',
-      rating: parseFloat(item.rating)
+      rating: parseFloat(item.rating),
+      restaurantName: restaurantName // Add restaurant name to cart item
     };
     
     // Add to cart multiple times based on quantity
     for (let i = 0; i < quantity; i++) {
       addToCart(cartItem);
     }
-
   };
 
   const handleBuyNow = () => {
@@ -73,8 +73,6 @@ const FoodItemDetail = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       
-
-      
       {/* Main Scrollable Content */}
       <ScrollView 
         showsVerticalScrollIndicator={false}
@@ -82,12 +80,11 @@ const FoodItemDetail = () => {
       >
         {/* Hero Image */}
         <View style={styles.imageContainer}>
-            <Image 
-                   source={item.image} 
-                   style={styles.heroImage}
-                   resizeMode="cover"
-                 />
-  
+          <Image 
+            source={item.image} 
+            style={styles.heroImage}
+            resizeMode="cover"
+          />
           
           <View style={[styles.badgeContainer, { backgroundColor: item.isVeg ? '#0f8a0f' : '#b30000' }]}>
             <Text style={styles.badgeText}>{item.isVeg ? 'VEG' : 'NON-VEG'}</Text>
@@ -96,6 +93,14 @@ const FoodItemDetail = () => {
         
         {/* Content */}
         <View style={styles.contentContainer}>
+          {/* Restaurant Name - New Addition */}
+          {restaurantName && (
+            <View style={styles.restaurantNameContainer}>
+              <Icon name="restaurant" size={18} color="#FF3F00" />
+              <Text style={styles.restaurantName}>{restaurantName}</Text>
+            </View>
+          )}
+          
           {/* Header Section */}
           <View style={styles.headerSection}>
             <Text style={styles.title}>{item.name}</Text>
@@ -142,7 +147,6 @@ const FoodItemDetail = () => {
               </TouchableOpacity>
             </View>
           </View>
-          
           
           {/* Reviews (Placeholder) */}
           <View style={styles.reviewsSection}>
@@ -208,7 +212,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: BOTTOM_TAB_HEIGHT + BOTTOM_PADDING, // Add padding to avoid bottom nav
   },
-
   imageContainer: {
     position: 'relative',
     width: width,
@@ -238,6 +241,23 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     marginTop: -20,
     minHeight: height * 0.7, // Ensure content area is tall enough
+  },
+  // New styles for restaurant name
+  restaurantNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF8EE',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+  },
+  restaurantName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FF3F00',
+    marginLeft: 6,
   },
   headerSection: {
     flexDirection: 'row',
@@ -321,40 +341,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     paddingHorizontal: 15,
-  },
-  nutritionSection: {
-    marginBottom: 20,
-  },
-  nutritionGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 8,
-  },
-  nutritionItem: {
-    alignItems: 'center',
-    backgroundColor: '#F8F8F8',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    width: '22%',
-  },
-  nutritionValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  nutritionLabel: {
-    fontSize: 12,
-    color: '#666',
-  },
-  ingredientsSection: {
-    marginBottom: 20,
-  },
-  ingredients: {
-    fontSize: 16,
-    color: '#666',
-    lineHeight: 24,
   },
   reviewsSection: {
     marginBottom: 20,

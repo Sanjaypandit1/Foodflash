@@ -20,7 +20,10 @@ import {ImageSourcePropType} from 'react-native';
 type RootStackParamList = {
   Home: undefined;
   RestaurantDetails: {restaurant: Restaurant};
-  FoodItemDetail: {item: FoodItem};
+  FoodItemDetail: {
+    item: FoodItem;
+    restaurantName?: string; // Add this line to include restaurantName
+  };
 };
 
 type Restaurant = {
@@ -149,7 +152,10 @@ export default function BurgerJoint() {
     <TouchableOpacity
       style={styles.foodCard}
       activeOpacity={0.9}
-      onPress={() => navigation.navigate('FoodItemDetail', {item})}>
+      onPress={() => navigation.navigate('FoodItemDetail', {
+        item,
+        restaurantName: restaurant.name // Pass the restaurant name
+      })}>
       <View style={styles.foodInfo}>
         <View style={styles.foodHeader}>
           <Text style={styles.foodName}>{item.name}</Text>
