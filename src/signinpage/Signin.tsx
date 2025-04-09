@@ -14,9 +14,8 @@ import {
   Keyboard,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const { width, height } = Dimensions.get('window');
+const {  } = Dimensions.get('window');
 
 interface InputFieldProps {
   placeholder: string;
@@ -42,7 +41,7 @@ const InputField: React.FC<InputFieldProps> = ({
   const inputRef = useRef<TextInput>(null);
 
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
       activeOpacity={0.9}
       style={[styles.inputContainer, isFocused && styles.inputContainerFocused]}
       onPress={() => inputRef.current?.focus()}
@@ -91,7 +90,7 @@ const SignInScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  
+
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
 
@@ -116,7 +115,7 @@ const SignInScreen: React.FC = () => {
           {/* Header */}
           <View >
           <Image source={require('../Assets/logo.jpg')} style={styles.logo} />
-           
+
           </View>
 
           {/* Form */}
@@ -160,7 +159,7 @@ const SignInScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.signInButton}
               onPress={handleSignIn}
             >

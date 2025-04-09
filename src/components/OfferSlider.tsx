@@ -10,46 +10,46 @@ const OfferSlider = () => {
   const slides = [
     {
       id: 1,
-      title: "Burger That Will\nSatisfy Your Cravings",
+      title: 'Burger That Will\nSatisfy Your Cravings',
       image: require('../Assets/poster/poster1.jpg'),
-      discount: "20%",
-      color: "#4CAF50" // Green
+      discount: '20%',
+      color: '#4CAF50', // Green
     },
     {
       id: 2,
-      title: "Pizza With Extra\nCheese Toppings",
+      title: 'Pizza With Extra\nCheese Toppings',
       image: require('../Assets/poster/poster2.jpg'),
-      discount: "15%",
-      color: "#FF5722" // Orange
+      discount: '15%',
+      color: '#FF5722', // Orange
     },
     {
       id: 3,
-      title: "Fresh Salads For\nHealthy Living",
+      title: 'Fresh Salads For\nHealthy Living',
       image: require('../Assets/poster/poster7.jpg'),
-      discount: "10%",
-      color: "#9C27B0" // Purple
+      discount: '10%',
+      color: '#9C27B0', // Purple
     },
     {
       id: 4,
-      title: "Desserts That\nMelt In Your Mouth",
+      title: 'Desserts That\nMelt In Your Mouth',
       image: require('../Assets/poster/poster4.jpg'),
-      discount: "25%",
-      color: "#E91E63" // Pink
+      discount: '25%',
+      color: '#E91E63', // Pink
     },
     {
       id: 5,
-      title: "Pasta Made With\nAuthentic Recipe",
+      title: 'Pasta Made With\nAuthentic Recipe',
       image: require('../Assets/poster/poster5.jpg'),
-      discount: "18%",
-      color: "#FF9800" // Amber
+      discount: '18%',
+      color: '#FF9800', // Amber
     },
     {
       id: 6,
-      title: "Biryani That Will\nChange Your Mind",
+      title: 'Biryani That Will\nChange Your Mind',
       image: require('../Assets/poster/poster6.jpeg'),
-      discount: "14%",
-      color: "#1E88E5" // Blue
-    }
+      discount: '14%',
+      color: '#1E88E5', // Blue
+    },
   ];
 
   return (
@@ -72,11 +72,11 @@ const OfferSlider = () => {
                   <Text style={[styles.orderText, { color: slide.color }]}>Order Now</Text>
                 </TouchableOpacity>
               </View>
-              
+
               <View style={styles.imageContainer}>
-                <Image 
-                  source={slide.image} 
-                  style={styles.foodImage} 
+                <Image
+                  source={slide.image}
+                  style={styles.foodImage}
                   resizeMode="contain"
                 />
                 <View style={styles.discountBadge}>
@@ -85,16 +85,16 @@ const OfferSlider = () => {
                 </View>
               </View>
             </View>
-            
+
             {/* Custom pagination indicator */}
             <View style={styles.customPagination}>
               {slides.map((_, i) => (
-                <View 
-                  key={i} 
+                <View
+                  key={i}
                   style={[
-                    styles.paginationDot, 
-                    i === index ? styles.paginationActiveDot : null
-                  ]} 
+                    styles.paginationDot,
+                    i === index ? styles.paginationActiveDot : null,
+                  ]}
                 />
               ))}
               <View style={styles.paginationCounter}>
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     height: 200, // Increased height to accommodate pagination
     alignItems:'center',
     margin:12,
-   
+
   },
   slide: {
     width: '100%',

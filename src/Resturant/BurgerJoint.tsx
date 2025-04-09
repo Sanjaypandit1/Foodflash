@@ -142,9 +142,9 @@ export default function BurgerJoint() {
 
   // Filter food items based on selected filter
   const filteredFoodItems = foodItems.filter(item => {
-    if (filter === 'all') return true;
-    if (filter === 'veg') return item.isVeg;
-    if (filter === 'nonVeg') return !item.isVeg;
+    if (filter === 'all') {return true;}
+    if (filter === 'veg') {return item.isVeg;}
+    if (filter === 'nonVeg') {return !item.isVeg;}
     return true;
   });
 
@@ -154,7 +154,7 @@ export default function BurgerJoint() {
       activeOpacity={0.9}
       onPress={() => navigation.navigate('FoodItemDetail', {
         item,
-        restaurantName: restaurant.name // Pass the restaurant name
+        restaurantName: restaurant.name, // Pass the restaurant name
       })}>
       <View style={styles.foodInfo}>
         <View style={styles.foodHeader}>

@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useState } from 'react'
-import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navigation/native'
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navigation/native';
 import {ImageSourcePropType} from 'react-native';
 
 
@@ -47,7 +47,7 @@ const foodItems: FoodItem[] = [
     image: require('../Assets/SusiPalace/aalu-nimki.jpeg'),
     isVeg: true,
     rating: '4.5',
-    preparationTime: '20 min'
+    preparationTime: '20 min',
   },
   {
     id: '26',
@@ -57,7 +57,7 @@ const foodItems: FoodItem[] = [
     image: require('../Assets/SusiPalace/chicken-khana.jpeg'),
     isVeg: false,
     rating: '4.7',
-    preparationTime: '25 min'
+    preparationTime: '25 min',
   },
   {
     id: '27',
@@ -67,7 +67,7 @@ const foodItems: FoodItem[] = [
     image: require('../Assets/SusiPalace/chicken-sekewa.jpeg'),
     isVeg: false,
     rating: '4.2',
-    preparationTime: '10 min'
+    preparationTime: '10 min',
   },
   {
     id: '28',
@@ -77,7 +77,7 @@ const foodItems: FoodItem[] = [
     image: require('../Assets/SusiPalace/mutton-khana.jpeg'),
     isVeg: false,
     rating: '4.6',
-    preparationTime: '15 min'
+    preparationTime: '15 min',
   },
   {
     id: '29',
@@ -87,7 +87,7 @@ const foodItems: FoodItem[] = [
     image: require('../Assets/SusiPalace/mutton-momo.jpg'),
     isVeg: false,
     rating: '4.4',
-    preparationTime: '30 min'
+    preparationTime: '30 min',
   },
   {
     id: '30',
@@ -97,7 +97,7 @@ const foodItems: FoodItem[] = [
     image: require('../Assets/SusiPalace/veg-khana.jpg'),
     isVeg: true,
     rating: '4.4',
-    preparationTime: '30 min'
+    preparationTime: '30 min',
   },
   {
     id: '31',
@@ -107,7 +107,7 @@ const foodItems: FoodItem[] = [
     image: require('../Assets/SusiPalace/veg-momo.jpeg'),
     isVeg: true,
     rating: '4.4',
-    preparationTime: '30 min'
+    preparationTime: '30 min',
   },
   {
     id: '32',
@@ -117,32 +117,32 @@ const foodItems: FoodItem[] = [
     image: require('../Assets/SusiPalace/veg-pakoda.jpg'),
     isVeg: true,
     rating: '4.8',
-    preparationTime: '25 min'
-  }
+    preparationTime: '25 min',
+  },
 ];
 export default function SushilPalace() {
    const route = useRoute<RouteProp<RootStackParamList, 'RestaurantDetails'>>();
     const { restaurant } = route.params;
     const [filter, setFilter] = useState<FilterOption>('all');
-  
+
       // Properly type the navigation object
       const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-    
+
     // Filter food items based on selected filter
     const filteredFoodItems = foodItems.filter(item => {
-      if (filter === 'all') return true;
-      if (filter === 'veg') return item.isVeg;
-      if (filter === 'nonVeg') return !item.isVeg;
+      if (filter === 'all') {return true;}
+      if (filter === 'veg') {return item.isVeg;}
+      if (filter === 'nonVeg') {return !item.isVeg;}
       return true;
     });
-  
+
    const renderFoodItem = ({ item }: { item: FoodItem }) => (
       <TouchableOpacity
            style={styles.foodCard}
            activeOpacity={0.9}
            onPress={() => navigation.navigate('FoodItemDetail', {
              item,
-             restaurantName: restaurant.name // Pass the restaurant name
+             restaurantName: restaurant.name, // Pass the restaurant name
            })}>
          <View style={styles.foodInfo}>
            <View style={styles.foodHeader}>
@@ -151,56 +151,56 @@ export default function SushilPalace() {
                <Text style={styles.vegBadgeText}>{item.isVeg ? 'VEG' : 'NON-VEG'}</Text>
              </View>
            </View>
-           
+
            <Text style={styles.foodPrice}>Rs. {item.price}</Text>
            <Text style={styles.foodDescription} numberOfLines={2}>{item.description}</Text>
-           
+
            <View style={styles.foodMeta}>
              <Text style={styles.foodRating}>★ {item.rating}</Text>
              <Text style={styles.foodTime}>{item.preparationTime}</Text>
            </View>
-           
-           <TouchableOpacity 
+
+           <TouchableOpacity
              style={styles.addButton}
              onPress={() => navigation.navigate('FoodItemDetail', { item })}
            >
              <Text style={styles.addButtonText}>ADD</Text>
            </TouchableOpacity>
          </View>
-         
-          <Image 
-         source={item.image} 
+
+          <Image
+         source={item.image}
          style={styles.foodImage}
          resizeMode="cover"
        />
        </TouchableOpacity>
      );
-   
+
      return (
        <View style={styles.container}>
          <View style={styles.header}>
            <Text style={styles.restaurantName}>{restaurant.name}</Text>
            <Text style={styles.restaurantInfo}>{restaurant.cuisine} • {restaurant.rating} ★ • {restaurant.deliveryTime}</Text>
          </View>
-         
+
          <View style={styles.filterContainer}>
            <Text style={styles.filterLabel}>Filter:</Text>
            <View style={styles.filterOptions}>
-             <TouchableOpacity 
+             <TouchableOpacity
                style={[styles.filterOption, filter === 'all' && styles.filterOptionActive]}
                onPress={() => setFilter('all')}
              >
                <Text style={[styles.filterText, filter === 'all' && styles.filterTextActive]}>All</Text>
              </TouchableOpacity>
-             
-             <TouchableOpacity 
+
+             <TouchableOpacity
                style={[styles.filterOption, filter === 'veg' && styles.filterOptionActive]}
                onPress={() => setFilter('veg')}
              >
                <Text style={[styles.filterText, filter === 'veg' && styles.filterTextActive]}>Vegetarian</Text>
              </TouchableOpacity>
-             
-             <TouchableOpacity 
+
+             <TouchableOpacity
                style={[styles.filterOption, filter === 'nonVeg' && styles.filterOptionActive]}
                onPress={() => setFilter('nonVeg')}
              >
@@ -208,7 +208,7 @@ export default function SushilPalace() {
              </TouchableOpacity>
            </View>
          </View>
-         
+
          <FlatList
            data={filteredFoodItems}
            renderItem={renderFoodItem}
@@ -219,7 +219,7 @@ export default function SushilPalace() {
        </View>
      );
    }
-   
+
    const styles = StyleSheet.create({
      container: {
        flex: 1,

@@ -55,10 +55,10 @@ const MenuItem: React.FC<MenuItemProps> = ({ title, icon, iconType = 'feather', 
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[
-        styles.menuItem, 
-        isLast ? styles.lastMenuItem : null
+        styles.menuItem,
+        isLast ? styles.lastMenuItem : null,
       ]}
     >
       <View style={styles.menuItemLeft}>
@@ -106,7 +106,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, items }) => {
 // Profile Header Component
 const ProfileHeader: React.FC = () => {
   const navigation = useNavigation<NavigationProps>();
-  
+
   return (
     <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
       <View style={styles.header}>
@@ -125,10 +125,10 @@ const ProfileHeader: React.FC = () => {
 // Sign In Button Component
 const SignInButton: React.FC = () => {
   const navigation = useNavigation<NavigationProps>();
-  
+
   return (
-    <TouchableOpacity 
-      style={styles.signInButton} 
+    <TouchableOpacity
+      style={styles.signInButton}
       onPress={() => navigation.navigate('SignIn')}
     >
       <Icon name="power" size={20} color="#fff" />
@@ -156,7 +156,7 @@ const SettingsScreen: React.FC = () => {
   const earningItems: MenuItem[] = [
     { id: 1, title: 'Refer & Earn', icon: 'users' },
   ];
-  
+
   const helpSupportItems: MenuItem[] = [
     { id: 1, title: 'Help & Support', icon: 'headphones', iconType: 'feather' },
     { id: 2, title: 'About Us', icon: 'info', iconType: 'feather' },
@@ -169,7 +169,7 @@ const SettingsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ProfileHeader />
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollViewContent}
         showsVerticalScrollIndicator={false}

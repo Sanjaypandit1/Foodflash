@@ -48,7 +48,7 @@ const HighlightsForYou = () => {
       image: require('../Assets/BurgerJoint/chicken-burger.jpg'),
       isVeg: false,
       rating: '4.8',
-      preparationTime: '25 min'
+      preparationTime: '25 min',
     },
     {
       id: '2',
@@ -61,7 +61,7 @@ const HighlightsForYou = () => {
       image: require('../Assets/SpiceGarden/Butter-Chicken.jpeg'),
       isVeg: false,
       rating: '4.9',
-      preparationTime: '30 min'
+      preparationTime: '30 min',
     },
     {
       id: '3',
@@ -74,8 +74,8 @@ const HighlightsForYou = () => {
       image: require('../Assets/DeliciousBite/mushroom-pizza.jpg'),
       isVeg: true,
       rating: '4.6',
-      preparationTime: '20 min'
-    }
+      preparationTime: '20 min',
+    },
   ];
 
   // Properly type the handleHighlightPress function
@@ -90,9 +90,9 @@ const HighlightsForYou = () => {
         image: item.image,
         isVeg: item.isVeg,
         rating: item.rating,
-        preparationTime: item.preparationTime
+        preparationTime: item.preparationTime,
       },
-      restaurantName: item.restaurant
+      restaurantName: item.restaurant,
     });
   };
 
@@ -108,56 +108,56 @@ const HighlightsForYou = () => {
       </View>
 
       {/* Highlights Carousel */}
-      <ScrollView 
-        horizontal 
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.carouselContainer}
       >
         {highlightItems.map((item) => (
-          <TouchableOpacity 
-            key={item.id} 
+          <TouchableOpacity
+            key={item.id}
             style={styles.highlightCard}
             onPress={() => handleHighlightPress(item)}
             activeOpacity={0.9}
           >
             <View style={styles.imageContainer}>
               <Image source={item.image} style={styles.highlightImage} />
-              
+
               {/* Discount Badge */}
               <View style={styles.discountBadge}>
                 <Text style={styles.discountText}>{item.discount} OFF</Text>
               </View>
-              
+
               {/* Veg/Non-Veg Indicator */}
               <View style={[styles.vegBadge, { backgroundColor: item.isVeg ? '#0f8a0f' : '#b30000' }]}>
                 <Text style={styles.vegBadgeText}>{item.isVeg ? 'VEG' : 'NON-VEG'}</Text>
               </View>
             </View>
-            
+
             {/* Restaurant Name */}
             <View style={styles.restaurantContainer}>
               <Ionicons name="restaurant-outline" size={14} color="#FF3F00" />
               <Text style={styles.restaurantName}>{item.restaurant}</Text>
             </View>
-            
+
             {/* Food Name */}
             <Text style={styles.foodName}>{item.name}</Text>
-            
+
             {/* Price and Rating */}
             <View style={styles.detailsRow}>
               <View style={styles.priceContainer}>
                 <Text style={styles.originalPrice}>₹{item.originalPrice}</Text>
                 <Text style={styles.price}>₹{item.price}</Text>
               </View>
-              
+
               <View style={styles.ratingContainer}>
                 <Ionicons name="star" size={14} color="#FF3F00" />
                 <Text style={styles.ratingText}>{item.rating}</Text>
               </View>
             </View>
-            
+
             {/* Order Button */}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.orderButton}
               onPress={() => handleHighlightPress(item)}
             >

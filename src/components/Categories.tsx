@@ -19,7 +19,7 @@ const Categories: React.FC<Props> = ({ navigation }) => {
       description: 'Delicious pizza topped with grilled chicken pieces, bell peppers, onions, and a blend of mozzarella and cheddar cheese. Finished with our signature herb seasoning.',
       isVeg: false,
       rating: '4.7',
-      preparationTime: '25 min'
+      preparationTime: '25 min',
     },
     {
       id: '2',
@@ -30,7 +30,7 @@ const Categories: React.FC<Props> = ({ navigation }) => {
       description: 'Juicy dumplings filled with minced chicken, onions, garlic, and ginger. Steamed to perfection and served with spicy red chili dipping sauce.',
       isVeg: false,
       rating: '4.4',
-      preparationTime: '30 min'
+      preparationTime: '30 min',
     },
     {
       id: '3',
@@ -41,7 +41,7 @@ const Categories: React.FC<Props> = ({ navigation }) => {
       description: 'Fragrant long-grain basmati rice layered with tender chicken pieces, caramelized onions, and traditional spices. Slow-cooked in a sealed pot and garnished with fresh herbs.',
       isVeg: false,
       rating: '4.4',
-      preparationTime: '30 min'
+      preparationTime: '30 min',
     },
     {
       id: '4',
@@ -52,7 +52,7 @@ const Categories: React.FC<Props> = ({ navigation }) => {
       description: 'Grilled chicken breast with crisp lettuce, tomato, cheese, and our signature mayo in a toasted brioche bun. Served with seasoned fries and coleslaw.',
       isVeg: false,
       rating: '4.8',
-      preparationTime: '25 min'
+      preparationTime: '25 min',
     },
     {
       id: '5',
@@ -63,7 +63,7 @@ const Categories: React.FC<Props> = ({ navigation }) => {
       description: 'Tender chicken pieces cooked in a rich, creamy tomato sauce with butter, cream, and aromatic spices. Served with naan bread or steamed rice.',
       isVeg: false,
       rating: '4.8',
-      preparationTime: '25 min'
+      preparationTime: '25 min',
     },
     {
       id: '6',
@@ -74,8 +74,8 @@ const Categories: React.FC<Props> = ({ navigation }) => {
       description: 'Wok-tossed noodles with tender chicken strips, crunchy vegetables, and our house special sauce. Garnished with spring onions and sesame seeds.',
       isVeg: false,
       rating: '4.8',
-      preparationTime: '25 min'
-    }
+      preparationTime: '25 min',
+    },
   ];
 
   return (
@@ -84,10 +84,10 @@ const Categories: React.FC<Props> = ({ navigation }) => {
       <Text style={styles.subhead}>Explore food by category</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollView}>
         {categoryItems.map((item) => (
-          <TouchableOpacity 
+          <TouchableOpacity
             key={item.id}
-            style={styles.card} 
-            onPress={() => navigation.navigate('FoodItemDetail', { 
+            style={styles.card}
+            onPress={() => navigation.navigate('FoodItemDetail', {
               item: {
                 id: item.id,
                 name: item.name,
@@ -96,23 +96,23 @@ const Categories: React.FC<Props> = ({ navigation }) => {
                 image: item.image,
                 isVeg: item.isVeg,
                 rating: item.rating,
-                preparationTime: item.preparationTime
+                preparationTime: item.preparationTime,
               },
-              restaurantName: item.restaurant // Pass restaurant name to FoodItemDetail
+              restaurantName: item.restaurant, // Pass restaurant name to FoodItemDetail
             })}
           >
             <Image source={item.image} style={styles.image} />
-            
+
             {/* Category name overlay */}
             <View style={styles.categoryOverlay}>
               <Text style={styles.categoryName}>{item.name}</Text>
             </View>
-            
+
             {/* Restaurant name */}
             <View style={styles.restaurantContainer}>
               <Text style={styles.restaurant}>{item.restaurant}</Text>
             </View>
-            
+
             <View style={styles.priceRatingContainer}>
               <Text style={styles.price}>Rs. {item.price}</Text>
               <View style={styles.ratingContainer}>
