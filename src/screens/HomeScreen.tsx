@@ -19,6 +19,7 @@ type RootStackParamList = {
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
+  
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {

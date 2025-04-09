@@ -170,7 +170,7 @@ export default function BurgerJoint() {
           </View>
         </View>
 
-        <Text style={styles.foodPrice}>{item.price}</Text>
+        <Text style={styles.foodPrice}>Rs. {item.price}</Text>
         <Text style={styles.foodDescription} numberOfLines={2}>
           {item.description}
         </Text>

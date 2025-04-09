@@ -19,12 +19,13 @@ import MenuScreen from "./src/screens/MenuScreen"
 import LanguageSelectionScreen from "./src/FirstPage/Language"
 import OnboardingScreen from "./src/FirstPage/OnboardingScreen"
 import OnboardingScreen2 from "./src/FirstPage/onboardingscreen2"
-import SignInScreen from "./src/signinpage/Signin" // Import SignInScreen
+import SignInScreen from "./src/signinpage/Signin"
 import DeliciousBite from "./src/Resturant/DelicioueBite"
 import BurgerJoint from "./src/Resturant/BurgerJoint"
 import SpiceGarden from "./src/Resturant/SpiceGarden"
 import SushilPalace from "./src/Resturant/SushiPalace"
 import FoodItemDetail from "./src/components/ProductDetails"
+import CheckoutScreen from "./src/screens/CheckoutScreen" // Import the new CheckoutScreen
 
 // Type for bottom tab navigator
 type TabParamList = {
@@ -52,32 +53,12 @@ const HomeStackNavigator = () => {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen name="Homescreen" component={HomeScreen} options={{ headerShown: false }} />
-
-      <HomeStack.Screen 
-  name="DeliciousBite" 
-  component={DeliciousBite} 
-  options={{ headerShown: true, title: "" }}
-/>
-<HomeStack.Screen 
-  name="BurgerJoint" 
-  component={BurgerJoint} 
-  options={{ headerShown: true, title: "" }}
-/>
-<HomeStack.Screen 
-  name="SpiceGarden" 
-  component={SpiceGarden} 
-  options={{ headerShown: true, title: "" }}
-/>
-<HomeStack.Screen 
-  name="SushilPalace" 
-  component={SushilPalace} 
-  options={{ headerShown: true, title: "" }}
-/>
-<HomeStack.Screen
-name="FoodItemDetail"
-component={FoodItemDetail}
-options={{ headerShown: true }}
-/>
+      <HomeStack.Screen name="DeliciousBite" component={DeliciousBite} options={{ headerShown: true, title: "" }} />
+      <HomeStack.Screen name="BurgerJoint" component={BurgerJoint} options={{ headerShown: true, title: "" }} />
+      <HomeStack.Screen name="SpiceGarden" component={SpiceGarden} options={{ headerShown: true, title: "" }} />
+      <HomeStack.Screen name="SushilPalace" component={SushilPalace} options={{ headerShown: true, title: "" }} />
+      <HomeStack.Screen name="FoodItemDetail" component={FoodItemDetail} options={{ headerShown: true }} />
+      <HomeStack.Screen name="CheckoutScreen" component={CheckoutScreen} options={{ headerShown: false }} />
     </HomeStack.Navigator>
   )
 }

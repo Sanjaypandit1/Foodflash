@@ -41,7 +41,7 @@ type FilterOption = 'all' | 'veg' | 'nonVeg';
 // For SpiceGarden.tsx - Indian cuisine food items
 const foodItems: FoodItem[] = [
   {
-    id: '1',
+    id: '17',
     name: 'Veg Biryani',
     price: '225',
     description: 'Aromatic basmati rice cooked with garden-fresh vegetables, saffron, and authentic Indian spices. Served with cooling raita and crispy papadum.',
@@ -51,7 +51,7 @@ const foodItems: FoodItem[] = [
     preparationTime: '20 min'
   },
   {
-    id: '2',
+    id: '18',
     name: 'Paneer Pakoda',
     price: '280',
     description: 'Soft cottage cheese cubes dipped in spiced gram flour batter and deep-fried to golden perfection. Served with mint chutney and tamarind sauce.',
@@ -61,7 +61,7 @@ const foodItems: FoodItem[] = [
     preparationTime: '25 min'
   },
   {
-    id: '3',
+    id: '19',
     name: 'Mushroom Chilly',
     price: '225',
     description: 'Button mushrooms tossed in a spicy Indo-Chinese sauce with bell peppers, onions, and green chilies. Garnished with spring onions and sesame seeds.',
@@ -71,7 +71,7 @@ const foodItems: FoodItem[] = [
     preparationTime: '10 min'
   },
   {
-    id: '4',
+    id: '20',
     name: 'Grilled Chicken',
     price: '600',
     description: 'Tender chicken pieces marinated in yogurt and aromatic spices, then grilled to perfection. Served with mint chutney and a side of fresh salad.',
@@ -81,7 +81,7 @@ const foodItems: FoodItem[] = [
     preparationTime: '15 min'
   },
   {
-    id: '5',
+    id: '21',
     name: 'French Fry',
     price: '100',
     description: 'Crispy golden potato fries seasoned with our special spice blend. Served with tomato ketchup and garlic mayonnaise for dipping.',
@@ -91,7 +91,7 @@ const foodItems: FoodItem[] = [
     preparationTime: '30 min'
   },
   {
-    id: '6',
+    id: '22',
     name: 'Chicken Biryani',
     price: '490',
     description: 'Fragrant long-grain basmati rice layered with tender chicken pieces, caramelized onions, and traditional spices. Slow-cooked in a sealed pot and garnished with fresh herbs.',
@@ -101,7 +101,7 @@ const foodItems: FoodItem[] = [
     preparationTime: '30 min'
   },
   {
-    id: '7',
+    id: '23',
     name: 'Chicken Pakoda',
     price: '300',
     description: 'Juicy chicken pieces coated in a spiced chickpea flour batter and deep-fried until crispy and golden. Served with mint-coriander chutney and lemon wedges.',
@@ -111,7 +111,7 @@ const foodItems: FoodItem[] = [
     preparationTime: '30 min'
   },
   {
-    id: '8',
+    id: '24',
     name: 'Butter Chicken',
     price: '330',
     description: 'Tender chicken pieces cooked in a rich, creamy tomato sauce with butter, cream, and aromatic spices. Served with naan bread or steamed rice.',
@@ -153,7 +153,7 @@ export default function SpiceGarden() {
             </View>
           </View>
           
-          <Text style={styles.foodPrice}>{item.price}</Text>
+          <Text style={styles.foodPrice}>Rs. {item.price}</Text>
           <Text style={styles.foodDescription} numberOfLines={2}>{item.description}</Text>
           
           <View style={styles.foodMeta}>

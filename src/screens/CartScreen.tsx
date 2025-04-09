@@ -1,20 +1,77 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView, ScrollView, Dimensions } from "react-native"
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  SafeAreaView,
+  ScrollView,
+  Dimensions,
+  Alert,
+} from "react-native"
 import { useCart } from "../components/CartContext"
 import Icon from "react-native-vector-icons/MaterialIcons"
-import { useNavigation, type NavigationProp, type ParamListBase } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
 
 const { width, height } = Dimensions.get("window")
 
+// Define proper types for navigation
+type RootStackParamList = {
+  Homescreen: undefined
+  FoodItemDetail: {
+    item: {
+      id: string
+      name: string
+      price: string
+      description: string
+      image: any
+      isVeg: boolean
+      rating: string
+      preparationTime: string
+    }
+    restaurantName?: string
+  }
+}
+
 const CartScreen = () => {
   const { cart, removeFromCart, clearCart } = useCart()
-  const navigation = useNavigation<NavigationProp<ParamListBase>>()
+  // Use any type for navigation as a workaround
+  const navigation = useNavigation<any>()
 
   // Calculate total price
   const calculateTotal = () => {
     return cart.reduce((total, item) => {
-      const price = Number.parseInt(item.price.replace("Rs.", ""))
+      const price = Number.parseFloat(item.price.replace("Rs.", ""))
       return total + price * item.quantity
     }, 0)
+  }
+
+  // Handle navigation to food item details
+  const handleItemPress = (item: any) => {
+    try {
+      console.log("Navigating to FoodItemDetail with item:", item.name)
+
+      // Navigate to the HomeStack navigator first, then to FoodItemDetail
+      navigation.navigate("Home", {
+        screen: "FoodItemDetail",
+        params: {
+          item: {
+            id: item.id,
+            name: item.name,
+            price: item.price.replace("Rs.", ""),
+            description: item.description,
+            image: item.image,
+            isVeg: item.tag === "Vegetarian",
+            rating: item.rating.toString(),
+            preparationTime: "20 min", // Default value since it might not be in cart item
+          },
+          restaurantName: item.restaurantName || "Restaurant", // Use restaurant name if available
+        },
+      })
+    } catch (error) {
+      console.error("Navigation error:", error)
+      Alert.alert("Navigation Error", "Could not navigate to product details.")
+    }
   }
 
   if (cart.length === 0) {
@@ -26,7 +83,16 @@ const CartScreen = () => {
         <View style={styles.emptyContainer}>
           <Icon name="shopping-cart" size={80} color="#ccc" />
           <Text style={styles.emptyText}>Your cart is empty</Text>
-          <TouchableOpacity style={styles.shopNowButton} onPress={() => navigation.navigate("Homescreen" as never)}>
+          <TouchableOpacity
+            style={styles.shopNowButton}
+            onPress={() => {
+              try {
+                navigation.navigate("Home", { screen: "Homescreen" })
+              } catch (error) {
+                console.error("Navigation error:", error)
+              }
+            }}
+          >
             <Text style={styles.shopNowText}>Shop Now</Text>
           </TouchableOpacity>
         </View>
@@ -56,19 +122,27 @@ const CartScreen = () => {
         >
           {cart.map((item) => (
             <View key={item.cartId} style={styles.cartItem}>
-              <Image source={item.image} style={styles.itemImage} />
-              <View style={styles.itemDetails}>
-                <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={styles.itemTag}>{item.tag}</Text>
-                <View style={styles.priceRow}>
-                  <Text style={styles.itemPrice}>{item.price}</Text>
-                  <Text style={styles.itemQuantity}>Qty: {item.quantity}</Text>
+              <TouchableOpacity
+                style={styles.itemContentContainer}
+                onPress={() => handleItemPress(item)}
+                activeOpacity={0.7}
+              >
+                <Image source={item.image} style={styles.itemImage} />
+                <View style={styles.itemDetails}>
+                  <Text style={styles.itemName}>{item.name}</Text>
+                  <Text style={styles.itemTag}>{item.tag}</Text>
+                  <View style={styles.priceRow}>
+                    <Text style={styles.itemPrice}>{item.price}</Text>
+                    <Text style={styles.itemQuantity}>Qty: {item.quantity}</Text>
+                  </View>
                 </View>
-                <TouchableOpacity style={styles.removeButton} onPress={() => removeFromCart(item.cartId)}>
-                  <Icon name="delete" size={18} color="white" />
-                  <Text style={styles.removeText}>Remove</Text>
-                </TouchableOpacity>
-              </View>
+              </TouchableOpacity>
+
+              {/* Separate TouchableOpacity for the remove button */}
+              <TouchableOpacity style={styles.removeButton} onPress={() => removeFromCart(item.cartId)}>
+                <Icon name="delete" size={18} color="white" />
+                <Text style={styles.removeText}>Remove</Text>
+              </TouchableOpacity>
             </View>
           ))}
           {/* Add padding at the bottom to ensure last item is fully visible above footer */}
@@ -80,14 +154,23 @@ const CartScreen = () => {
           <View style={styles.footer}>
             <View style={styles.totalContainer}>
               <Text style={styles.totalLabel}>Total:</Text>
-              <Text style={styles.totalAmount}>Rs.{calculateTotal()}</Text>
+              <Text style={styles.totalAmount}>Rs.{calculateTotal().toFixed(2)}</Text>
             </View>
 
             <TouchableOpacity style={styles.checkoutButton}>
               <Text style={styles.checkoutText}>Proceed to Checkout</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.addToCartButton}>
+            <TouchableOpacity
+              style={styles.addToCartButton}
+              onPress={() => {
+                try {
+                  navigation.navigate("Home", { screen: "Homescreen" })
+                } catch (error) {
+                  console.error("Navigation error:", error)
+                }
+              }}
+            >
               <Text style={styles.addToCartText}>Add More Items</Text>
             </TouchableOpacity>
           </View>
@@ -158,7 +241,6 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   cartItem: {
-    flexDirection: "row",
     backgroundColor: "white",
     borderRadius: 10,
     padding: 15,
@@ -168,6 +250,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  itemContentContainer: {
+    flexDirection: "row",
+    marginBottom: 10,
   },
   itemImage: {
     width: 80,
@@ -276,4 +362,3 @@ const styles = StyleSheet.create({
 })
 
 export default CartScreen
-
