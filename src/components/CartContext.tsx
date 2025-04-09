@@ -1,17 +1,16 @@
-"use client"
-
-import type React from "react"
-import { createContext, useState, useContext, type ReactNode } from "react"
+import React, { createContext, useState, useContext, type ReactNode } from "react"
+import { ImageSourcePropType } from "react-native"
 
 // Add a unique ID for cart items
 interface BiryaniItem {
   id: string
   name: string
   price: string
-  image: any
+  image: ImageSourcePropType
   description: string
   tag: string
   rating: number
+  restaurantName?: string // Add restaurant name
 }
 
 // Add a cart item interface with a unique cart ID
@@ -80,4 +79,3 @@ export const useCart = (): CartContextType => {
   }
   return context
 }
-

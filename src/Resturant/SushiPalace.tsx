@@ -8,7 +8,10 @@ import {ImageSourcePropType} from 'react-native';
 type RootStackParamList = {
   Home: undefined;
   RestaurantDetails: { restaurant: Restaurant };
-  FoodItemDetail: { item: FoodItem };
+  FoodItemDetail: {
+    item: FoodItem;
+    restaurantName?: string; // Add this line to include restaurantName
+  };
 };
 
 type Restaurant = {
@@ -37,86 +40,86 @@ type FilterOption = 'all' | 'veg' | 'nonVeg';
 // For SushilPalace.tsx - Japanese cuisine food items
 const foodItems: FoodItem[] = [
   {
-    id: '1',
+    id: '25',
     name: 'Aalu Nimki',
     price: '80',
-    description: 'Classic pizza with tomato sauce, mozzarella, and basil',
+    description: 'Crispy Nepali snack made with spiced mashed potatoes shaped into small discs and deep-fried until golden. Served with tomato achar (pickle) and a sprinkle of chat masala.',
     image: require('../Assets/SusiPalace/aalu-nimki.jpeg'),
     isVeg: true,
     rating: '4.5',
     preparationTime: '20 min'
   },
   {
-    id: '2',
+    id: '26',
     name: 'Chicken Khana',
     price: '250',
-    description: 'Creamy pasta with grilled chicken and parmesan',
+    description: 'Traditional Nepali thali with grilled chicken, steamed rice, lentil soup (dal), seasonal vegetables, pickles, and papadum. A complete balanced meal with authentic flavors.',
     image: require('../Assets/SusiPalace/chicken-khana.jpeg'),
     isVeg: false,
     rating: '4.7',
     preparationTime: '25 min'
   },
   {
-    id: '3',
-    name: 'Sekewa chicken',
+    id: '27',
+    name: 'Sekewa Chicken',
     price: '180',
-    description: 'Fresh mixed greens with seasonal vegetables and vinaigrette',
+    description: 'Traditional Nepali-style grilled chicken marinated with timur (Nepali pepper), garlic, and local herbs. Skewered and slow-cooked over charcoal for a smoky flavor.',
     image: require('../Assets/SusiPalace/chicken-sekewa.jpeg'),
     isVeg: false,
     rating: '4.2',
     preparationTime: '10 min'
   },
   {
-    id: '4',
+    id: '28',
     name: 'Mutton Khana',
     price: '300',
-    description: 'Juicy beef patty with lettuce, tomato, and special sauce',
+    description: 'Hearty Nepali thali featuring tender mutton curry, steamed rice, black lentils, seasonal vegetables, gundruk (fermented leafy greens), and homemade pickles.',
     image: require('../Assets/SusiPalace/mutton-khana.jpeg'),
     isVeg: false,
     rating: '4.6',
     preparationTime: '15 min'
   },
   {
-    id: '5',
+    id: '29',
     name: 'Mutton Momo',
     price: '220',
-    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    description: 'Juicy dumplings filled with minced mutton, ginger, garlic, onions, and Himalayan herbs. Steamed to perfection and served with spicy tomato achar and sesame chutney.',
     image: require('../Assets/SusiPalace/mutton-momo.jpg'),
     isVeg: false,
     rating: '4.4',
     preparationTime: '30 min'
   },
   {
-    id: '6',
+    id: '30',
     name: 'Veg Khana',
     price: '280',
-    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    description: 'Traditional vegetarian Nepali thali with steamed rice, mixed vegetable curry, dal (lentil soup), saag (leafy greens), achar (pickle), and papadum. A complete meal with authentic flavors.',
     image: require('../Assets/SusiPalace/veg-khana.jpg'),
     isVeg: true,
     rating: '4.4',
     preparationTime: '30 min'
   },
   {
-    id: '7',
+    id: '31',
     name: 'Veg Momo',
     price: '100',
-    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    description: 'Soft dumplings filled with a mixture of finely chopped cabbage, carrots, onions, and Himalayan spices. Steamed and served with homemade tomato-sesame chutney.',
     image: require('../Assets/SusiPalace/veg-momo.jpeg'),
     isVeg: true,
     rating: '4.4',
     preparationTime: '30 min'
   },
   {
-    id: '8',
+    id: '32',
     name: 'Veg Pakoda',
     price: '115',
-    description: 'Fresh salmon fil',
+    description: 'Crispy fritters made with assorted vegetables (onions, potatoes, spinach) dipped in gram flour batter with cumin, coriander, and chili. Served with mint-coriander chutney.',
     image: require('../Assets/SusiPalace/veg-pakoda.jpg'),
     isVeg: true,
     rating: '4.8',
     preparationTime: '25 min'
   }
-  ];
+];
 export default function SushilPalace() {
    const route = useRoute<RouteProp<RootStackParamList, 'RestaurantDetails'>>();
     const { restaurant } = route.params;
@@ -134,11 +137,13 @@ export default function SushilPalace() {
     });
   
    const renderFoodItem = ({ item }: { item: FoodItem }) => (
-       <TouchableOpacity 
-         style={styles.foodCard} 
-         activeOpacity={0.9}
-         onPress={() => navigation.navigate('FoodItemDetail', { item })}
-       >
+      <TouchableOpacity
+           style={styles.foodCard}
+           activeOpacity={0.9}
+           onPress={() => navigation.navigate('FoodItemDetail', {
+             item,
+             restaurantName: restaurant.name // Pass the restaurant name
+           })}>
          <View style={styles.foodInfo}>
            <View style={styles.foodHeader}>
              <Text style={styles.foodName}>{item.name}</Text>
@@ -147,7 +152,7 @@ export default function SushilPalace() {
              </View>
            </View>
            
-           <Text style={styles.foodPrice}>{item.price}</Text>
+           <Text style={styles.foodPrice}>Rs. {item.price}</Text>
            <Text style={styles.foodDescription} numberOfLines={2}>{item.description}</Text>
            
            <View style={styles.foodMeta}>

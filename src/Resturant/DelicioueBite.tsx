@@ -6,7 +6,10 @@ import {ImageSourcePropType} from 'react-native';
 type RootStackParamList = {
   Home: undefined;
   RestaurantDetails: { restaurant: Restaurant };
-  FoodItemDetail: { item: FoodItem };
+  FoodItemDetail: {
+    item: FoodItem;
+    restaurantName?: string; // Add this line to include restaurantName
+  };
 };
 
 type Restaurant = {
@@ -34,80 +37,80 @@ type FilterOption = 'all' | 'veg' | 'nonVeg';
 // Sample food items data
 const foodItems: FoodItem[] = [
   {
-    id: '1',
+    id: '9',
     name: 'Veg Momo',
     price: '120',
-    description: 'Classic pizza with tomato sauce, mozzarella, and basil',
+    description: 'Steamed dumplings filled with finely chopped vegetables, herbs, and aromatic spices. Served with spicy tomato chutney.',
     image: require('../Assets/DeliciousBite/veg-momo.jpg'),
     isVeg: true,
     rating: '4.5',
     preparationTime: '20 min'
   },
   {
-    id: '2',
+    id: '10',
     name: 'Samosa',
     price: '120',
-    description: 'Creamy pasta with grilled chicken and parmesan',
-    image: require('../Assets/DeliciousBite/veg-momo.jpg'),
+    description: 'Crispy triangular pastry filled with spiced potatoes, peas, and cumin. Deep-fried to golden perfection and served with mint chutney.',
+    image: require('../Assets/DeliciousBite/samosa.jpg'),
     isVeg: true,
     rating: '4.7',
     preparationTime: '25 min'
   },
   {
-    id: '3',
+    id: '11',
     name: 'Paneer Chowmin',
     price: '120',
-    description: 'Fresh mixed greens with seasonal vegetables and vinaigrette',
+    description: 'Stir-fried noodles with soft paneer cubes, bell peppers, carrots, and cabbage. Tossed in our special soy-based sauce with garlic and ginger.',
     image: require('../Assets/DeliciousBite/paneer-chowmin.jpg'),
     isVeg: true,
     rating: '4.2',
     preparationTime: '10 min'
   },
   {
-    id: '4',
+    id: '12',
     name: 'Mushroom Pizza',
     price: '350',
-    description: 'Juicy beef patty with lettuce, tomato, and special sauce',
+    description: 'Hand-tossed thin crust topped with rich tomato sauce, mozzarella cheese, and assorted mushrooms. Finished with fresh herbs and truffle oil.',
     image: require('../Assets/DeliciousBite/mushroom-pizza.jpg'),
     isVeg: true,
     rating: '4.6',
     preparationTime: '15 min'
   },
   {
-    id: '5',
+    id: '13',
     name: 'Mixed Pizza',
     price: '500',
-    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    description: 'Our signature pizza loaded with chicken, pepperoni, bell peppers, olives, and onions on a bed of mozzarella and cheddar cheese blend.',
     image: require('../Assets/DeliciousBite/mushroom-pizza.jpg'),
     isVeg: false,
     rating: '4.4',
     preparationTime: '30 min'
   },
   {
-    id: '6',
-    name: 'Chicekn Pizza',
-    price: '$15.99',
-    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    id: '14',
+    name: 'Chicken Pizza',
+    price: '450',
+    description: 'Classic pizza topped with marinated grilled chicken pieces, onions, bell peppers, and corn. Covered with melted mozzarella and a drizzle of BBQ sauce.',
     image: require('../Assets/DeliciousBite/chicken-pizza.jpeg'),
     isVeg: false,
     rating: '4.4',
     preparationTime: '30 min'
   },
   {
-    id: '7',
-    name: 'Chicekn Momo',
+    id: '15',
+    name: 'Chicken Momo',
     price: '200',
-    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    description: 'Juicy dumplings filled with minced chicken, onions, garlic, and ginger. Steamed to perfection and served with spicy red chili dipping sauce.',
     image: require('../Assets/DeliciousBite/chicken-momo.jpg'),
     isVeg: false,
     rating: '4.4',
     preparationTime: '30 min'
   },
   {
-    id: '8',
-    name: 'Chiceken Chowmin',
+    id: '16',
+    name: 'Chicken Chowmin',
     price: '180',
-    description: 'Fresh salmon fil',
+    description: 'Wok-tossed noodles with tender chicken strips, crunchy vegetables, and our house special sauce. Garnished with spring onions and sesame seeds.',
     image: require('../Assets/DeliciousBite/chicken-chowmin.jpg'),
     isVeg: false,
     rating: '4.8',
@@ -132,11 +135,13 @@ export default function DeliciousBite() {
   });
 
  const renderFoodItem = ({ item }: { item: FoodItem }) => (
-     <TouchableOpacity 
-       style={styles.foodCard} 
-       activeOpacity={0.9}
-       onPress={() => navigation.navigate('FoodItemDetail', { item })}
-     >
+     <TouchableOpacity
+          style={styles.foodCard}
+          activeOpacity={0.9}
+          onPress={() => navigation.navigate('FoodItemDetail', {
+            item,
+            restaurantName: restaurant.name // Pass the restaurant name
+          })}>
        <View style={styles.foodInfo}>
          <View style={styles.foodHeader}>
            <Text style={styles.foodName}>{item.name}</Text>
@@ -145,7 +150,7 @@ export default function DeliciousBite() {
            </View>
          </View>
          
-         <Text style={styles.foodPrice}>{item.price}</Text>
+         <Text style={styles.foodPrice}>Rs. {item.price}</Text>
          <Text style={styles.foodDescription} numberOfLines={2}>{item.description}</Text>
          
          <View style={styles.foodMeta}>

@@ -8,7 +8,10 @@ import {ImageSourcePropType} from 'react-native';
 type RootStackParamList = {
   Home: undefined;
   RestaurantDetails: { restaurant: Restaurant };
-  FoodItemDetail: { item: FoodItem };
+  FoodItemDetail: {
+    item: FoodItem;
+    restaurantName?: string; // Add this line to include restaurantName
+  };
 };
 
 type Restaurant = {
@@ -38,87 +41,86 @@ type FilterOption = 'all' | 'veg' | 'nonVeg';
 // For SpiceGarden.tsx - Indian cuisine food items
 const foodItems: FoodItem[] = [
   {
-    id: '1',
+    id: '17',
     name: 'Veg Biryani',
     price: '225',
-    description: 'Classic pizza with tomato sauce, mozzarella, and basil',
+    description: 'Aromatic basmati rice cooked with garden-fresh vegetables, saffron, and authentic Indian spices. Served with cooling raita and crispy papadum.',
     image: require('../Assets/SpiceGarden/Veg-biryani.jpeg'),
     isVeg: true,
     rating: '4.5',
     preparationTime: '20 min'
   },
   {
-    id: '2',
+    id: '18',
     name: 'Paneer Pakoda',
     price: '280',
-    description: 'Creamy pasta with grilled chicken and parmesan',
+    description: 'Soft cottage cheese cubes dipped in spiced gram flour batter and deep-fried to golden perfection. Served with mint chutney and tamarind sauce.',
     image: require('../Assets/SpiceGarden/Paneer-Pakoda.jpg'),
     isVeg: true,
     rating: '4.7',
     preparationTime: '25 min'
   },
   {
-    id: '3',
-    name: 'Mushroom hilly',
+    id: '19',
+    name: 'Mushroom Chilly',
     price: '225',
-    description: 'Fresh mixed greens with seasonal vegetables and vinaigrette',
+    description: 'Button mushrooms tossed in a spicy Indo-Chinese sauce with bell peppers, onions, and green chilies. Garnished with spring onions and sesame seeds.',
     image: require('../Assets/SpiceGarden/mushroom-chilly.webp'),
     isVeg: true,
     rating: '4.2',
     preparationTime: '10 min'
   },
   {
-    id: '4',
+    id: '20',
     name: 'Grilled Chicken',
     price: '600',
-    description: 'Juicy beef patty with lettuce, tomato, and special sauce',
+    description: 'Tender chicken pieces marinated in yogurt and aromatic spices, then grilled to perfection. Served with mint chutney and a side of fresh salad.',
     image: require('../Assets/SpiceGarden/Grilled-chicken.jpg'),
     isVeg: false,
     rating: '4.6',
     preparationTime: '15 min'
   },
   {
-    id: '5',
+    id: '21',
     name: 'French Fry',
     price: '100',
-    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    description: 'Crispy golden potato fries seasoned with our special spice blend. Served with tomato ketchup and garlic mayonnaise for dipping.',
     image: require('../Assets/SpiceGarden/French-fry.webp'),
     isVeg: true,
     rating: '4.4',
     preparationTime: '30 min'
   },
   {
-    id: '6',
+    id: '22',
     name: 'Chicken Biryani',
     price: '490',
-    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    description: 'Fragrant long-grain basmati rice layered with tender chicken pieces, caramelized onions, and traditional spices. Slow-cooked in a sealed pot and garnished with fresh herbs.',
     image: require('../Assets/SpiceGarden/chicken-biryani.jpg'),
     isVeg: false,
     rating: '4.4',
     preparationTime: '30 min'
   },
   {
-    id: '7',
+    id: '23',
     name: 'Chicken Pakoda',
     price: '300',
-    description: 'Creamy arborio rice with wild mushrooms and parmesan',
+    description: 'Juicy chicken pieces coated in a spiced chickpea flour batter and deep-fried until crispy and golden. Served with mint-coriander chutney and lemon wedges.',
     image: require('../Assets/SpiceGarden/chicken-pakoda.jpg'),
     isVeg: false,
     rating: '4.4',
     preparationTime: '30 min'
   },
   {
-    id: '8',
+    id: '24',
     name: 'Butter Chicken',
     price: '330',
-    description: 'Fresh salmon fil',
+    description: 'Tender chicken pieces cooked in a rich, creamy tomato sauce with butter, cream, and aromatic spices. Served with naan bread or steamed rice.',
     image: require('../Assets/SpiceGarden/Butter-Chicken.jpeg'),
     isVeg: false,
     rating: '4.8',
     preparationTime: '25 min'
   }
-  ];
-
+];
 export default function SpiceGarden() {
   const route = useRoute<RouteProp<RootStackParamList, 'RestaurantDetails'>>();
    const { restaurant } = route.params;
@@ -136,11 +138,13 @@ export default function SpiceGarden() {
    });
  
   const renderFoodItem = ({ item }: { item: FoodItem }) => (
-      <TouchableOpacity 
-        style={styles.foodCard} 
-        activeOpacity={0.9}
-        onPress={() => navigation.navigate('FoodItemDetail', { item })}
-      >
+      <TouchableOpacity
+           style={styles.foodCard}
+           activeOpacity={0.9}
+           onPress={() => navigation.navigate('FoodItemDetail', {
+             item,
+             restaurantName: restaurant.name // Pass the restaurant name
+           })}>
         <View style={styles.foodInfo}>
           <View style={styles.foodHeader}>
             <Text style={styles.foodName}>{item.name}</Text>
@@ -149,7 +153,7 @@ export default function SpiceGarden() {
             </View>
           </View>
           
-          <Text style={styles.foodPrice}>{item.price}</Text>
+          <Text style={styles.foodPrice}>Rs. {item.price}</Text>
           <Text style={styles.foodDescription} numberOfLines={2}>{item.description}</Text>
           
           <View style={styles.foodMeta}>

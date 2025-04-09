@@ -4,55 +4,116 @@ import { NavigationProp } from '@react-navigation/native';
 
 // Define prop types
 type Props = {
-    navigation: NavigationProp<any>; // 'any' can be replaced with your stack param list if available
-  };
-  
+  navigation: NavigationProp<any>;
+};
 
 const TodayTrends: React.FC<Props> = ({ navigation }) => {
+  // Updated trending items with restaurant-specific images and restaurant names
+  const trendingItems = [
+    {
+      id: '1',
+      name: 'Chicken Biryani',
+      restaurant: 'Spice Garden',
+      originalPrice: '500',
+      discountedPrice: '450',
+      discount: '10.0',
+      image: require('../Assets/SpiceGarden/chicken-biryani.jpg'),
+      description: 'Fragrant long-grain basmati rice layered with tender chicken pieces, caramelized onions, and traditional spices.',
+      isVeg: false,
+      rating: '4.5',
+      preparationTime: '30 min'
+    },
+    {
+      id: '2',
+      name: 'Chicken Momo',
+      restaurant: 'Delicious Bites',
+      originalPrice: '200',
+      discountedPrice: '140',
+      discount: '30.0',
+      image: require('../Assets/DeliciousBite/chicken-momo.jpg'),
+      description: 'Juicy dumplings filled with minced chicken, onions, garlic, and ginger. Steamed to perfection.',
+      isVeg: false,
+      rating: '4.7',
+      preparationTime: '15 min'
+    },
+    {
+      id: '3',
+      name: 'Chicken Pizza',
+      restaurant: 'Burger Joint',
+      originalPrice: '400',
+      discountedPrice: '360',
+      discount: '10.0',
+      image: require('../Assets/BurgerJoint/chicken-pizza.jpg'),
+      description: 'Delicious pizza topped with grilled chicken pieces, bell peppers, onions, and a blend of mozzarella and cheddar cheese.',
+      isVeg: false,
+      rating: '4.3',
+      preparationTime: '25 min'
+    },
+    {
+      id: '4',
+      name: 'Veg Momo',
+      restaurant: 'Delicious Bites',
+      originalPrice: '120',
+      discountedPrice: '100',
+      discount: '16.7',
+      image: require('../Assets/DeliciousBite/veg-momo.jpg'),
+      description: 'Steamed dumplings filled with finely chopped vegetables, herbs, and aromatic spices.',
+      isVeg: true,
+      rating: '4.2',
+      preparationTime: '20 min'
+    },
+    {
+      id: '5',
+      name: 'Butter Chicken',
+      restaurant: 'Spice Garden',
+      originalPrice: '330',
+      discountedPrice: '280',
+      discount: '15.2',
+      image: require('../Assets/SpiceGarden/Butter-Chicken.jpeg'),
+      description: 'Tender chicken pieces cooked in a rich, creamy tomato sauce with butter, cream, and aromatic spices.',
+      isVeg: false,
+      rating: '4.8',
+      preparationTime: '25 min'
+    }
+  ];
 
   return (
     <View style={styles.container}>
       <Text style={styles.head}>Today's Trends</Text>
       <Text style={styles.subhead}>Here's what you might like to taste</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollView}>
-        <TouchableOpacity style={styles.card} onPress = {() =>navigation.navigate('ProductScreen')}>
-          <Image source={require('../Assets/biryani/chickenbiryani.jpeg')} style={styles.image} />
-          <View style={styles.discountTag}><Text style={styles.discountText}>10.0% OFF</Text></View>
-          <Text style={styles.restaurant}>Swad Restaurant</Text>
-          <Text style={styles.itemName}>Chicken Biryani</Text>
-          <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.500</Text> Rs.450</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.card} onPress = {() =>navigation.navigate('ProductScreen2')} >
-          <Image source={require('../Assets/momo/chickenmomo.jpeg')} style={styles.image} />
-          <View style={styles.discountTag}><Text style={styles.discountText}>30.0% OFF</Text></View>
-          <Text style={styles.restaurant}>Hotel Planet</Text>
-          <Text style={styles.itemName}>Chicken Momo</Text>
-          <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.200</Text> Rs. 140</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card} onPress = {() =>navigation.navigate('ProductScreen3')}>
-          <Image source={require('../Assets/Chowmin/chickenchowmin.jpg')} style={styles.image} />
-          <View style={styles.discountTag}><Text style={styles.discountText}>10.0% OFF</Text></View>
-          <Text style={styles.restaurant}>Hotel Swad</Text>
-          <Text style={styles.itemName}>Chicken Chowmin</Text>
-          <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.200</Text> Rs. 180</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card}onPress = {() =>navigation.navigate('Samosa')}>
-          <Image source={require('../Assets/Extra/samosa.jpg')} style={styles.image} />
-          <View style={styles.discountTag}><Text style={styles.discountText}>10.0% OFF</Text></View>
-          <Text style={styles.restaurant}>Parnam Cafe</Text>
-          <Text style={styles.itemName}>Samosa Chat</Text>
-          <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.110</Text> Rs. 100</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress = {() =>navigation.navigate('Pakoda')}>
-          <Image source={require('../Assets/Extra/vegpakoda.jpg')} style={styles.image} />
-          <View style={styles.discountTag}><Text style={styles.discountText}>40.0% OFF</Text></View>
-          <Text style={styles.restaurant}>Parnam Cafe</Text>
-          <Text style={styles.itemName}>Pakoda</Text>
-          <Text style={styles.price}><Text style={styles.strikeThrough}>Rs.100</Text> Rs. 60</Text>
-        </TouchableOpacity>
+        {trendingItems.map((item) => (
+          <TouchableOpacity 
+            key={item.id}
+            style={styles.card} 
+            onPress={() => navigation.navigate('FoodItemDetail', { 
+              item: {
+                id: item.id,
+                name: item.name,
+                price: item.discountedPrice,
+                description: item.description,
+                image: item.image,
+                isVeg: item.isVeg,
+                rating: item.rating,
+                preparationTime: item.preparationTime
+              },
+              restaurantName: item.restaurant // Pass restaurant name to FoodItemDetail
+            })}
+          >
+            <Image source={item.image} style={styles.image} />
+            <View style={styles.discountTag}><Text style={styles.discountText}>{item.discount}% OFF</Text></View>
+            
+            {/* Restaurant name with icon */}
+            <View style={styles.restaurantContainer}>
+              <Text style={styles.restaurant}>{item.restaurant}</Text>
+            </View>
+            
+            <Text style={styles.itemName}>{item.name}</Text>
+            <Text style={styles.price}>
+              <Text style={styles.strikeThrough}>Rs.{item.originalPrice}</Text> Rs.{item.discountedPrice}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
     </View>
   );
@@ -111,20 +172,31 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
+  restaurantContainer: {
+    backgroundColor: '#FFF8EE',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+    marginTop: 8,
+    marginBottom: 2,
+  },
   restaurant: {
     fontSize: 12,
-    color: '#888',
-    marginTop: 5,
+    color: '#E96A1C',
+    fontWeight: '600',
   },
   itemName: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
+    marginTop: 4,
   },
   price: {
     fontSize: 14,
     fontWeight: 'bold',
     color: '#E96A1C',
+    marginTop: 4,
   },
   strikeThrough: {
     textDecorationLine: 'line-through',
