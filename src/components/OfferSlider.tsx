@@ -3,7 +3,7 @@ import React from 'react';
 import Swiper from 'react-native-swiper';
 
 
-const { width } = Dimensions.get('window');
+const {  } = Dimensions.get('window');
 
 const OfferSlider = () => {
   // Custom slide data

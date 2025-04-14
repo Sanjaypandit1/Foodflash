@@ -14,8 +14,9 @@ import Icon from 'react-native-vector-icons/Feather';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 
+
 // Get screen dimensions for responsive layout
-const { height } = Dimensions.get('window');
+const {  } = Dimensions.get('window');
 
 // Define types for menu items
 interface MenuItem {
@@ -24,6 +25,7 @@ interface MenuItem {
   icon: string;
   iconType?: 'feather' | 'material';
   toggle?: boolean;
+  onPress?: () => void;
 }
 
 // Menu Item Component Props
@@ -33,6 +35,7 @@ interface MenuItemProps {
   iconType?: 'feather' | 'material';
   toggle?: boolean;
   isLast?: boolean;
+  onPress?: () => void; // 👉 यो लाइन थप्नुहोस्
 }
 
 // Menu Section Component Props
@@ -45,21 +48,20 @@ interface MenuSectionProps {
 type RootStackParamList = {
   Settings: undefined;
   SignIn: undefined;
+  LanguageSelectionScreen: undefined;
 };
 
-type NavigationProps = NavigationProp<RootStackParamList>;
+type NavigationProps = NavigationProp<RootStackParamList, 'Settings'>;
 
 // Menu Item Component
-const MenuItem: React.FC<MenuItemProps> = ({ title, icon, iconType = 'feather', toggle, isLast }) => {
+const MenuItem: React.FC<MenuItemProps> = ({ title, icon, iconType = 'feather', toggle, isLast, onPress }) => {
   const [isEnabled, setIsEnabled] = useState(false);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
   return (
     <TouchableOpacity
-      style={[
-        styles.menuItem,
-        isLast ? styles.lastMenuItem : null,
-      ]}
+    style={[styles.menuItem, isLast ? styles.lastMenuItem : null]}
+    onPress={onPress}
     >
       <View style={styles.menuItemLeft}>
         {iconType === 'feather' ? (
@@ -96,6 +98,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, items }) => {
             iconType={item.iconType}
             toggle={item.toggle}
             isLast={index === items.length - 1}
+            onPress={item.onPress}
           />
         ))}
       </View>
@@ -139,11 +142,12 @@ const SignInButton: React.FC = () => {
 
 // Settings Screen
 const SettingsScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProps>();
   // Define menu items
   const generalItems: MenuItem[] = [
     { id: 1, title: 'Profile', icon: 'user' },
     { id: 2, title: 'My Address', icon: 'map-pin' },
-    { id: 3, title: 'Language', icon: 'globe' },
+    { id: 3, title: 'Language', icon: 'globe' , onPress: () => navigation.navigate('LanguageSelectionScreen' as never)},
     { id: 4, title: 'Dark Mode', icon: 'moon', toggle: true },
   ];
 

@@ -36,7 +36,7 @@ export default Headerbar;
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    paddingTop: 50,
+    paddingTop: 30,
     paddingBottom: 10,
     backgroundColor: 'red',
     paddingHorizontal: 20,

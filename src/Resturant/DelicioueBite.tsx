@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navigation/native';
 import {ImageSourcePropType} from 'react-native';

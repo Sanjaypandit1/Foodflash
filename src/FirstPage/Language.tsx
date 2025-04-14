@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 // Language Data
 const languages = [
@@ -11,21 +12,28 @@ const languages = [
   { id: 'bn', name: 'Bengali', flag: '🇧🇩' },
 ];
 
-const LanguageSelectionScreen = ({ onLanguageSelect }: { onLanguageSelect: () => void }) => {
+// ✅ Props type define गरियो
+type LanguageScreenProps = {
+  onLanguageSelect?: () => void;
+};
+
+const LanguageSelectionScreen = ({ onLanguageSelect }: LanguageScreenProps) => {
   const [selectedLang, setSelectedLang] = useState('en');
+  const navigation = useNavigation();
 
   const handleLanguageSelection = async () => {
     await AsyncStorage.setItem('selectedLanguage', selectedLang);
-    onLanguageSelect();
+
+    if (onLanguageSelect) {
+      onLanguageSelect();
+    } else {
+      navigation.goBack();
+    }
   };
 
   return (
     <View style={styles.container}>
-            <Image
-        source={require('../Assets/flag.jpg')} // Replace with actual image
-        style={styles.image}
-        resizeMode="contain"
-      />
+      <Image source={require('../Assets/flag.jpg')} style={styles.image} resizeMode="contain" />
       <Text style={styles.title}>Choose Your Language</Text>
       <Text style={styles.subtitle}>Choose your language to proceed</Text>
 
@@ -55,9 +63,6 @@ const LanguageSelectionScreen = ({ onLanguageSelect }: { onLanguageSelect: () =>
 };
 
 export default LanguageSelectionScreen;
-
-// Styles (same as before)
-
 
 // Styles
 const styles = StyleSheet.create({

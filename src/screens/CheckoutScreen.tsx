@@ -47,13 +47,13 @@ const CheckoutScreen = () => {
     {
       id: '1',
       name: 'Home',
-      address: '123 Main Street, Apartment 4B, New York, NY 10001',
+      address: 'Sundarharainch-12, Morang Nepal',
       isDefault: true,
     },
     {
       id: '2',
       name: 'Work',
-      address: '456 Office Plaza, Suite 200, New York, NY 10002',
+      address: 'Itahari-05, Sunsari Nepal',
       isDefault: false,
     },
   ]);

@@ -41,6 +41,7 @@ type TabParamList = {
 type RootStackParamList = {
   MainTabs: undefined
   SignIn: undefined
+  LanguageSelectionScreen:undefined
   // Add other root-level screens here
 }
 
@@ -138,6 +139,7 @@ function MainApp() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={MainTabNavigator} />
       <Stack.Screen name="SignIn" component={SignInScreen} />
+      <Stack.Screen name='LanguageSelectionScreen' component={LanguageSelectionScreen}/>
     </Stack.Navigator>
   );
 }
@@ -174,7 +176,7 @@ export default function App() {
   const handleLanguageSelection = async () => {
     await AsyncStorage.setItem('selectedLanguage', 'true');
     setShowLanguageScreen(false);
-    setShowOnboarding(true); // Show onboarding after selecting language
+    setShowOnboarding(true);  // Show onboarding after selecting language
   };
 
   // Handler for finishing OnboardingScreen1:
