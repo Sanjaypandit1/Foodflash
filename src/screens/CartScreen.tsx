@@ -8,12 +8,12 @@ import {
   ScrollView,
   Dimensions,
   Alert,
-} from "react-native"
-import { useCart } from "../components/CartContext"
-import Icon from "react-native-vector-icons/MaterialIcons"
-import { useNavigation } from "@react-navigation/native"
+} from 'react-native';
+import { useCart } from '../components/CartContext';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { type RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-const { width, height } = Dimensions.get("window")
+const { width, height } = Dimensions.get('window');
 
 // Define proper types for navigation
 type RootStackParamList = {
@@ -32,47 +32,51 @@ type RootStackParamList = {
     restaurantName?: string
   }
 }
-
 const CartScreen = () => {
-  const { cart, removeFromCart, clearCart } = useCart()
+  const { cart, removeFromCart, clearCart } = useCart();
   // Use any type for navigation as a workaround
-  const navigation = useNavigation<any>()
+  const navigation = useNavigation<any>();
 
   // Calculate total price
   const calculateTotal = () => {
     return cart.reduce((total, item) => {
-      const price = Number.parseFloat(item.price.replace("Rs.", ""))
-      return total + price * item.quantity
-    }, 0)
-  }
+      const price = Number.parseFloat(item.price.replace('Rs.', ''));
+      return total + price * item.quantity;
+    }, 0);
+  };
 
   // Handle navigation to food item details
   const handleItemPress = (item: any) => {
     try {
-      console.log("Navigating to FoodItemDetail with item:", item.name)
+      console.log('Navigating to FoodItemDetail with item:', item.name);
 
       // Navigate to the HomeStack navigator first, then to FoodItemDetail
-      navigation.navigate("Home", {
-        screen: "FoodItemDetail",
+      navigation.navigate('Home', {
+        screen: 'FoodItemDetail',
         params: {
           item: {
             id: item.id,
             name: item.name,
-            price: item.price.replace("Rs.", ""),
+            price: item.price.replace('Rs.', ''),
             description: item.description,
             image: item.image,
-            isVeg: item.tag === "Vegetarian",
+            isVeg: item.tag === 'Vegetarian',
             rating: item.rating.toString(),
-            preparationTime: "20 min", // Default value since it might not be in cart item
+            preparationTime: '20 min', // Default value since it might not be in cart item
           },
-          restaurantName: item.restaurantName || "Restaurant", // Use restaurant name if available
+          restaurantName: item.restaurantName || 'Restaurant', // Use restaurant name if available
         },
-      })
+      });
     } catch (error) {
-      console.error("Navigation error:", error)
-      Alert.alert("Navigation Error", "Could not navigate to product details.")
+      console.error('Navigation error:', error);
+      Alert.alert('Navigation Error', 'Could not navigate to product details.');
     }
-  }
+  };
+  const handleBuyNow = () => {
+    navigation.navigate('Home', {
+      screen: 'CheckoutScreen',
+    });
+  };
 
   if (cart.length === 0) {
     return (
@@ -87,9 +91,9 @@ const CartScreen = () => {
             style={styles.shopNowButton}
             onPress={() => {
               try {
-                navigation.navigate("Home", { screen: "Homescreen" })
+                navigation.navigate('Home', { screen: 'Homescreen' });
               } catch (error) {
-                console.error("Navigation error:", error)
+                console.error('Navigation error:', error);
               }
             }}
           >
@@ -97,7 +101,7 @@ const CartScreen = () => {
           </TouchableOpacity>
         </View>
       </SafeAreaView>
-    )
+    );
   }
 
   return (
@@ -157,7 +161,7 @@ const CartScreen = () => {
               <Text style={styles.totalAmount}>Rs.{calculateTotal().toFixed(2)}</Text>
             </View>
 
-            <TouchableOpacity style={styles.checkoutButton}>
+            <TouchableOpacity style={styles.checkoutButton} onPress={handleBuyNow}>
               <Text style={styles.checkoutText}>Proceed to Checkout</Text>
             </TouchableOpacity>
 
@@ -165,9 +169,9 @@ const CartScreen = () => {
               style={styles.addToCartButton}
               onPress={() => {
                 try {
-                  navigation.navigate("Home", { screen: "Homescreen" })
+                  navigation.navigate('Home', { screen: 'Homescreen' });
                 } catch (error) {
-                  console.error("Navigation error:", error)
+                  console.error('Navigation error:', error);
                 }
               }}
             >
@@ -177,61 +181,61 @@ const CartScreen = () => {
         </View>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: '#f5f5f5',
     paddingBottom: 20, // Add padding to the bottom of the screen
   },
   header: {
-    backgroundColor: "red",
+    backgroundColor: 'red',
     padding: 15,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
+    fontWeight: 'bold',
+    color: 'white',
   },
   clearButton: {
     padding: 5,
   },
   clearButtonText: {
-    color: "white",
-    fontWeight: "bold",
+    color: 'white',
+    fontWeight: 'bold',
   },
   mainContainer: {
     flex: 1,
-    display: "flex",
-    flexDirection: "column",
+    display: 'flex',
+    flexDirection: 'column',
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
   },
   emptyText: {
     fontSize: 18,
-    color: "#555",
+    color: '#555',
     marginTop: 15,
     marginBottom: 20,
   },
   shopNowButton: {
-    backgroundColor: "#F7931A",
+    backgroundColor: '#F7931A',
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 25,
   },
   shopNowText: {
-    color: "white",
+    color: 'white',
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   scrollContainer: {
     flex: 1,
@@ -241,18 +245,18 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   cartItem: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   itemContentContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginBottom: 10,
   },
   itemImage: {
@@ -266,99 +270,99 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 4,
   },
   itemTag: {
     fontSize: 14,
-    color: "#666",
+    color: '#666',
     marginBottom: 4,
   },
   priceRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 8,
   },
   itemPrice: {
     fontSize: 16,
-    fontWeight: "bold",
-    color: "#F7931A",
+    fontWeight: 'bold',
+    color: '#F7931A',
   },
   itemQuantity: {
     fontSize: 14,
-    color: "#666",
+    color: '#666',
   },
   removeButton: {
-    backgroundColor: "#ff3b30",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#ff3b30',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 5,
-    alignSelf: "flex-start",
+    alignSelf: 'flex-start',
   },
   removeText: {
-    color: "white",
+    color: 'white',
     marginLeft: 5,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   footerWrapper: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 35, // Position the footer 20 units from the bottom
     left: 0,
     right: 0,
     paddingHorizontal: 15,
   },
   footer: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     padding: 15,
     borderRadius: 20,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 10,
   },
   totalContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 15,
   },
   totalLabel: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   totalAmount: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "#F7931A",
+    fontWeight: 'bold',
+    color: '#F7931A',
   },
   checkoutButton: {
-    backgroundColor: "red",
+    backgroundColor: 'red',
     padding: 15,
     borderRadius: 10,
-    alignItems: "center",
+    alignItems: 'center',
   },
   checkoutText: {
-    color: "white",
+    color: 'white',
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   addToCartButton: {
-    backgroundColor: "#F7931A",
+    backgroundColor: '#F7931A',
     padding: 15,
     borderRadius: 10,
-    alignItems: "center",
+    alignItems: 'center',
     marginTop: 10,
   },
   addToCartText: {
-    color: "white",
+    color: 'white',
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
-})
+});
 
-export default CartScreen
+export default CartScreen;

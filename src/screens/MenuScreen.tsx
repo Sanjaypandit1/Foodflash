@@ -1,13 +1,13 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import SettingsScreen from '../MenuScreen/FrontScreen'
+import { StyleSheet} from 'react-native';
+import React from 'react';
+import SettingsScreen from '../MenuScreen/FrontScreen';
 
 const MenuScreen = () => {
   return (
    <SettingsScreen />
-  )
-}
+  );
+};
 
-export default MenuScreen
+export default MenuScreen;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

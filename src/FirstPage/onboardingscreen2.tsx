@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
+import React, { useState } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
 
 const onboardingData = [
   {
     id: 1,
-    image: require("../Assets/deliveryboy.webp"), // Replace with actual image path
-    title: "Enjoy On-Time Food Delivery!",
-    description: "Get the food delivered to your doorstep at the preferred time and schedule.",
+    image: require('../Assets/deliveryboy.webp'), // Replace with actual image path
+    title: 'Enjoy On-Time Food Delivery!',
+    description: 'Get the food delivered to your doorstep at the preferred time and schedule.',
   },
   // You can add more slides if needed
 ];
@@ -20,7 +20,7 @@ interface OnboardingScreen2Props {
   onFinish: () => void;
 }
 
-const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({ navigation, onFinish }) => {
+const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({  onFinish }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleNext = () => {
@@ -45,7 +45,7 @@ const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({ navigation, onFin
           <TouchableOpacity style={styles.skipButton} onPress={onFinish}>
                 <Text style={styles.skipText}>Skip</Text>
               </TouchableOpacity>
-      
+
         <TouchableOpacity style={styles.nextButton} onPress={onFinish}>
               <LinearGradient colors={['red', 'red']} style={styles.gradient}>
                 <Icon name="arrow-forward" size={24} color="#fff" />
@@ -58,9 +58,9 @@ const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({ navigation, onFin
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FAF6F1",
-    alignItems: "center",
-    justifyContent: "space-around",
+    backgroundColor: '#FAF6F1',
+    alignItems: 'center',
+    justifyContent: 'space-around',
     paddingVertical: 40,
   },
   image: {
@@ -69,39 +69,39 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   textContainer: {
-    alignItems: "center",
+    alignItems: 'center',
     paddingHorizontal: 20,
     marginBottom: 200,
   },
   title: {
     fontSize: 24,
-    fontWeight: "700",
-    color: "#333",
-    textAlign: "center",
+    fontWeight: '700',
+    color: '#333',
+    textAlign: 'center',
     marginBottom: 10,
   },
   description: {
     fontSize: 16,
-    color: "#666",
-    textAlign: "center",
+    color: '#666',
+    textAlign: 'center',
     lineHeight: 22,
   },
   pagination: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 30,
   },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#ccc",
+    backgroundColor: '#ccc',
     marginHorizontal: 4,
   },
   activeDot: {
     width: 16,
     height: 8,
-    backgroundColor: "",
+    backgroundColor: '',
     borderRadius: 4,
     marginHorizontal: 4,
   },
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     overflow: 'hidden',
     elevation: 5,
-  
+
   },
   gradient: {
     flex: 1,

@@ -21,7 +21,7 @@ const TodayTrends: React.FC<Props> = ({ navigation }) => {
       description: 'Fragrant long-grain basmati rice layered with tender chicken pieces, caramelized onions, and traditional spices.',
       isVeg: false,
       rating: '4.5',
-      preparationTime: '30 min'
+      preparationTime: '30 min',
     },
     {
       id: '2',
@@ -34,7 +34,7 @@ const TodayTrends: React.FC<Props> = ({ navigation }) => {
       description: 'Juicy dumplings filled with minced chicken, onions, garlic, and ginger. Steamed to perfection.',
       isVeg: false,
       rating: '4.7',
-      preparationTime: '15 min'
+      preparationTime: '15 min',
     },
     {
       id: '3',
@@ -47,7 +47,7 @@ const TodayTrends: React.FC<Props> = ({ navigation }) => {
       description: 'Delicious pizza topped with grilled chicken pieces, bell peppers, onions, and a blend of mozzarella and cheddar cheese.',
       isVeg: false,
       rating: '4.3',
-      preparationTime: '25 min'
+      preparationTime: '25 min',
     },
     {
       id: '4',
@@ -60,7 +60,7 @@ const TodayTrends: React.FC<Props> = ({ navigation }) => {
       description: 'Steamed dumplings filled with finely chopped vegetables, herbs, and aromatic spices.',
       isVeg: true,
       rating: '4.2',
-      preparationTime: '20 min'
+      preparationTime: '20 min',
     },
     {
       id: '5',
@@ -73,8 +73,8 @@ const TodayTrends: React.FC<Props> = ({ navigation }) => {
       description: 'Tender chicken pieces cooked in a rich, creamy tomato sauce with butter, cream, and aromatic spices.',
       isVeg: false,
       rating: '4.8',
-      preparationTime: '25 min'
-    }
+      preparationTime: '25 min',
+    },
   ];
 
   return (
@@ -83,10 +83,10 @@ const TodayTrends: React.FC<Props> = ({ navigation }) => {
       <Text style={styles.subhead}>Here's what you might like to taste</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollView}>
         {trendingItems.map((item) => (
-          <TouchableOpacity 
+          <TouchableOpacity
             key={item.id}
-            style={styles.card} 
-            onPress={() => navigation.navigate('FoodItemDetail', { 
+            style={styles.card}
+            onPress={() => navigation.navigate('FoodItemDetail', {
               item: {
                 id: item.id,
                 name: item.name,
@@ -95,19 +95,19 @@ const TodayTrends: React.FC<Props> = ({ navigation }) => {
                 image: item.image,
                 isVeg: item.isVeg,
                 rating: item.rating,
-                preparationTime: item.preparationTime
+                preparationTime: item.preparationTime,
               },
-              restaurantName: item.restaurant // Pass restaurant name to FoodItemDetail
+              restaurantName: item.restaurant, // Pass restaurant name to FoodItemDetail
             })}
           >
             <Image source={item.image} style={styles.image} />
             <View style={styles.discountTag}><Text style={styles.discountText}>{item.discount}% OFF</Text></View>
-            
+
             {/* Restaurant name with icon */}
             <View style={styles.restaurantContainer}>
               <Text style={styles.restaurant}>{item.restaurant}</Text>
             </View>
-            
+
             <Text style={styles.itemName}>{item.name}</Text>
             <Text style={styles.price}>
               <Text style={styles.strikeThrough}>Rs.{item.originalPrice}</Text> Rs.{item.discountedPrice}

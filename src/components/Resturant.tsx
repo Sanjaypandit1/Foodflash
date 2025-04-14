@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native'
-import React from 'react'
-import { useNavigation } from '@react-navigation/native'
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 // Define types for data
 type Restaurant = {
@@ -20,7 +20,7 @@ const restaurantData: Restaurant[] = [
     rating: '4.5',
     cuisine: 'Kathmandu',
     deliveryTime: '25-35 min',
-    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
   },
   {
     id: '2',
@@ -28,7 +28,7 @@ const restaurantData: Restaurant[] = [
     rating: '4.2',
     cuisine: 'Itahari',
     deliveryTime: '30-40 min',
-    image: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80'
+    image: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80',
   },
   {
     id: '3',
@@ -36,7 +36,7 @@ const restaurantData: Restaurant[] = [
     rating: '4.7',
     cuisine: 'Biratchowk',
     deliveryTime: '20-30 min',
-    image: 'https://images.unsplash.com/photo-1579027989536-b7b1f875659b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'
+    image: 'https://images.unsplash.com/photo-1579027989536-b7b1f875659b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
   },
   {
     id: '4',
@@ -44,14 +44,14 @@ const restaurantData: Restaurant[] = [
     rating: '4.3',
     cuisine: 'Biratnagar',
     deliveryTime: '15-25 min',
-    image: 'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80'
-  }
-]
+    image: 'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80',
+  },
+];
 
 export default function Resturant() {
   // Use the useNavigation hook
   const navigation = useNavigation();
-  
+
   const handleRestaurantPress = (restaurant: Restaurant) => {
     try {
       // Navigate to different screens based on restaurant ID
@@ -82,16 +82,16 @@ export default function Resturant() {
     } catch (error) {
       console.error('Navigation error:', error);
     }
-  }
+  };
 
   const renderRestaurantItem = ({ item }: { item: Restaurant }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.restaurantCard}
       onPress={() => handleRestaurantPress(item)}
       activeOpacity={0.8}
     >
-      <Image 
-        source={{ uri: item.image }} 
+      <Image
+        source={{ uri: item.image }}
         style={styles.restaurantImage}
         resizeMode="cover"
       />
@@ -104,7 +104,7 @@ export default function Resturant() {
         </View>
       </View>
     </TouchableOpacity>
-  )
+  );
 
   return (
     <View style={styles.container}>
@@ -114,7 +114,7 @@ export default function Resturant() {
           <Text style={styles.seeAllText}>See All</Text>
         </TouchableOpacity>
       </View>
-      
+
       <FlatList
         data={restaurantData}
         renderItem={renderRestaurantItem}
@@ -124,7 +124,7 @@ export default function Resturant() {
         scrollEnabled={false} // Disable scrolling as parent ScrollView handles it
       />
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -188,5 +188,5 @@ const styles = StyleSheet.create({
   restaurantDelivery: {
     fontSize: 14,
     color: '#666',
-  }
-})
+  },
+});
