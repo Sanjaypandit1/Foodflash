@@ -14,11 +14,13 @@ import {
   Platform,
   KeyboardAvoidingView,
   Dimensions,
+  useColorScheme,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useCart} from '../components/CartContext';
 import {useOrders} from '../components/OrderContext';
 import {useNavigation} from '@react-navigation/native';
+import AddressManager, { Address } from '../MenuScreen/Address1';
 
 const {} = Dimensions.get('window');
 const BOTTOM_PADDING = Platform.OS === 'ios' ? 34 : 20;
@@ -26,42 +28,20 @@ const BOTTOM_PADDING = Platform.OS === 'ios' ? 34 : 20;
 // Payment method type
 type PaymentMethod = 'card' | 'cash' | 'wallet';
 
-// Address type
-type Address = {
-  id: string;
-  name: string;
-  address: string;
-  isDefault: boolean;
-};
-
 const CheckoutScreen = () => {
   const {cart, clearCart} = useCart();
   const {addOrder} = useOrders();
   const navigation = useNavigation<any>();
+  
+  // Use React Native's built-in useColorScheme
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === 'dark';
 
   // State for selected payment method
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
 
-  // State for delivery addresses
-  const [addresses, setAddresses] = useState<Address[]>([
-    {
-      id: '1',
-      name: 'Home',
-      address: 'Sundarharainch-12, Morang Nepal',
-      isDefault: true,
-    },
-    {
-      id: '2',
-      name: 'Work',
-      address: 'Itahari-05, Sunsari Nepal',
-      isDefault: false,
-    },
-  ]);
-
   // State for selected address
-  const [selectedAddressId, setSelectedAddressId] = useState<string>(
-    addresses.find(addr => addr.isDefault)?.id || '1',
-  );
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
 
   // State for promo code
   const [promoCode, setPromoCode] = useState<string>('');
@@ -88,9 +68,9 @@ const CheckoutScreen = () => {
     return calculateSubtotal() + deliveryFee - calculateDiscount();
   };
 
-  // Get selected address
-  const getSelectedAddress = () => {
-    return addresses.find(addr => addr.id === selectedAddressId)?.address || '';
+  // Handle selecting an address
+  const handleSelectAddress = (address: Address) => {
+    setSelectedAddress(address);
   };
 
   // Get payment method text
@@ -119,6 +99,12 @@ const CheckoutScreen = () => {
 
   // Handle place order
   const handlePlaceOrder = () => {
+    // Check if an address is selected
+    if (!selectedAddress) {
+      Alert.alert('No Address Selected', 'Please select a delivery address.');
+      return;
+    }
+
     Alert.alert('Confirm Order', 'Are you sure you want to place this order?', [
       {
         text: 'Cancel',
@@ -141,7 +127,8 @@ const CheckoutScreen = () => {
           addOrder({
             items: orderItems,
             total: calculateTotal(),
-            deliveryAddress: getSelectedAddress(),
+            deliveryAddress: selectedAddress.address,
+            contactPhone: selectedAddress.phone,
             paymentMethod: getPaymentMethodText(),
           });
 
@@ -174,12 +161,12 @@ const CheckoutScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, isDarkMode && styles.darkSafeArea]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}>
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, isDarkMode && styles.darkHeader]}>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => navigation.goBack()}>
@@ -195,60 +182,36 @@ const CheckoutScreen = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}>
           {/* Delivery Address Section */}
-          <View style={styles.section}>
+          <View style={[styles.section, isDarkMode && styles.darkSection]}>
             <View style={styles.sectionHeader}>
               <Icon name="location-on" size={22} color="#FF3F00" />
-              <Text style={styles.sectionTitle}>Delivery Address</Text>
+              <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>Delivery Address</Text>
             </View>
 
-            {addresses.map(address => (
-              <TouchableOpacity
-                key={address.id}
-                style={[
-                  styles.addressCard,
-                  selectedAddressId === address.id &&
-                    styles.selectedAddressCard,
-                ]}
-                onPress={() => setSelectedAddressId(address.id)}>
-                <View style={styles.addressHeader}>
-                  <Text style={styles.addressName}>{address.name}</Text>
-                  {address.isDefault && (
-                    <View style={styles.defaultBadge}>
-                      <Text style={styles.defaultText}>Default</Text>
-                    </View>
-                  )}
-                </View>
-                <Text style={styles.addressText}>{address.address}</Text>
-                <View style={styles.radioButton}>
-                  {selectedAddressId === address.id && (
-                    <View style={styles.radioButtonInner} />
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
-
-            <TouchableOpacity style={styles.addButton}>
-              <Icon name="add" size={20} color="#FF3F00" />
-              <Text style={styles.addButtonText}>Add New Address</Text>
-            </TouchableOpacity>
+            <AddressManager 
+              onSelectAddress={handleSelectAddress}
+              mode="select"
+            />
           </View>
 
           {/* Payment Method Section */}
-          <View style={styles.section}>
+          <View style={[styles.section, isDarkMode && styles.darkSection]}>
             <View style={styles.sectionHeader}>
               <Icon name="payment" size={22} color="#FF3F00" />
-              <Text style={styles.sectionTitle}>Payment Method</Text>
+              <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>Payment Method</Text>
             </View>
 
             <TouchableOpacity
               style={[
                 styles.paymentOption,
                 paymentMethod === 'card' && styles.selectedPaymentOption,
+                isDarkMode && styles.darkPaymentOption,
+                paymentMethod === 'card' && isDarkMode && styles.darkSelectedPaymentOption,
               ]}
               onPress={() => setPaymentMethod('card')}>
               <View style={styles.paymentOptionContent}>
-                <Icon name="credit-card" size={24} color="#333" />
-                <Text style={styles.paymentOptionText}>Credit/Debit Card</Text>
+                <Icon name="credit-card" size={24} color={isDarkMode ? "#f0f0f0" : "#333"} />
+                <Text style={[styles.paymentOptionText, isDarkMode && styles.darkText]}>Credit/Debit Card</Text>
               </View>
               <View style={styles.radioButton}>
                 {paymentMethod === 'card' && (
@@ -261,11 +224,13 @@ const CheckoutScreen = () => {
               style={[
                 styles.paymentOption,
                 paymentMethod === 'cash' && styles.selectedPaymentOption,
+                isDarkMode && styles.darkPaymentOption,
+                paymentMethod === 'cash' && isDarkMode && styles.darkSelectedPaymentOption,
               ]}
               onPress={() => setPaymentMethod('cash')}>
               <View style={styles.paymentOptionContent}>
-                <Icon name="attach-money" size={24} color="#333" />
-                <Text style={styles.paymentOptionText}>Cash on Delivery</Text>
+                <Icon name="attach-money" size={24} color={isDarkMode ? "#f0f0f0" : "#333"} />
+                <Text style={[styles.paymentOptionText, isDarkMode && styles.darkText]}>Cash on Delivery</Text>
               </View>
               <View style={styles.radioButton}>
                 {paymentMethod === 'cash' && (
@@ -278,11 +243,13 @@ const CheckoutScreen = () => {
               style={[
                 styles.paymentOption,
                 paymentMethod === 'wallet' && styles.selectedPaymentOption,
+                isDarkMode && styles.darkPaymentOption,
+                paymentMethod === 'wallet' && isDarkMode && styles.darkSelectedPaymentOption,
               ]}
               onPress={() => setPaymentMethod('wallet')}>
               <View style={styles.paymentOptionContent}>
-                <Icon name="account-balance-wallet" size={24} color="#333" />
-                <Text style={styles.paymentOptionText}>Digital Wallet</Text>
+                <Icon name="account-balance-wallet" size={24} color={isDarkMode ? "#f0f0f0" : "#333"} />
+                <Text style={[styles.paymentOptionText, isDarkMode && styles.darkText]}>Digital Wallet</Text>
               </View>
               <View style={styles.radioButton}>
                 {paymentMethod === 'wallet' && (
@@ -293,16 +260,17 @@ const CheckoutScreen = () => {
           </View>
 
           {/* Promo Code Section */}
-          <View style={styles.section}>
+          <View style={[styles.section, isDarkMode && styles.darkSection]}>
             <View style={styles.sectionHeader}>
               <Icon name="local-offer" size={22} color="#FF3F00" />
-              <Text style={styles.sectionTitle}>Promo Code</Text>
+              <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>Promo Code</Text>
             </View>
 
             <View style={styles.promoContainer}>
               <TextInput
-                style={styles.promoInput}
+                style={[styles.promoInput, isDarkMode && styles.darkPromoInput]}
                 placeholder="Enter promo code"
+                placeholderTextColor={isDarkMode ? "#888" : "#aaa"}
                 value={promoCode}
                 onChangeText={setPromoCode}
                 editable={!promoApplied}
@@ -325,10 +293,10 @@ const CheckoutScreen = () => {
           </View>
 
           {/* Order Summary Section */}
-          <View style={styles.section}>
+          <View style={[styles.section, isDarkMode && styles.darkSection]}>
             <View style={styles.sectionHeader}>
               <Icon name="receipt" size={22} color="#FF3F00" />
-              <Text style={styles.sectionTitle}>Order Summary</Text>
+              <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>Order Summary</Text>
             </View>
 
             {/* Order Items */}
@@ -337,13 +305,13 @@ const CheckoutScreen = () => {
                 <View style={styles.orderItemLeft}>
                   <Image source={item.image} style={styles.orderItemImage} />
                   <View style={styles.orderItemDetails}>
-                    <Text style={styles.orderItemName}>{item.name}</Text>
-                    <Text style={styles.orderItemPrice}>
+                    <Text style={[styles.orderItemName, isDarkMode && styles.darkText]}>{item.name}</Text>
+                    <Text style={[styles.orderItemPrice, isDarkMode && styles.darkSubText]}>
                       {item.price} × {item.quantity}
                     </Text>
                   </View>
                 </View>
-                <Text style={styles.orderItemTotal}>
+                <Text style={[styles.orderItemTotal, isDarkMode && styles.darkText]}>
                   Rs.
                   {(
                     Number.parseFloat(item.price.replace('Rs.', '')) *
@@ -356,15 +324,15 @@ const CheckoutScreen = () => {
             {/* Price Breakdown */}
             <View style={styles.priceBreakdown}>
               <View style={styles.priceRow}>
-                <Text style={styles.priceLabel}>Subtotal</Text>
-                <Text style={styles.priceValue}>
+                <Text style={[styles.priceLabel, isDarkMode && styles.darkSubText]}>Subtotal</Text>
+                <Text style={[styles.priceValue, isDarkMode && styles.darkText]}>
                   Rs.{calculateSubtotal().toFixed(2)}
                 </Text>
               </View>
 
               <View style={styles.priceRow}>
-                <Text style={styles.priceLabel}>Delivery Fee</Text>
-                <Text style={styles.priceValue}>
+                <Text style={[styles.priceLabel, isDarkMode && styles.darkSubText]}>Delivery Fee</Text>
+                <Text style={[styles.priceValue, isDarkMode && styles.darkText]}>
                   Rs.{deliveryFee.toFixed(2)}
                 </Text>
               </View>
@@ -381,8 +349,8 @@ const CheckoutScreen = () => {
               )}
 
               <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Total</Text>
-                <Text style={styles.totalValue}>
+                <Text style={[styles.totalLabel, isDarkMode && styles.darkText]}>Total</Text>
+                <Text style={[styles.totalValue, isDarkMode && styles.darkText]}>
                   Rs.{calculateTotal().toFixed(2)}
                 </Text>
               </View>
@@ -394,10 +362,10 @@ const CheckoutScreen = () => {
         </ScrollView>
 
         {/* Place Order Button */}
-        <View style={styles.footer}>
-          <View style={styles.totalContainer}>
-            <Text style={styles.totalLabelFooter}>Total</Text>
-            <Text style={styles.totalValueFooter}>
+        <View style={[styles.footer, isDarkMode && styles.darkFooter]}>
+          <View style={[styles.totalContainer, isDarkMode && styles.darkTotalContainer]}>
+            <Text style={[styles.totalLabelFooter, isDarkMode && styles.darkSubText]}>Total</Text>
+            <Text style={[styles.totalValueFooter, isDarkMode && styles.darkText]}>
               Rs.{calculateTotal().toFixed(2)}
             </Text>
           </View>
@@ -418,6 +386,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f9f9f9',
   },
+  darkSafeArea: {
+    backgroundColor: '#121212',
+  },
   container: {
     flex: 1,
   },
@@ -429,6 +400,9 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 20,
     elevation: 4,
+  },
+  darkHeader: {
+    backgroundColor: '#8B0000',
   },
   backButton: {
     padding: 5,
@@ -455,6 +429,10 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
   },
+  darkSection: {
+    backgroundColor: '#222',
+    shadowColor: '#000',
+  },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -466,51 +444,45 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: '#222',
   },
-  addressCard: {
+  darkText: {
+    color: '#f0f0f0',
+  },
+  darkSubText: {
+    color: '#aaa',
+  },
+  paymentOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: '#E0E0E0',
     borderRadius: 12,
-    padding: 14,
+    padding: 16,
     marginBottom: 10,
     backgroundColor: '#fff',
   },
-  selectedAddressCard: {
+  darkPaymentOption: {
+    borderColor: '#444',
+    backgroundColor: '#333',
+  },
+  selectedPaymentOption: {
     borderColor: '#FF3F00',
     backgroundColor: '#FFF3EB',
   },
-  addressHeader: {
+  darkSelectedPaymentOption: {
+    borderColor: '#FF3F00',
+    backgroundColor: '#3A2A20',
+  },
+  paymentOptionContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
   },
-  addressName: {
+  paymentOptionText: {
+    marginLeft: 12,
     fontSize: 15,
-    fontWeight: '600',
     color: '#333',
   },
-  defaultBadge: {
-    backgroundColor: '#FF3F00',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginLeft: 8,
-  },
-  defaultText: {
-    color: 'white',
-    fontSize: 11,
-    fontWeight: '500',
-  },
-  addressText: {
-    fontSize: 14,
-    color: '#555',
-    lineHeight: 20,
-    paddingRight: 30,
-  },
   radioButton: {
-    position: 'absolute',
-    right: 14,
-    top: '50%',
-    marginTop: 6,
     width: 20,
     height: 20,
     borderRadius: 10,
@@ -524,42 +496,6 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     backgroundColor: '#FF3F00',
-  },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    marginTop: 6,
-  },
-  addButtonText: {
-    color: '#FF3F00',
-    fontWeight: '600',
-    marginLeft: 5,
-    fontSize: 15,
-  },
-  paymentOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 10,
-  },
-  selectedPaymentOption: {
-    borderColor: '#FF3F00',
-    backgroundColor: '#FFF3EB',
-  },
-  paymentOptionContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  paymentOptionText: {
-    marginLeft: 12,
-    fontSize: 15,
-    color: '#333',
   },
   promoContainer: {
     flexDirection: 'row',
@@ -575,6 +511,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginRight: 10,
     backgroundColor: '#fff',
+    color: '#333',
+  },
+  darkPromoInput: {
+    borderColor: '#444',
+    backgroundColor: '#333',
+    color: '#f0f0f0',
   },
   promoButton: {
     backgroundColor: '#FF3F00',
@@ -665,13 +607,16 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
   },
-
   footer: {
     paddingHorizontal: 15,
     paddingBottom: BOTTOM_PADDING + 10,
     backgroundColor: 'white',
     borderTopWidth: 1,
     borderColor: '#ddd',
+  },
+  darkFooter: {
+    backgroundColor: '#222',
+    borderColor: '#444',
   },
   placeOrderPrice: {
     fontSize: 18,
@@ -688,19 +633,20 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: '#eee',
   },
-
+  darkTotalContainer: {
+    backgroundColor: '#222',
+    borderColor: '#444',
+  },
   totalLabelFooter: {
     fontSize: 16,
     color: '#555',
     fontWeight: 'bold',
   },
-
   totalValueFooter: {
     fontSize: 16,
     color: '#000',
     fontWeight: 'bold',
   },
-
   placeOrderButton: {
     marginBottom: 35,
     backgroundColor: '#FF3F00',

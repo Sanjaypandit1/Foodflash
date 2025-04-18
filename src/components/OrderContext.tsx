@@ -1,52 +1,56 @@
-'use client';
-
-import React, { createContext, useState, useContext, type ReactNode } from 'react';
-import type { ImageSourcePropType } from 'react-native';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Order item interface
-export interface OrderItem {
-  id: string
-  name: string
-  price: string
-  image: ImageSourcePropType
-  quantity: number
-  tag: string
-}
+// Order item type
+export type OrderItem = {
+  id: string;
+  name: string;
+  price: string;
+  image: any;
+  quantity: number;
+  tag?: string;
+};
 
-// Order interface
-export interface Order {
-  id: string
-  items: OrderItem[]
-  total: number
-  date: string
-  status: 'pending' | 'processing' | 'delivered' | 'cancelled'
-  deliveryAddress: string
-  paymentMethod: string
-}
+// Order type
+export type Order = {
+  id: string;
+  items: OrderItem[];
+  total: number;
+  deliveryAddress: string;
+  contactPhone: string;
+  paymentMethod: string;
+  status: string;
+  date: string;
+};
 
-interface OrderContextType {
-  orders: Order[]
-  addOrder: (order: Omit<Order, 'id' | 'date' | 'status'>) => void
-  getOrderById: (id: string) => Order | undefined
-  cancelOrder: (id: string) => void
-}
+// Context type
+export type OrderContextType = {
+  orders: Order[];
+  addOrder: (orderData: Omit<Order, 'id' | 'status' | 'date'>) => void;
+  cancelOrder: (orderId: string) => void;
+  clearOrders: () => void;
+};
 
-const OrderContext = createContext<OrderContextType | undefined>(undefined);
+// Create context
+const OrderContext = createContext<OrderContextType>({
+  orders: [],
+  addOrder: () => {},
+  cancelOrder: () => {},
+  clearOrders: () => {},
+});
 
-interface OrderProviderProps {
-  children: ReactNode
-}
+// Custom hook to use the order context
+export const useOrders = () => useContext(OrderContext);
 
-export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
+// Provider component
+export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [orders, setOrders] = useState<Order[]>([]);
 
-  // Load orders from AsyncStorage on component mount
-  React.useEffect(() => {
+  // Load orders from AsyncStorage on mount
+  useEffect(() => {
     const loadOrders = async () => {
       try {
         const savedOrders = await AsyncStorage.getItem('orders');
-        console.log('Loading orders from storage:', savedOrders);
         if (savedOrders) {
           setOrders(JSON.parse(savedOrders));
         }
@@ -59,50 +63,56 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
   }, []);
 
   // Save orders to AsyncStorage whenever they change
-  React.useEffect(() => {
+  useEffect(() => {
     const saveOrders = async () => {
       try {
         await AsyncStorage.setItem('orders', JSON.stringify(orders));
-        console.log('Saved orders to storage:', JSON.stringify(orders));
       } catch (error) {
         console.error('Failed to save orders:', error);
       }
     };
 
-    if (orders.length > 0) {
-      saveOrders();
-    }
+    saveOrders();
   }, [orders]);
 
-  const addOrder = (order: Omit<Order, 'id' | 'date' | 'status'>) => {
+  // Add a new order
+  const addOrder = (orderData: Omit<Order, 'id' | 'status' | 'date'>) => {
     const newOrder: Order = {
-      ...order,
-      id: `order-${Date.now()}`,
+      ...orderData,
+      id: Date.now().toString(),
+      status: 'pending', // Make sure status is lowercase to match your UI logic
       date: new Date().toISOString(),
-      status: 'pending',
     };
 
-    console.log('Adding new order:', newOrder);
-    setOrders((prevOrders) => [newOrder, ...prevOrders]);
+    setOrders(prevOrders => [newOrder, ...prevOrders]);
   };
 
-  const getOrderById = (id: string) => {
-    return orders.find((order) => order.id === id);
+  // Cancel an order
+  const cancelOrder = (orderId: string) => {
+    console.log('Cancelling order with ID:', orderId); // Add this for debugging
+    
+    setOrders(prevOrders => {
+      const updatedOrders = prevOrders.map(order => 
+        order.id === orderId 
+          ? { ...order, status: 'cancelled' } 
+          : order
+      );
+      
+      console.log('Updated orders:', updatedOrders); // Add this for debugging
+      return updatedOrders;
+    });
   };
 
-  const cancelOrder = (id: string) => {
-    setOrders((prevOrders) => prevOrders.map((order) => (order.id === id ? { ...order, status: 'cancelled' } : order)));
+  // Clear all orders
+  const clearOrders = () => {
+    setOrders([]);
   };
 
   return (
-    <OrderContext.Provider value={{ orders, addOrder, getOrderById, cancelOrder }}>{children}</OrderContext.Provider>
+    <OrderContext.Provider value={{ orders, addOrder, cancelOrder, clearOrders }}>
+      {children}
+    </OrderContext.Provider>
   );
 };
 
-export const useOrders = (): OrderContextType => {
-  const context = useContext(OrderContext);
-  if (!context) {
-    throw new Error('useOrders must be used within an OrderProvider');
-  }
-  return context;
-};
+export default OrderContext;

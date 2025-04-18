@@ -13,6 +13,7 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import AddressScreen from './AddressScreen';
 
 
 // Get screen dimensions for responsive layout
@@ -146,7 +147,7 @@ const SettingsScreen: React.FC = () => {
   // Define menu items
   const generalItems: MenuItem[] = [
     { id: 1, title: 'Profile', icon: 'user' },
-    { id: 2, title: 'My Address', icon: 'map-pin' },
+    { id: 2, title: 'My Address', icon: 'map-pin', onPress: () => navigation.navigate('AddressScreen' as never) },
     { id: 3, title: 'Language', icon: 'globe' , onPress: () => navigation.navigate('LanguageSelectionScreen' as never)},
     { id: 4, title: 'Dark Mode', icon: 'moon', toggle: true },
   ];

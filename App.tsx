@@ -27,6 +27,7 @@ import SpiceGarden from './src/Resturant/SpiceGarden';
 import SushilPalace from './src/Resturant/SushiPalace';
 import FoodItemDetail from './src/components/ProductDetails';
 import CheckoutScreen from './src/screens/CheckoutScreen'; // Import the new CheckoutScreen
+import AddressScreen from './src/MenuScreen/AddressScreen';
 
 // Type for bottom tab navigator
 type TabParamList = {
@@ -42,6 +43,7 @@ type RootStackParamList = {
   MainTabs: undefined
   SignIn: undefined
   LanguageSelectionScreen:undefined
+  AddressScreen:undefined
   // Add other root-level screens here
 }
 
@@ -140,6 +142,7 @@ function MainApp() {
       <Stack.Screen name="MainTabs" component={MainTabNavigator} />
       <Stack.Screen name="SignIn" component={SignInScreen} />
       <Stack.Screen name='LanguageSelectionScreen' component={LanguageSelectionScreen}/>
+      <Stack.Screen name='AddressScreen' component={AddressScreen}/>
     </Stack.Navigator>
   );
 }
