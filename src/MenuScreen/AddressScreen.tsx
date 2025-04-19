@@ -9,6 +9,7 @@ import {
   ScrollView,
   TextInput,
   Alert,
+   StatusBar, Platform 
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AddressManager, { Address } from './Address1';
@@ -232,16 +233,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f9f9f9',
+   paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
+  },
+  safeArea: {
+    flex: 1,
   },
   darkContainer: {
     backgroundColor: '#121212',
   },
   header: {
-    backgroundColor: '#FF3F00',
+    backgroundColor: 'red',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 30,
+    padding: 15,
     elevation: 4,
   },
   darkHeader: {
@@ -263,7 +268,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF3F00',
+    backgroundColor: 'red',
     marginHorizontal: 15,
     marginTop: 15,
     paddingVertical: 12,

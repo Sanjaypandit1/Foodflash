@@ -7,10 +7,29 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Image,
+  StatusBar,
+  Platform
 } from 'react-native';
 import { useOrders } from '../components/OrderContext';
 import { useColorScheme } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+
+// Define types for the order items and orders
+interface OrderItem {
+  id: string;
+  name: string;
+  price: string;
+  quantity: number;
+  image: any; // Use more specific type if available
+}
+
+interface Order {
+  id: string;
+  date: string;
+  status: string;
+  items: OrderItem[];
+  total: number;
+}
 
 const OrdersScreen = () => {
   const { orders, cancelOrder } = useOrders();
@@ -57,81 +76,100 @@ const OrdersScreen = () => {
     </View>
   );
 
+  // Render individual order item
+  const renderOrderItem = ({ item, index }: { item: Order; index: number }) => (
+    <View 
+      style={[
+        styles.orderCard, 
+        isDarkMode && styles.darkOrderCard,
+        index === orders.length - 1 && styles.lastOrderCard // Special styling for last item
+      ]}
+    >
+      <View style={styles.orderHeader}>
+        <View>
+          <Text style={[styles.orderDate, isDarkMode && styles.darkText]}>
+            {formatDate(item.date)}
+          </Text>
+          <Text style={[styles.orderId, isDarkMode && styles.darkSubText]}>
+            Order #{item.id.slice(-6)}
+          </Text>
+        </View>
+        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '20' }]}>
+          <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
+            {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.orderItems}>
+        {item.items.slice(0, 2).map((orderItem: OrderItem, index: number) => (
+          <View key={orderItem.id} style={styles.orderItem}>
+            <Image source={orderItem.image} style={styles.itemImage} />
+            <View style={styles.itemDetails}>
+              <Text style={[styles.itemName, isDarkMode && styles.darkText]}>
+                {orderItem.name}
+              </Text>
+              <Text style={[styles.itemPrice, isDarkMode && styles.darkSubText]}>
+                {orderItem.price} × {orderItem.quantity}
+              </Text>
+            </View>
+          </View>
+        ))}
+        {item.items.length > 2 && (
+          <Text style={[styles.moreItems, isDarkMode && styles.darkSubText]}>
+            +{item.items.length - 2} more items
+          </Text>
+        )}
+      </View>
+
+      <View style={styles.orderFooter}>
+        <View>
+          <Text style={[styles.totalLabel, isDarkMode && styles.darkSubText]}>Total</Text>
+          <Text style={[styles.totalAmount, isDarkMode && styles.darkText]}>
+            Rs.{item.total.toFixed(2)}
+          </Text>
+        </View>
+        
+        {item.status.toLowerCase() === 'pending' && (
+          <TouchableOpacity 
+            style={styles.cancelButton}
+            onPress={() => handleCancelOrder(item.id)}>
+            <Text style={styles.cancelButtonText}>Cancel Order</Text>
+          </TouchableOpacity>
+        )}
+        
+        {item.status.toLowerCase() === 'delivered' && (
+          <TouchableOpacity style={styles.reorderButton}>
+            <Text style={styles.reorderButtonText}>Reorder</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={[styles.container, isDarkMode && styles.darkContainer]}>
       <View style={[styles.header, isDarkMode && styles.darkHeader]}>
         <Text style={styles.headerTitle}>My Orders</Text>
       </View>
 
-      <FlatList
-        data={orders}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={[styles.orderCard, isDarkMode && styles.darkOrderCard]}>
-            <View style={styles.orderHeader}>
-              <View>
-                <Text style={[styles.orderDate, isDarkMode && styles.darkText]}>
-                  {formatDate(item.date)}
-                </Text>
-                <Text style={[styles.orderId, isDarkMode && styles.darkSubText]}>
-                  Order #{item.id.slice(-6)}
-                </Text>
-              </View>
-              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '20' }]}>
-                <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
-                  {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.orderItems}>
-              {item.items.slice(0, 2).map((orderItem, index) => (
-                <View key={orderItem.id} style={styles.orderItem}>
-                  <Image source={orderItem.image} style={styles.itemImage} />
-                  <View style={styles.itemDetails}>
-                    <Text style={[styles.itemName, isDarkMode && styles.darkText]}>
-                      {orderItem.name}
-                    </Text>
-                    <Text style={[styles.itemPrice, isDarkMode && styles.darkSubText]}>
-                      {orderItem.price} × {orderItem.quantity}
-                    </Text>
-                  </View>
-                </View>
-              ))}
-              {item.items.length > 2 && (
-                <Text style={[styles.moreItems, isDarkMode && styles.darkSubText]}>
-                  +{item.items.length - 2} more items
-                </Text>
-              )}
-            </View>
-
-            <View style={styles.orderFooter}>
-              <View>
-                <Text style={[styles.totalLabel, isDarkMode && styles.darkSubText]}>Total</Text>
-                <Text style={[styles.totalAmount, isDarkMode && styles.darkText]}>
-                  Rs.{item.total.toFixed(2)}
-                </Text>
-              </View>
-              
-              {item.status.toLowerCase() === 'pending' && (
-                <TouchableOpacity 
-                  style={styles.cancelButton}
-                  onPress={() => handleCancelOrder(item.id)}>
-                  <Text style={styles.cancelButtonText}>Cancel Order</Text>
-                </TouchableOpacity>
-              )}
-              
-              {item.status.toLowerCase() === 'delivered' && (
-                <TouchableOpacity style={styles.reorderButton}>
-                  <Text style={styles.reorderButtonText}>Reorder</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-        )}
-        contentContainerStyle={orders.length === 0 ? styles.emptyList : styles.list}
-        ListEmptyComponent={renderEmptyState}
-      />
+      {/* Wrap FlatList in a View with flex: 1 to ensure it takes up all available space */}
+      <View style={styles.listContainer}>
+        <FlatList
+          data={orders}
+          keyExtractor={(item) => item.id}
+          renderItem={renderOrderItem}
+          contentContainerStyle={orders.length === 0 ? styles.emptyList : styles.list}
+          ListEmptyComponent={renderEmptyState}
+          showsVerticalScrollIndicator={true}
+          initialNumToRender={5}
+          maxToRenderPerBatch={10}
+          windowSize={10}
+          removeClippedSubviews={Platform.OS === 'android'}
+          // Add footer component to ensure space at the bottom
+          ListFooterComponent={<View style={styles.listFooter} />}
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -140,9 +178,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f9f9f9',
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
   },
   darkContainer: {
     backgroundColor: '#121212',
+  },
+  listContainer: {
+    flex: 1, // Ensure the list container takes up all available space
   },
   header: {
     backgroundColor: '#FF3F00',
@@ -165,6 +207,7 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: 15,
+    paddingBottom: 80, // Significantly increased bottom padding
   },
   emptyList: {
     flex: 1,
@@ -182,6 +225,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 3,
     elevation: 2,
+  },
+  lastOrderCard: {
+    marginBottom: 50, // Add extra margin to the last card
   },
   darkOrderCard: {
     backgroundColor: '#222',
@@ -303,6 +349,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#777',
     textAlign: 'center',
+  },
+  listFooter: {
+    height: 30, // Extra space at the bottom of the list
   },
 });
 

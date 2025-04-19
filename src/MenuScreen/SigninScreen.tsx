@@ -12,6 +12,7 @@ import {
   ScrollView,
   Dimensions,
   Keyboard,
+   StatusBar
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 
@@ -196,7 +197,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-  },
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
+   },
+   safeArea: {
+     flex: 1,
+   },
   keyboardAvoidingView: {
     flex: 1,
   },

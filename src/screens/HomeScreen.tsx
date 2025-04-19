@@ -1,5 +1,5 @@
 import React from 'react';
-import {  StyleSheet, StatusBar } from 'react-native';
+import {  StyleSheet, StatusBar,  Platform } from 'react-native';
 import Headerbar from '../components/Headerbar';
 import Categories from '../components/Categories';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
@@ -30,7 +30,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 80 }} // Added padding at the bottom
       >
-        <StatusBar backgroundColor={'#FF3F00'} />
+        <StatusBar backgroundColor={'#FFF5EB'} />
         <Headerbar />
         <OfferSlider />
         <Categories navigation={navigation}/>
@@ -46,7 +46,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFF5EB',
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
+  },
+  safeArea: {
+    flex: 1,
   },
 });
 

@@ -9,7 +9,7 @@ import {
   TextInput,
   Alert,
   FlatList,
-  useColorScheme,
+  useColorScheme, StatusBar, Platform 
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -425,6 +425,10 @@ const styles = StyleSheet.create({
   // Your existing styles...
   container: {
     width: '100%',
+   paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
+  },
+  safeArea: {
+    flex: 1,
   },
   emptyContainer: {
     alignItems: 'center',

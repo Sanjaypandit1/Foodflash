@@ -8,6 +8,7 @@ import {
   ScrollView,
   Dimensions,
   Alert,
+  StatusBar, Platform
 } from 'react-native';
 import { useCart } from '../components/CartContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -185,11 +186,14 @@ const CartScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  
   safeArea: {
     flex: 1,
     backgroundColor: '#f5f5f5',
     paddingBottom: 20, // Add padding to the bottom of the screen
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
   },
+
   header: {
     backgroundColor: 'red',
     padding: 15,

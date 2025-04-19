@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet,StatusBar, Platform} from 'react-native';
 
 const FavoritesScreen = () => {
   return (
@@ -15,6 +15,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
+  },
+  safeArea: {
+    flex: 1,
   },
   text: {
     fontSize: 20,
