@@ -18,7 +18,7 @@ const Headerbar = () => {
 
         {/* Notification Bell Icon */}
         <TouchableOpacity style={styles.bellIcon}>
-          <Ionicons name="notifications-outline" size={28} color="black" />
+          <Ionicons name="notifications-outline" size={28} color="red" />
         </TouchableOpacity>
       </View>
 

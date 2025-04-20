@@ -146,6 +146,7 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 10,
   },
+
   scrollView: {
     flexDirection: 'row',
     paddingVertical: 5,

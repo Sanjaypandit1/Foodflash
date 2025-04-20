@@ -133,7 +133,7 @@ const MainTabNavigator = () => {
               iconName = 'shopping-bag';
               break;
             case 'Menu':
-              iconName = 'bars';
+              iconName = 'user';
               break;
             default:
               iconName = 'circle';
