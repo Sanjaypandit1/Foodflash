@@ -10,6 +10,7 @@ import type { GestureResponderEvent } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CartProvider, useCart } from './src/components/CartContext';
 import { OrderProvider } from './src/components/OrderContext';
+import CategoryItems from './src/components/CategoryItem';
 
 // Importing Screens
 import HomeScreen from './src/screens/HomeScreen';
@@ -72,6 +73,7 @@ type RootStackParamList = {
   Home: undefined
   Orders: undefined
   Cart: undefined
+  CategoryItems:undefined
 
 }
 
@@ -90,6 +92,7 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen name="SpiceGarden" component={SpiceGarden} options={{ headerShown: true, title: '' }} />
       <HomeStack.Screen name="SushilPalace" component={SushilPalace} options={{ headerShown: true, title: '' }} />
       <HomeStack.Screen name="FoodItemDetail" component={FoodItemDetail} options={{ headerShown: true }} />
+      <Stack.Screen name="CategoryItems" component={CategoryItems} options={{ headerShown:false}} />
       <HomeStack.Screen name="CheckoutScreen" component={CheckoutScreen} options={{ headerShown: false }} />
     </HomeStack.Navigator>
   );
