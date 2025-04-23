@@ -14,7 +14,7 @@ import {
   Platform,
   KeyboardAvoidingView,
   Dimensions,
-  useColorScheme,
+  useColorScheme,StatusBar
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useCart} from '../components/CartContext';
@@ -385,7 +385,9 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#f9f9f9',
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
   },
+ 
   darkSafeArea: {
     backgroundColor: '#121212',
   },

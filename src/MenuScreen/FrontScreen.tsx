@@ -47,10 +47,23 @@ interface MenuSectionProps {
 
 // Navigation type
 type RootStackParamList = {
-  Settings: undefined;
-  SignIn: undefined;
-  LanguageSelectionScreen: undefined;
-};
+  Settings: undefined
+  SignIn: undefined
+  Profile: undefined
+  Address: undefined
+  LanguageSelectionScreen:undefined
+  Coupons: undefined
+  LoyaltyPoints: undefined
+  Wallet: undefined
+  Refer: undefined
+  Support: undefined
+  About: undefined
+  Terms: undefined
+  Privacy: undefined
+  Refund: undefined
+  Cancellation: undefined
+}
+
 
 type NavigationProps = NavigationProp<RootStackParamList, 'Settings'>;
 
@@ -146,30 +159,61 @@ const SettingsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProps>();
   // Define menu items
   const generalItems: MenuItem[] = [
-    { id: 1, title: 'Profile', icon: 'user' },
-    { id: 2, title: 'My Address', icon: 'map-pin', onPress: () => navigation.navigate('AddressScreen' as never) },
-    { id: 3, title: 'Language', icon: 'globe' , onPress: () => navigation.navigate('LanguageSelectionScreen' as never)},
-    { id: 4, title: 'Dark Mode', icon: 'moon', toggle: true },
-  ];
+    { id: 1, title: "Profile", icon: "user", onPress: () => navigation.navigate("Profile") },
+    { id: 2, title: "My Address", icon: "map-pin", onPress: () => navigation.navigate("Address") },
+    { id: 3, title: "Language", icon: "globe", onPress: () => navigation.navigate("LanguageSelectionScreen") },
+    { id: 4, title: "Dark Mode", icon: "moon", toggle: true },
+  ]
 
   const promotionalItems: MenuItem[] = [
-    { id: 1, title: 'Coupon', icon: 'ticket', iconType: 'material' },
-    { id: 2, title: 'Loyalty Points', icon: 'star' },
-    { id: 3, title: 'My Wallet', icon: 'credit-card' },
-  ];
+    { id: 1, title: "Coupon", icon: "ticket", iconType: "material", onPress: () => navigation.navigate("Coupons") },
+    { id: 2, title: "Loyalty Points", icon: "star", onPress: () => navigation.navigate("LoyaltyPoints") },
+    { id: 3, title: "My Wallet", icon: "credit-card", onPress: () => navigation.navigate("Wallet") },
+  ]
 
   const earningItems: MenuItem[] = [
-    { id: 1, title: 'Refer & Earn', icon: 'users' },
-  ];
+    { id: 1, title: "Refer & Earn", icon: "users", onPress: () => navigation.navigate("Refer") },
+  ]
 
   const helpSupportItems: MenuItem[] = [
-    { id: 1, title: 'Help & Support', icon: 'headphones', iconType: 'feather' },
-    { id: 2, title: 'About Us', icon: 'info', iconType: 'feather' },
-    { id: 3, title: 'Terms & Condition', icon: 'file-text', iconType: 'feather' },
-    { id: 4, title: 'Privacy Policy', icon: 'shield', iconType: 'feather' },
-    { id: 5, title: 'Refund Policy', icon: 'refresh-cw', iconType: 'feather' },
-    { id: 6, title: 'Cancellation Policy', icon: 'x-circle', iconType: 'feather' },
-  ];
+    {
+      id: 1,
+      title: "Help & Support",
+      icon: "headphones",
+      iconType: "feather",
+      onPress: () => navigation.navigate("Support"),
+    },
+    { id: 2, title: "About Us", icon: "info", iconType: "feather", onPress: () => navigation.navigate("About") },
+    {
+      id: 3,
+      title: "Terms & Condition",
+      icon: "file-text",
+      iconType: "feather",
+      onPress: () => navigation.navigate("Terms"),
+    },
+    {
+      id: 4,
+      title: "Privacy Policy",
+      icon: "shield",
+      iconType: "feather",
+      onPress: () => navigation.navigate("Privacy"),
+    },
+    {
+      id: 5,
+      title: "Refund Policy",
+      icon: "refresh-cw",
+      iconType: "feather",
+      onPress: () => navigation.navigate("Refund"),
+    },
+    {
+      id: 6,
+      title: "Cancellation Policy",
+      icon: "x-circle",
+      iconType: "feather",
+      onPress: () => navigation.navigate("Cancellation"),
+    },
+  ]
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -205,7 +249,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: 'red', // Changed from red to match the theme
-    paddingTop: 35,
+    paddingTop: 10,
     paddingBottom: 20,
   },
   profileContainer: {

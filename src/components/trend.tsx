@@ -123,7 +123,7 @@ export default TodayTrends;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F9F1E7',
+    backgroundColor: '#fff',
     paddingVertical: 15,
     paddingHorizontal: 15,
   },

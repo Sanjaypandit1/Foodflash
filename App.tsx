@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { View, ActivityIndicator, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { View, ActivityIndicator, TouchableOpacity, StyleSheet, Text,  } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,6 +10,7 @@ import type { GestureResponderEvent } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CartProvider, useCart } from './src/components/CartContext';
 import { OrderProvider } from './src/components/OrderContext';
+import CategoryItems from './src/components/CategoryItem';
 
 // Importing Screens
 import HomeScreen from './src/screens/HomeScreen';
@@ -20,7 +21,7 @@ import MenuScreen from './src/screens/MenuScreen';
 import LanguageSelectionScreen from './src/FirstPage/Language';
 import OnboardingScreen from './src/FirstPage/OnboardingScreen';
 import OnboardingScreen2 from './src/FirstPage/onboardingscreen2';
-import SignInScreen from './src/signinpage/Signin';
+import SignInScreen from './src/MenuScreen/SigninScreen';
 import DeliciousBite from './src/Resturant/DelicioueBite';
 import BurgerJoint from './src/Resturant/BurgerJoint';
 import SpiceGarden from './src/Resturant/SpiceGarden';
@@ -28,6 +29,17 @@ import SushilPalace from './src/Resturant/SushiPalace';
 import FoodItemDetail from './src/components/ProductDetails';
 import CheckoutScreen from './src/screens/CheckoutScreen'; // Import the new CheckoutScreen
 import AddressScreen from './src/MenuScreen/AddressScreen';
+import ProfileScreen from './src/MenuScreen/ProfileScreen';
+import CouponsScreen from './src/MenuScreen/CouponsScreen';
+import LoyaltyPointsScreen from './src/MenuScreen/LoyaltyPointScreen';
+import WalletScreen from './src/MenuScreen/WalletScreen';
+import ReferScreen from './src/MenuScreen/ReferScreen';
+import SupportScreen from './src/MenuScreen/SupportScreen';
+import AboutScreen from './src/MenuScreen/AboutScreen';
+import TermsScreen from './src/MenuScreen/TermsScreen';
+import PrivacyScreen from './src/MenuScreen/PrivacyScreen';
+import RefundScreen from './src/MenuScreen/RefundScreen';
+import CancellationScreen from './src/MenuScreen/CancellationScreen';
 
 // Type for bottom tab navigator
 type TabParamList = {
@@ -44,7 +56,25 @@ type RootStackParamList = {
   SignIn: undefined
   LanguageSelectionScreen:undefined
   AddressScreen:undefined
-  // Add other root-level screens here
+  Settings: undefined
+  Profile: undefined
+  Address: undefined
+  Language: undefined
+  Coupons: undefined
+  LoyaltyPoints: undefined
+  Wallet: undefined
+  Refer: undefined
+  Support: undefined
+  About: undefined
+  Terms: undefined
+  Privacy: undefined
+  Refund: undefined
+  Cancellation: undefined
+  Home: undefined
+  Orders: undefined
+  Cart: undefined
+  CategoryItems:undefined
+
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -62,6 +92,7 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen name="SpiceGarden" component={SpiceGarden} options={{ headerShown: true, title: '' }} />
       <HomeStack.Screen name="SushilPalace" component={SushilPalace} options={{ headerShown: true, title: '' }} />
       <HomeStack.Screen name="FoodItemDetail" component={FoodItemDetail} options={{ headerShown: true }} />
+      <Stack.Screen name="CategoryItems" component={CategoryItems} options={{ headerShown:false}} />
       <HomeStack.Screen name="CheckoutScreen" component={CheckoutScreen} options={{ headerShown: false }} />
     </HomeStack.Navigator>
   );
@@ -105,7 +136,7 @@ const MainTabNavigator = () => {
               iconName = 'shopping-bag';
               break;
             case 'Menu':
-              iconName = 'bars';
+              iconName = 'user';
               break;
             default:
               iconName = 'circle';
@@ -142,7 +173,19 @@ function MainApp() {
       <Stack.Screen name="MainTabs" component={MainTabNavigator} />
       <Stack.Screen name="SignIn" component={SignInScreen} />
       <Stack.Screen name='LanguageSelectionScreen' component={LanguageSelectionScreen}/>
-      <Stack.Screen name='AddressScreen' component={AddressScreen}/>
+      <Stack.Screen name='AddressScreen' component={AddressScreen}/> 
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="Address" component={AddressScreen} />
+        <Stack.Screen name="Coupons" component={CouponsScreen} />
+        <Stack.Screen name="LoyaltyPoints" component={LoyaltyPointsScreen} />
+        <Stack.Screen name="Wallet" component={WalletScreen} />
+        <Stack.Screen name="Refer" component={ReferScreen} />
+        <Stack.Screen name="Support" component={SupportScreen} />
+        <Stack.Screen name="About" component={AboutScreen} />
+        <Stack.Screen name="Terms" component={TermsScreen} />
+        <Stack.Screen name="Privacy" component={PrivacyScreen} />
+        <Stack.Screen name="Refund" component={RefundScreen} />
+        <Stack.Screen name="Cancellation" component={CancellationScreen} />
     </Stack.Navigator>
   );
 }
