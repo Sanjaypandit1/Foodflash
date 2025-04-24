@@ -40,6 +40,7 @@ import TermsScreen from './src/MenuScreen/TermsScreen';
 import PrivacyScreen from './src/MenuScreen/PrivacyScreen';
 import RefundScreen from './src/MenuScreen/RefundScreen';
 import CancellationScreen from './src/MenuScreen/CancellationScreen';
+import AllCategories from './src/components/AllCategories';
 
 // Type for bottom tab navigator
 type TabParamList = {
@@ -94,6 +95,7 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen name="FoodItemDetail" component={FoodItemDetail} options={{ headerShown: true }} />
       <Stack.Screen name="CategoryItems" component={CategoryItems} options={{ headerShown:false}} />
       <HomeStack.Screen name="CheckoutScreen" component={CheckoutScreen} options={{ headerShown: false }} />
+      <HomeStack.Screen name='AllCategories'component={AllCategories} options={ {headerShown:false} } />
     </HomeStack.Navigator>
   );
 };
