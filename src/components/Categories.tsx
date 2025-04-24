@@ -86,8 +86,28 @@ const Categories: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.head}>Categories</Text>
-      <Text style={styles.subhead}>Explore food by category</Text>
+      <View style={styles.headerContainer}>
+        <View>
+          <Text style={styles.head}>Categories</Text>
+          <Text style={styles.subhead}>Explore food by category</Text>
+        </View>
+        <TouchableOpacity 
+  onPress={() => navigation.navigate("AllCategories", { 
+    categories: categoryItems.map(item => ({
+      id: item.id,
+      name: item.name,
+      restaurant: item.restaurant,
+      price: item.price,
+      description: item.description,
+      isVeg: item.isVeg,
+      rating: item.rating,
+      preparationTime: item.preparationTime
+    }))
+  })}
+>
+  <Text style={styles.seeAll}>See All</Text>
+</TouchableOpacity>
+      </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollView}>
         {categoryItems.map((item) => (
           <TouchableOpacity
@@ -133,6 +153,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginTop: 10,
   },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
   head: {
     fontSize: 20,
     fontWeight: "bold",
@@ -142,9 +168,12 @@ const styles = StyleSheet.create({
   subhead: {
     fontSize: 14,
     color: "#666",
-    marginBottom: 10,
   },
-
+  seeAll: {
+    color: "#E96A1C",
+    fontWeight: "600",
+    fontSize: 14,
+  },
   scrollView: {
     flexDirection: "row",
     paddingVertical: 5,
