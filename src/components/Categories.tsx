@@ -59,18 +59,6 @@ const Categories: React.FC<Props> = ({ navigation }) => {
       preparationTime: "25 min",
     },
     {
-      id: "5",
-      name: "Butter Chicken",
-      restaurant: "Spice Garden",
-      image: require("../Assets/SpiceGarden/Butter-Chicken.jpeg"),
-      price: "330",
-      description:
-        "Tender chicken pieces cooked in a rich, creamy tomato sauce with butter, cream, and aromatic spices. Served with naan bread or steamed rice.",
-      isVeg: false,
-      rating: "4.8",
-      preparationTime: "25 min",
-    },
-    {
       id: "6",
       name: "Chowmin",
       restaurant: "Delicious Bites",
@@ -91,22 +79,24 @@ const Categories: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.head}>Categories</Text>
           <Text style={styles.subhead}>Explore food by category</Text>
         </View>
-        <TouchableOpacity 
-  onPress={() => navigation.navigate("AllCategories", { 
-    categories: categoryItems.map(item => ({
-      id: item.id,
-      name: item.name,
-      restaurant: item.restaurant,
-      price: item.price,
-      description: item.description,
-      isVeg: item.isVeg,
-      rating: item.rating,
-      preparationTime: item.preparationTime
-    }))
-  })}
->
-  <Text style={styles.seeAll}>See All</Text>
-</TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("AllCategories", {
+              categories: categoryItems.map((item) => ({
+                id: item.id,
+                name: item.name,
+                restaurant: item.restaurant,
+                price: item.price,
+                description: item.description,
+                isVeg: item.isVeg,
+                rating: item.rating,
+                preparationTime: item.preparationTime,
+              })),
+            })
+          }
+        >
+          <Text style={styles.seeAll}>See All</Text>
+        </TouchableOpacity>
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollView}>
         {categoryItems.map((item) => (
@@ -116,6 +106,13 @@ const Categories: React.FC<Props> = ({ navigation }) => {
             onPress={() =>
               navigation.navigate("CategoryItems", {
                 categoryName: item.name,
+                restaurant: item.restaurant,
+                image: item.image,
+                price: item.price,
+                description: item.description,
+                isVeg: item.isVeg,
+                rating: item.rating,
+                preparationTime: item.preparationTime,
               })
             }
           >

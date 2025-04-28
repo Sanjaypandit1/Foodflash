@@ -63,8 +63,8 @@ const AllCategories = () => {
           <Text style={styles.itemName}>{item.name}</Text>
           <Text style={styles.itemRestaurant}>{item.restaurant}</Text>
           <View style={styles.priceRatingContainer}>
-            <Text style={styles.itemPrice}>Rs. {item.price}</Text>
-            <Text style={styles.itemRating}>★ {item.rating}</Text>
+            
+            <Text style={styles.itemRating}></Text>
           </View>
         </View>
       </TouchableOpacity>
