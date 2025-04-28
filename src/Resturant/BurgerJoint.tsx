@@ -1,9 +1,11 @@
 "use client"
 
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react-native"
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity,   StatusBar, Platform } from "react-native"
 import { useState } from "react"
 import { type RouteProp, useNavigation, useRoute, type NavigationProp } from "@react-navigation/native"
 import type { ImageSourcePropType } from "react-native"
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import LinearGradient from "react-native-linear-gradient"
 
 // Define types
 type RootStackParamList = {
@@ -33,11 +35,13 @@ type FoodItem = {
   isVeg: boolean
   rating: string
   preparationTime: string
+  category: string // Added category field
 }
 
-type FilterOption = "all" | "veg" | "nonVeg"
+// Changed from FilterOption type to string for more flexibility
+type FilterOption = string
 
-// Sample food items data with fixed image format
+// Sample food items data with fixed image format and added category
 const foodItems: FoodItem[] = [
   {
     id: "1",
@@ -48,6 +52,7 @@ const foodItems: FoodItem[] = [
     isVeg: false,
     rating: "4.6",
     preparationTime: "25 min",
+    category: "pizza"
   },
   {
     id: "2",
@@ -58,6 +63,7 @@ const foodItems: FoodItem[] = [
     isVeg: true,
     rating: "4.5",
     preparationTime: "20 min",
+    category: "pizza"
   },
   {
     id: "3",
@@ -68,6 +74,7 @@ const foodItems: FoodItem[] = [
     isVeg: true,
     rating: "4.7",
     preparationTime: "20 min",
+    category: "pizza"
   },
   {
     id: "4",
@@ -78,6 +85,7 @@ const foodItems: FoodItem[] = [
     isVeg: false,
     rating: "4.4",
     preparationTime: "22 min",
+    category: "pizza"
   },
   {
     id: "5",
@@ -88,56 +96,62 @@ const foodItems: FoodItem[] = [
     isVeg: true,
     rating: "4.5",
     preparationTime: "20 min",
+    category: "pizza"
   },
   {
     id: "6",
     name: "Veg Steam Momo",
     price: "150",
     description: "Steamed dumplings filled with seasonal veggies and light spices.",
-    image: { uri: "https://media.istockphoto.com/id/1292635321/photo/veg-steam-momo-nepalese-traditional-dish-momo-stuffed-with-vegetables-and-then-cooked-and.webp?a=1&b=1&s=612x612&w=0&k=20&c=UnTAWRhFjF0ERXdBmZXCYQU5nsLGAHfKwbGBqQ6QzT0=" }, // Proper veg momo image
+    image: { uri: "https://media.istockphoto.com/id/1292635321/photo/veg-steam-momo-nepalese-traditional-dish-momo-stuffed-with-vegetables-and-then-cooked-and.webp?a=1&b=1&s=612x612&w=0&k=20&c=UnTAWRhFjF0ERXdBmZXCYQU5nsLGAHfKwbGBqQ6QzT0=" },
     isVeg: true,
     rating: "4.3",
     preparationTime: "15 min",
+    category: "momo"
   },
   {
     id: "7",
     name: "Chicken Steam Momo",
     price: "180",
     description: "Tender chicken filled in steamed momos, served with spicy chutney.",
-    image: { uri: "https://media.istockphoto.com/id/1475787002/photo/chicken-dumplings-in-a-plate-with-chopsticks-directly-above-photo.webp?a=1&b=1&s=612x612&w=0&k=20&c=Ub3lgPcUD11P-nEGBztAcWBGZojeEqJ6gPWUpQ9D3uE=" }, // Proper chicken momo image
+    image: { uri: "https://media.istockphoto.com/id/1475787002/photo/chicken-dumplings-in-a-plate-with-chopsticks-directly-above-photo.webp?a=1&b=1&s=612x612&w=0&k=20&c=Ub3lgPcUD11P-nEGBztAcWBGZojeEqJ6gPWUpQ9D3uE=" },
     isVeg: false,
     rating: "4.5",
     preparationTime: "15 min",
+    category: "momo"
   },
   {
     id: "8",
     name: "Buff Momo",
     price: "190",
     description: "Traditional Nepali buff momos packed with spices.",
-    image: { uri: "https://media.istockphoto.com/id/636287858/photo/nepali-cuisine-steam-mo-mo-or-dumpling.webp?a=1&b=1&s=612x612&w=0&k=20&c=qRhH-hnUPZppMP3rUfmBcPEiS0bUXH9mf8Svs06dwsQ=" }, // Proper buff momo image
+    image: { uri: "https://media.istockphoto.com/id/636287858/photo/nepali-cuisine-steam-mo-mo-or-dumpling.webp?a=1&b=1&s=612x612&w=0&k=20&c=qRhH-hnUPZppMP3rUfmBcPEiS0bUXH9mf8Svs06dwsQ=" },
     isVeg: false,
     rating: "4.5",
     preparationTime: "15 min",
+    category: "momo"
   },
   {
     id: "9",
     name: "Veg Jhol Momo",
     price: "170",
     description: "Vegetable momos dipped in spicy jhol (soup) sauce.",
-    image: { uri: "https://media.istockphoto.com/id/496359484/photo/dumpling-soup.jpg?s=1024x1024&w=is&k=20&c=--1Hxz1rrBxxHQyYbondSv_B_kTv3kdvRUMh1bLteC0=" }, // Proper jhol momo image
+    image: { uri: "https://media.istockphoto.com/id/496359484/photo/dumpling-soup.jpg?s=1024x1024&w=is&k=20&c=--1Hxz1rrBxxHQyYbondSv_B_kTv3kdvRUMh1bLteC0=" },
     isVeg: true,
     rating: "4.4",
     preparationTime: "20 min",
+    category: "momo"
   },
   {
     id: "10",
     name: "Chicken Jhol Momo",
     price: "200",
     description: "Chicken stuffed momos with jhol (gravy) special sauce.",
-    image: { uri: "https://media.istockphoto.com/id/1458219795/photo/jhol-momo-jhol-momo-are-steamed-dumplings-made-with-spiced-meat-fillings-momo-jhol-achar-or.webp?a=1&b=1&s=612x612&w=0&k=20&c=3CdF0QeKfJB_52TQRyX3flkbkCgSyJvDfxG2I7OosfU=" }, // Proper chicken jhol momo image
+    image: { uri: "https://media.istockphoto.com/id/1458219795/photo/jhol-momo-jhol-momo-are-steamed-dumplings-made-with-spiced-meat-fillings-momo-jhol-achar-or.webp?a=1&b=1&s=612x612&w=0&k=20&c=3CdF0QeKfJB_52TQRyX3flkbkCgSyJvDfxG2I7OosfU=" },
     isVeg: false,
     rating: "4.6",
     preparationTime: "20 min",
+    category: "momo"
   },
   {
     id: "11",
@@ -148,6 +162,7 @@ const foodItems: FoodItem[] = [
     isVeg: false,
     rating: "4.5",
     preparationTime: "15 min",
+    category: "chowmin"
   },
   {
     id: "12",
@@ -158,6 +173,7 @@ const foodItems: FoodItem[] = [
     isVeg: true,
     rating: "4.3",
     preparationTime: "15 min",
+    category: "chowmin"
   },
   {
     id: "13",
@@ -168,6 +184,7 @@ const foodItems: FoodItem[] = [
     isVeg: true,
     rating: "4.4",
     preparationTime: "15 min",
+    category: "chowmin"
   },
   {
     id: "14",
@@ -178,6 +195,7 @@ const foodItems: FoodItem[] = [
     isVeg: true,
     rating: "4.2",
     preparationTime: "10 min",
+    category: "burger"
   },
   {
     id: "15",
@@ -188,6 +206,7 @@ const foodItems: FoodItem[] = [
     isVeg: false,
     rating: "4.5",
     preparationTime: "10 min",
+    category: "burger"
   },
   {
     id: "16",
@@ -198,6 +217,7 @@ const foodItems: FoodItem[] = [
     isVeg: false,
     rating: "4.3",
     preparationTime: "10 min",
+    category: "burger"
   },
   {
     id: "17",
@@ -208,6 +228,7 @@ const foodItems: FoodItem[] = [
     isVeg: true,
     rating: "4.5",
     preparationTime: "25 min",
+    category: "biryani"
   },
   {
     id: "18",
@@ -218,6 +239,7 @@ const foodItems: FoodItem[] = [
     isVeg: false,
     rating: "4.7",
     preparationTime: "25 min",
+    category: "biryani"
   },
   {
     id: "19",
@@ -228,6 +250,7 @@ const foodItems: FoodItem[] = [
     isVeg: false,
     rating: "4.8",
     preparationTime: "30 min",
+    category: "biryani"
   },
   {
     id: "20",
@@ -238,6 +261,7 @@ const foodItems: FoodItem[] = [
     isVeg: true,
     rating: "4.6",
     preparationTime: "30 min",
+    category: "khana"
   },
   {
     id: "21",
@@ -248,6 +272,7 @@ const foodItems: FoodItem[] = [
     isVeg: false,
     rating: "4.7",
     preparationTime: "30 min",
+    category: "khana"
   },
   {
     id: "22",
@@ -258,6 +283,7 @@ const foodItems: FoodItem[] = [
     isVeg: false,
     rating: "4.8",
     preparationTime: "35 min",
+    category: "khana"
   },
   {
     id: "23",
@@ -268,6 +294,7 @@ const foodItems: FoodItem[] = [
     isVeg: true,
     rating: "4.5",
     preparationTime: "2 min",
+    category: "drinks"
   },
   {
     id: "24",
@@ -278,6 +305,7 @@ const foodItems: FoodItem[] = [
     isVeg: true,
     rating: "4.4",
     preparationTime: "2 min",
+    category: "drinks"
   },
   {
     id: "25",
@@ -288,6 +316,7 @@ const foodItems: FoodItem[] = [
     isVeg: true,
     rating: "4.3",
     preparationTime: "2 min",
+    category: "drinks"
   },
 ]
 
@@ -296,21 +325,12 @@ export default function BurgerJoint() {
   const { restaurant } = route.params
   const [filter, setFilter] = useState<FilterOption>("all")
 
-  // Properly type the navigation object
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
+  const filterCategories = ['all', 'momo', 'chowmin', 'drinks', 'pizza', 'khana', 'burger', 'biryani', 'others']
 
-  // Filter food items based on selected filter
   const filteredFoodItems = foodItems.filter((item) => {
-    if (filter === "all") {
-      return true
-    }
-    if (filter === "veg") {
-      return item.isVeg
-    }
-    if (filter === "nonVeg") {
-      return !item.isVeg
-    }
-    return true
+    if (filter === "all") return true
+    return item.category === filter
   })
 
   const renderFoodItem = ({ item }: { item: FoodItem }) => (
@@ -320,7 +340,7 @@ export default function BurgerJoint() {
       onPress={() =>
         navigation.navigate("FoodItemDetail", {
           item,
-          restaurantName: restaurant.name, // Pass the restaurant name
+          restaurantName: restaurant.name,
         })
       }
     >
@@ -338,12 +358,21 @@ export default function BurgerJoint() {
         </Text>
 
         <View style={styles.foodMeta}>
-          <Text style={styles.foodRating}>★ {item.rating}</Text>
-          <Text style={styles.foodTime}>{item.preparationTime}</Text>
+          <View style={styles.ratingContainer}>
+            <MaterialIcons name="star" size={16} color="#FFD700" />
+            <Text style={styles.foodRating}>{item.rating}</Text>
+          </View>
+          <View style={styles.timeContainer}>
+            <MaterialIcons name="access-time" size={14} color="#666" />
+            <Text style={styles.foodTime}>{item.preparationTime}</Text>
+          </View>
         </View>
 
-        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate("FoodItemDetail", { item })}>
-          <Text style={styles.addButtonText}>ADD</Text>
+        <TouchableOpacity 
+          style={styles.addButton} 
+          onPress={() => navigation.navigate("FoodItemDetail", { item })}
+        >
+          <Text style={styles.addButtonText}>ADD +</Text>
         </TouchableOpacity>
       </View>
 
@@ -353,37 +382,52 @@ export default function BurgerJoint() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.restaurantName}>{restaurant.name}</Text>
-        <Text style={styles.restaurantInfo}>
-          {restaurant.cuisine} • {restaurant.rating} ★ • {restaurant.deliveryTime}
-        </Text>
+      {/* Restaurant Header with Image */}
+      <View style={styles.restaurantHeader}>
+  <Image 
+           source={{ uri: restaurant.image }} 
+           style={styles.restaurantImage}
+           resizeMode="cover"
+         />
+  <LinearGradient
+    colors={['rgba(0,0,0,0.7)', 'transparent']}
+    style={styles.imageOverlay}
+  />
+        
+        <View style={styles.headerContent}>
+          <Text style={styles.restaurantName}>{restaurant.name}</Text>
+          <View style={styles.restaurantInfoContainer}>
+            <Text style={styles.restaurantInfo}>{restaurant.cuisine}</Text>
+            <View style={styles.infoSeparator} />
+            <View style={styles.ratingContainer}>
+              <MaterialIcons name="star" size={16} color="#FFD700" />
+              <Text style={styles.restaurantInfo}>{restaurant.rating}</Text>
+            </View>
+            <View style={styles.infoSeparator} />
+            <Text style={styles.restaurantInfo}>{restaurant.deliveryTime}</Text>
+          </View>
+        </View>
       </View>
 
       <View style={styles.filterContainer}>
-        <Text style={styles.filterLabel}>Filter:</Text>
-        <View style={styles.filterOptions}>
-          <TouchableOpacity
-            style={[styles.filterOption, filter === "all" && styles.filterOptionActive]}
-            onPress={() => setFilter("all")}
-          >
-            <Text style={[styles.filterText, filter === "all" && styles.filterTextActive]}>All</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.filterOption, filter === "veg" && styles.filterOptionActive]}
-            onPress={() => setFilter("veg")}
-          >
-            <Text style={[styles.filterText, filter === "veg" && styles.filterTextActive]}>Veg</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.filterOption, filter === "nonVeg" && styles.filterOptionActive]}
-            onPress={() => setFilter("nonVeg")}
-          >
-            <Text style={[styles.filterText, filter === "nonVeg" && styles.filterTextActive]}>Non-Veg</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.filterLabel}>Filter by Category</Text>
+        <FlatList
+          data={filterCategories}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item}
+          renderItem={({ item: category }) => (
+            <TouchableOpacity
+              style={[styles.filterOption, filter === category && styles.filterOptionActive]}
+              onPress={() => setFilter(category)}
+            >
+              <Text style={[styles.filterText, filter === category && styles.filterTextActive]}>
+                {category === 'all' ? 'All' : category.charAt(0).toUpperCase() + category.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          )}
+          contentContainerStyle={styles.filterOptions}
+        />
       </View>
 
       <FlatList
@@ -400,133 +444,204 @@ export default function BurgerJoint() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
-    padding: 1,
+    backgroundColor: "#FFF",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
   },
-  header: {
-    marginBottom: 20,
+  restaurantHeader: {
+    height: 220,
+    marginBottom: 16,
+    position: 'relative',
+  },
+  restaurantImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+  },
+  imageOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    height: '40%',
+  },
+  headerContent: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
   },
   restaurantName: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 5,
+    fontSize: 28,
+    fontWeight: "800",
+    color: "white",
+    marginBottom: 8,
+    fontFamily: 'sans-serif-condensed',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+  restaurantInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
   },
   restaurantInfo: {
-    fontSize: 14,
-    color: "#666",
+    fontSize: 15,
+    color: "rgba(255,255,255,0.9)",
+    marginRight: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  infoSeparator: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    marginHorizontal: 8,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  timeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   filterContainer: {
-    marginBottom: 20,
+    marginBottom: 16,
+    paddingHorizontal: 16,
   },
   filterLabel: {
     fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "#333",
+    fontWeight: '700',
+    marginBottom: 12,
+    color: '#333',
+    letterSpacing: 0.5,
   },
   filterOptions: {
-    flexDirection: "row",
-    gap: 10,
+    paddingRight: 16,
+    gap: 12,
   },
   filterOption: {
     paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
     borderRadius: 20,
-    backgroundColor: "#EEEEEE",
+    backgroundColor: '#F5F5F5',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
   filterOptionActive: {
-    backgroundColor: "#FF3F00",
+    backgroundColor: '#FF3F00',
+    borderColor: '#FF3F00',
   },
   filterText: {
     fontSize: 14,
-    color: "#666",
+    color: '#666',
+    fontWeight: '500',
   },
   filterTextActive: {
-    color: "white",
-    fontWeight: "500",
+    color: 'white',
+    fontWeight: '600',
   },
   foodList: {
-    paddingBottom: 20,
+    paddingHorizontal: 16,
+    paddingBottom: 24,
   },
   foodCard: {
     flexDirection: "row",
     backgroundColor: "white",
-    borderRadius: 12,
-    marginBottom: 15,
-    padding: 15,
+    borderRadius: 16,
+    marginBottom: 16,
+    padding: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
   },
   foodInfo: {
     flex: 1,
-    marginRight: 15,
+    marginRight: 16,
   },
   foodHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 5,
+    marginBottom: 8,
   },
   foodName: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontWeight: "700",
     color: "#333",
     flex: 1,
-    marginRight: 10,
+    marginRight: 12,
   },
   vegBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 4,
+    alignSelf: 'flex-start',
   },
   vegBadgeText: {
     color: "white",
     fontSize: 10,
-    fontWeight: "bold",
+    fontWeight: "800",
+    letterSpacing: 0.5,
   },
   foodPrice: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontWeight: "700",
     color: "#FF3F00",
-    marginBottom: 5,
+    marginBottom: 8,
   },
   foodDescription: {
     fontSize: 14,
     color: "#666",
-    marginBottom: 10,
+    marginBottom: 12,
+    lineHeight: 20,
   },
   foodMeta: {
     flexDirection: "row",
-    marginBottom: 10,
+    marginBottom: 16,
+    alignItems: 'center',
+    gap: 16,
   },
   foodRating: {
     fontSize: 14,
-    color: "#FF3F00",
-    marginRight: 10,
+    color: "#333",
+    marginLeft: 4,
+    fontWeight: '600',
   },
   foodTime: {
     fontSize: 14,
     color: "#666",
+    marginLeft: 4,
   },
   foodImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
+    width: 110,
+    height: 110,
+    borderRadius: 12,
   },
   addButton: {
     backgroundColor: "#FF3F00",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
     alignSelf: "flex-start",
+    shadowColor: "#FF3F00",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
   addButtonText: {
     color: "white",
-    fontWeight: "bold",
-    fontSize: 12,
+    fontWeight: "700",
+    fontSize: 14,
+    letterSpacing: 0.5,
   },
 })

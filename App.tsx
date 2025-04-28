@@ -88,11 +88,11 @@ const HomeStackNavigator = () => {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen name="Homescreen" component={HomeScreen} options={{ headerShown: false }} />
-      <HomeStack.Screen name="DeliciousBite" component={DeliciousBite} options={{ headerShown: true, title: '' }} />
-      <HomeStack.Screen name="BurgerJoint" component={BurgerJoint} options={{ headerShown: true, title: '' }} />
-      <HomeStack.Screen name="SpiceGarden" component={SpiceGarden} options={{ headerShown: true, title: '' }} />
-      <HomeStack.Screen name="SushilPalace" component={SushilPalace} options={{ headerShown: true, title: '' }} />
-      <HomeStack.Screen name="FoodItemDetail" component={FoodItemDetail} options={{ headerShown: true }} />
+      <HomeStack.Screen name="DeliciousBite" component={DeliciousBite} options={{ headerShown: false, title: '' }} />
+      <HomeStack.Screen name="BurgerJoint" component={BurgerJoint} options={{ headerShown: false, title: '' }} />
+      <HomeStack.Screen name="SpiceGarden" component={SpiceGarden} options={{ headerShown: false, title: '' }} />
+      <HomeStack.Screen name="SushilPalace" component={SushilPalace} options={{ headerShown: false, title: '' }} />
+      <HomeStack.Screen name="FoodItemDetail" component={FoodItemDetail} options={{ headerShown: false }} />
       <Stack.Screen name="CategoryItems" component={CategoryItems} options={{ headerShown:false}} />
       <HomeStack.Screen name="CheckoutScreen" component={CheckoutScreen} options={{ headerShown: false }} />
       <HomeStack.Screen name='AllCategories'component={AllCategories} options={ {headerShown:false} } />
