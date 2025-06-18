@@ -513,8 +513,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    paddingBottom: 20, // Add padding to the bottom of the screen
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
+   
   },
   header: {
     flexDirection: "row",

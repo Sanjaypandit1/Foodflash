@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFF",
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
+
   },
   restaurantHeader: {
     height: 220,

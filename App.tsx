@@ -21,6 +21,8 @@ import MenuScreen from "./src/screens/MenuScreen"
 import LanguageSelectionScreen from "./src/FirstPage/Language"
 import OnboardingScreen from "./src/FirstPage/OnboardingScreen"
 import OnboardingScreen2 from "./src/FirstPage/onboardingscreen2"
+import LocationSelectionScreen from "./src/FirstPage/LocationScreen"
+
 import SignInScreen from "./src/MenuScreen/SigninScreen"
 import DeliciousBite from "./src/Resturant/DelicioueBite"
 import BurgerJoint from "./src/Resturant/BurgerJoint"
@@ -56,6 +58,7 @@ type RootStackParamList = {
   MainTabs: undefined
   SignIn: undefined
   LanguageSelectionScreen: undefined
+  LocationSelectionScreen: undefined
   AddressScreen: undefined
   Settings: undefined
   Profile: undefined
@@ -198,7 +201,6 @@ function MainApp() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={MainTabNavigator} />
       <Stack.Screen name="SignIn" component={SignInScreen} />
-      <Stack.Screen name="LanguageSelectionScreen" component={LanguageSelectionScreen} />
       <Stack.Screen name="AddressScreen" component={AddressScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="Address" component={AddressScreen} />
@@ -224,17 +226,21 @@ export default function App() {
   const [showLanguageScreen, setShowLanguageScreen] = useState(false)
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [showOnboarding2, setShowOnboarding2] = useState(false)
+  const [showLocationSelection, setShowLocationSelection] = useState(false)
 
   useEffect(() => {
     const checkFirstLaunch = async () => {
       try {
         const hasSelectedLanguage = await AsyncStorage.getItem("selectedLanguage")
         const hasSeenOnboarding = await AsyncStorage.getItem("hasSeenOnboarding")
+        const hasSelectedLocation = await AsyncStorage.getItem("locationConfirmed")
 
         if (!hasSelectedLanguage) {
           setShowLanguageScreen(true)
         } else if (!hasSeenOnboarding) {
           setShowOnboarding(true)
+        } else if (!hasSelectedLocation) {
+          setShowLocationSelection(true)
         }
       } catch (error) {
         console.error("Error reading AsyncStorage:", error)
@@ -260,6 +266,12 @@ export default function App() {
   const handleOnboardingFinish2 = async () => {
     await AsyncStorage.setItem("hasSeenOnboarding", "true")
     setShowOnboarding2(false)
+    setShowLocationSelection(true)
+  }
+
+  const handleLocationSelectionFinish = async () => {
+    await AsyncStorage.setItem("locationConfirmed", "true")
+    setShowLocationSelection(false)
   }
 
   if (isLoading) {
@@ -280,6 +292,8 @@ export default function App() {
             <OnboardingScreen onFinish={handleOnboardingFinish} />
           ) : showOnboarding2 ? (
             <OnboardingScreen2 onFinish={handleOnboardingFinish2} />
+          ) : showLocationSelection ? (
+            <LocationSelectionScreen onFinish={handleLocationSelectionFinish} />
           ) : (
             <MainApp />
           )}

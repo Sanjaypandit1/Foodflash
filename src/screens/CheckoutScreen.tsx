@@ -384,8 +384,7 @@ const CheckoutScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f9f9f9',
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
+  
   },
  
   darkSafeArea: {

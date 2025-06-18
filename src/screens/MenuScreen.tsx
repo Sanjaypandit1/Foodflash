@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
   container:{
     width: 'auto',
     
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
+
   },
   safeArea: {
     flex: 1,

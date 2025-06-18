@@ -12,7 +12,7 @@ const languages = [
   { id: 'bn', name: 'Bengali', flag: '🇧🇩' },
 ];
 
-// ✅ Props type define गरियो
+
 type LanguageScreenProps = {
   onLanguageSelect?: () => void;
 };
