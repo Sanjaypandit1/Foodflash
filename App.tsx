@@ -1,46 +1,46 @@
-'use client';
+"use client"
 
-import { useEffect, useState } from 'react';
-import { View, ActivityIndicator, TouchableOpacity, StyleSheet, Text,  } from 'react-native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import type { GestureResponderEvent } from 'react-native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { CartProvider, useCart } from './src/components/CartContext';
-import { OrderProvider } from './src/components/OrderContext';
-import CategoryItems from './src/components/CategoryItem';
+import { useEffect, useState } from "react"
+import { View, ActivityIndicator, TouchableOpacity, StyleSheet, Text } from "react-native"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import { NavigationContainer } from "@react-navigation/native"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import Icon from "react-native-vector-icons/FontAwesome"
+import type { GestureResponderEvent } from "react-native"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import { CartProvider, useCart } from "./src/components/CartContext"
+import { OrderProvider } from "./src/components/OrderContext"
+import CategoryItems from "./src/components/CategoryItem"
 
 // Importing Screens
-import HomeScreen from './src/screens/HomeScreen';
-import FavoritesScreen from './src/screens/FavoritesScreen';
-import CartScreen from './src/screens/CartScreen';
-import OrdersScreen from './src/screens/OrdersScreen';
-import MenuScreen from './src/screens/MenuScreen';
-import LanguageSelectionScreen from './src/FirstPage/Language';
-import OnboardingScreen from './src/FirstPage/OnboardingScreen';
-import OnboardingScreen2 from './src/FirstPage/onboardingscreen2';
-import SignInScreen from './src/MenuScreen/SigninScreen';
-import DeliciousBite from './src/Resturant/DelicioueBite';
-import BurgerJoint from './src/Resturant/BurgerJoint';
-import SpiceGarden from './src/Resturant/SpiceGarden';
-import SushilPalace from './src/Resturant/SushiPalace';
-import FoodItemDetail from './src/components/ProductDetails';
-import CheckoutScreen from './src/screens/CheckoutScreen'; // Import the new CheckoutScreen
-import AddressScreen from './src/MenuScreen/AddressScreen';
-import ProfileScreen from './src/MenuScreen/ProfileScreen';
-import CouponsScreen from './src/MenuScreen/CouponsScreen';
-import LoyaltyPointsScreen from './src/MenuScreen/LoyaltyPointScreen';
-import WalletScreen from './src/MenuScreen/WalletScreen';
-import ReferScreen from './src/MenuScreen/ReferScreen';
-import SupportScreen from './src/MenuScreen/SupportScreen';
-import AboutScreen from './src/MenuScreen/AboutScreen';
-import TermsScreen from './src/MenuScreen/TermsScreen';
-import PrivacyScreen from './src/MenuScreen/PrivacyScreen';
-import RefundScreen from './src/MenuScreen/RefundScreen';
-import CancellationScreen from './src/MenuScreen/CancellationScreen';
-import AllCategories from './src/components/AllCategories';
+import HomeScreen from "./src/screens/HomeScreen"
+import FavoritesScreen from "./src/screens/favorites-screen"
+import CartScreen from "./src/screens/CartScreen"
+import OrdersScreen from "./src/screens/OrdersScreen"
+import MenuScreen from "./src/screens/MenuScreen"
+import LanguageSelectionScreen from "./src/FirstPage/Language"
+import OnboardingScreen from "./src/FirstPage/OnboardingScreen"
+import OnboardingScreen2 from "./src/FirstPage/onboardingscreen2"
+import SignInScreen from "./src/MenuScreen/SigninScreen"
+import DeliciousBite from "./src/Resturant/DelicioueBite"
+import BurgerJoint from "./src/Resturant/BurgerJoint"
+import SpiceGarden from "./src/Resturant/SpiceGarden"
+import SushilPalace from "./src/Resturant/SushiPalace"
+import FoodItemDetail from "./src/components/ProductDetails"
+import CheckoutScreen from "./src/screens/CheckoutScreen"
+import AddressScreen from "./src/MenuScreen/AddressScreen"
+import ProfileScreen from "./src/MenuScreen/ProfileScreen"
+import CouponsScreen from "./src/MenuScreen/CouponsScreen"
+import LoyaltyPointsScreen from "./src/MenuScreen/LoyaltyPointScreen"
+import WalletScreen from "./src/MenuScreen/WalletScreen"
+import ReferScreen from "./src/MenuScreen/ReferScreen"
+import SupportScreen from "./src/MenuScreen/SupportScreen"
+import AboutScreen from "./src/MenuScreen/AboutScreen"
+import TermsScreen from "./src/MenuScreen/TermsScreen"
+import PrivacyScreen from "./src/MenuScreen/PrivacyScreen"
+import RefundScreen from "./src/MenuScreen/RefundScreen"
+import CancellationScreen from "./src/MenuScreen/CancellationScreen"
+import AllCategories from "./src/components/AllCategories"
 
 // Type for bottom tab navigator
 type TabParamList = {
@@ -55,8 +55,8 @@ type TabParamList = {
 type RootStackParamList = {
   MainTabs: undefined
   SignIn: undefined
-  LanguageSelectionScreen:undefined
-  AddressScreen:undefined
+  LanguageSelectionScreen: undefined
+  AddressScreen: undefined
   Settings: undefined
   Profile: undefined
   Address: undefined
@@ -74,36 +74,57 @@ type RootStackParamList = {
   Home: undefined
   Orders: undefined
   Cart: undefined
-  CategoryItems:undefined
-
+  CategoryItems: undefined
+  FoodItemDetail: {
+    item: {
+      id: string
+      name: string
+      price: string
+      description: string
+      image: { uri: string }
+      isVeg: boolean
+      rating: string
+      preparationTime: string
+    }
+    restaurantName?: string
+  }
 }
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
-const HomeStack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>()
+const HomeStack = createNativeStackNavigator()
+const FavoritesStack = createNativeStackNavigator()
 
-// Bottom Tab Navigator
-const Tab = createBottomTabNavigator<TabParamList>();
-
+// Home Stack Navigator
 const HomeStackNavigator = () => {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen name="Homescreen" component={HomeScreen} options={{ headerShown: false }} />
-      <HomeStack.Screen name="DeliciousBite" component={DeliciousBite} options={{ headerShown: false, title: '' }} />
-      <HomeStack.Screen name="BurgerJoint" component={BurgerJoint} options={{ headerShown: false, title: '' }} />
-      <HomeStack.Screen name="SpiceGarden" component={SpiceGarden} options={{ headerShown: false, title: '' }} />
-      <HomeStack.Screen name="SushilPalace" component={SushilPalace} options={{ headerShown: false, title: '' }} />
+      <HomeStack.Screen name="DeliciousBite" component={DeliciousBite} options={{ headerShown: false, title: "" }} />
+      <HomeStack.Screen name="BurgerJoint" component={BurgerJoint} options={{ headerShown: false, title: "" }} />
+      <HomeStack.Screen name="SpiceGarden" component={SpiceGarden} options={{ headerShown: false, title: "" }} />
+      <HomeStack.Screen name="SushilPalace" component={SushilPalace} options={{ headerShown: false, title: "" }} />
       <HomeStack.Screen name="FoodItemDetail" component={FoodItemDetail} options={{ headerShown: false }} />
-      <Stack.Screen name="CategoryItems" component={CategoryItems} options={{ headerShown:false}} />
+      <HomeStack.Screen name="CategoryItems" component={CategoryItems} options={{ headerShown: false }} />
       <HomeStack.Screen name="CheckoutScreen" component={CheckoutScreen} options={{ headerShown: false }} />
-      <HomeStack.Screen name='AllCategories'component={AllCategories} options={ {headerShown:false} } />
+      <HomeStack.Screen name="AllCategories" component={AllCategories} options={{ headerShown: false }} />
     </HomeStack.Navigator>
-  );
-};
+  )
+}
+
+// Favorites Stack Navigator
+const FavoritesStackNavigator = () => {
+  return (
+    <FavoritesStack.Navigator>
+      <FavoritesStack.Screen name="FavoritesMain" component={FavoritesScreen} options={{ headerShown: false }} />
+      <FavoritesStack.Screen name="FoodItemDetail" component={FoodItemDetail} options={{ headerShown: false }} />
+    </FavoritesStack.Navigator>
+  )
+}
 
 // Floating Cart Button Component
 const FloatingCartButton = ({ onPress }: { onPress?: (event: GestureResponderEvent) => void }) => {
-  const { getCartCount } = useCart();
-  const cartCount = getCartCount();
+  const { getCartCount } = useCart()
+  const cartCount = getCartCount()
 
   return (
     <TouchableOpacity style={styles.floatingButton} onPress={onPress}>
@@ -114,8 +135,8 @@ const FloatingCartButton = ({ onPress }: { onPress?: (event: GestureResponderEve
         </View>
       )}
     </TouchableOpacity>
-  );
-};
+  )
+}
 
 // Main Tab Navigator
 const MainTabNavigator = () => {
@@ -123,38 +144,38 @@ const MainTabNavigator = () => {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
-          let iconName: string;
+          let iconName: string
           switch (route.name) {
-            case 'Home':
-              iconName = 'home';
-              break;
-            case 'Favorites':
-              iconName = 'heart';
-              break;
-            case 'Cart':
-              iconName = 'shopping-cart';
-              break;
-            case 'Orders':
-              iconName = 'shopping-bag';
-              break;
-            case 'Menu':
-              iconName = 'user';
-              break;
+            case "Home":
+              iconName = "home"
+              break
+            case "Favorites":
+              iconName = "heart"
+              break
+            case "Cart":
+              iconName = "shopping-cart"
+              break
+            case "Orders":
+              iconName = "shopping-bag"
+              break
+            case "Menu":
+              iconName = "user"
+              break
             default:
-              iconName = 'circle';
-              break;
+              iconName = "circle"
+              break
           }
-          return <Icon name={iconName} size={size} color={color} />;
+          return <Icon name={iconName} size={size} color={color} />
         },
-        tabBarActiveTintColor: 'red',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: "red",
+        tabBarInactiveTintColor: "gray",
         tabBarStyle: styles.tabBarStyle,
         tabBarLabel: () => null,
         headerShown: false,
       })}
     >
       <Tab.Screen name="Home" component={HomeStackNavigator} />
-      <Tab.Screen name="Favorites" component={FavoritesScreen} />
+      <Tab.Screen name="Favorites" component={FavoritesStackNavigator} />
       <Tab.Screen
         name="Cart"
         component={CartScreen}
@@ -165,8 +186,11 @@ const MainTabNavigator = () => {
       <Tab.Screen name="Orders" component={OrdersScreen} />
       <Tab.Screen name="Menu" component={MenuScreen} />
     </Tab.Navigator>
-  );
-};
+  )
+}
+
+// Bottom Tab Navigator
+const Tab = createBottomTabNavigator<TabParamList>()
 
 // Main App Component with Root Stack
 function MainApp() {
@@ -174,78 +198,76 @@ function MainApp() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={MainTabNavigator} />
       <Stack.Screen name="SignIn" component={SignInScreen} />
-      <Stack.Screen name='LanguageSelectionScreen' component={LanguageSelectionScreen}/>
-      <Stack.Screen name='AddressScreen' component={AddressScreen}/> 
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-        <Stack.Screen name="Address" component={AddressScreen} />
-        <Stack.Screen name="Coupons" component={CouponsScreen} />
-        <Stack.Screen name="LoyaltyPoints" component={LoyaltyPointsScreen} />
-        <Stack.Screen name="Wallet" component={WalletScreen} />
-        <Stack.Screen name="Refer" component={ReferScreen} />
-        <Stack.Screen name="Support" component={SupportScreen} />
-        <Stack.Screen name="About" component={AboutScreen} />
-        <Stack.Screen name="Terms" component={TermsScreen} />
-        <Stack.Screen name="Privacy" component={PrivacyScreen} />
-        <Stack.Screen name="Refund" component={RefundScreen} />
-        <Stack.Screen name="Cancellation" component={CancellationScreen} />
+      <Stack.Screen name="LanguageSelectionScreen" component={LanguageSelectionScreen} />
+      <Stack.Screen name="AddressScreen" component={AddressScreen} />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="Address" component={AddressScreen} />
+      <Stack.Screen name="Coupons" component={CouponsScreen} />
+      <Stack.Screen name="LoyaltyPoints" component={LoyaltyPointsScreen} />
+      <Stack.Screen name="Wallet" component={WalletScreen} />
+      <Stack.Screen name="Refer" component={ReferScreen} />
+      <Stack.Screen name="Support" component={SupportScreen} />
+      <Stack.Screen name="About" component={AboutScreen} />
+      <Stack.Screen name="Terms" component={TermsScreen} />
+      <Stack.Screen name="Privacy" component={PrivacyScreen} />
+      <Stack.Screen name="Refund" component={RefundScreen} />
+      <Stack.Screen name="Cancellation" component={CancellationScreen} />
+      {/* Add FoodItemDetail to root stack as well for global access */}
+      <Stack.Screen name="FoodItemDetail" component={FoodItemDetail} options={{ headerShown: false }} />
     </Stack.Navigator>
-  );
+  )
 }
 
 // Wrapper App Component
 export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [showLanguageScreen, setShowLanguageScreen] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const [showOnboarding2, setShowOnboarding2] = useState(false);
+  const [isLoading, setIsLoading] = useState(true)
+  const [showLanguageScreen, setShowLanguageScreen] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showOnboarding2, setShowOnboarding2] = useState(false)
 
   useEffect(() => {
     const checkFirstLaunch = async () => {
       try {
-        const hasSelectedLanguage = await AsyncStorage.getItem('selectedLanguage');
-        const hasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
+        const hasSelectedLanguage = await AsyncStorage.getItem("selectedLanguage")
+        const hasSeenOnboarding = await AsyncStorage.getItem("hasSeenOnboarding")
 
         if (!hasSelectedLanguage) {
-          setShowLanguageScreen(true);
+          setShowLanguageScreen(true)
         } else if (!hasSeenOnboarding) {
-          // Initially, show the first onboarding screen
-          setShowOnboarding(true);
+          setShowOnboarding(true)
         }
       } catch (error) {
-        console.error('Error reading AsyncStorage:', error);
+        console.error("Error reading AsyncStorage:", error)
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    checkFirstLaunch();
-  }, []);
+    checkFirstLaunch()
+  }, [])
 
   const handleLanguageSelection = async () => {
-    await AsyncStorage.setItem('selectedLanguage', 'true');
-    setShowLanguageScreen(false);
-    setShowOnboarding(true);  // Show onboarding after selecting language
-  };
+    await AsyncStorage.setItem("selectedLanguage", "true")
+    setShowLanguageScreen(false)
+    setShowOnboarding(true)
+  }
 
-  // Handler for finishing OnboardingScreen1:
   const handleOnboardingFinish = async () => {
-    // Option 1: If you want two separate onboarding flows, update state:
-    setShowOnboarding(false);
-    setShowOnboarding2(true);
-  };
+    setShowOnboarding(false)
+    setShowOnboarding2(true)
+  }
 
-  // Handler for finishing OnboardingScreen2:
   const handleOnboardingFinish2 = async () => {
-    await AsyncStorage.setItem('hasSeenOnboarding', 'true');
-    setShowOnboarding2(false);
-  };
+    await AsyncStorage.setItem("hasSeenOnboarding", "true")
+    setShowOnboarding2(false)
+  }
 
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#F7931A" />
       </View>
-    );
+    )
   }
 
   return (
@@ -264,52 +286,52 @@ export default function App() {
         </NavigationContainer>
       </OrderProvider>
     </CartProvider>
-  );
+  )
 }
 
 // Styles
 const styles = StyleSheet.create({
   tabBarStyle: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     height: 60,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    position: 'absolute',
+    position: "absolute",
   },
   floatingButton: {
     top: -25,
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'red',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    backgroundColor: "red",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
   },
   badge: {
-    position: 'absolute',
+    position: "absolute",
     right: 0,
     top: 0,
-    backgroundColor: 'red',
+    backgroundColor: "red",
     borderRadius: 10,
     width: 20,
     height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   badgeText: {
-    color: 'white',
+    color: "white",
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
   },
-});
+})

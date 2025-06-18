@@ -18,6 +18,9 @@ import { type RouteProp, useNavigation, useRoute, type NavigationProp } from "@r
 import type { ImageSourcePropType } from "react-native"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import MaterialIcons from "react-native-vector-icons/MaterialIcons"
+import FavoriteButton from "../screens/favorite-button"
+import { getImageUri } from "../screens/favorite-helper"
+
 // Define types
 type RootStackParamList = {
   CategoryItems: {
@@ -43,6 +46,8 @@ type FoodItem = {
 
 const { width } = Dimensions.get("window")
 const itemWidth = (width - 20) / 2
+
+
 
 // Sample food items data from all restaurants
 const allFoodItems: FoodItem[] = [
@@ -935,6 +940,8 @@ const allFoodItems: FoodItem[] = [
 
   // Butter Chicken
 ]
+
+
 const CategoryItems = () => {
   const route = useRoute<RouteProp<RootStackParamList, "CategoryItems">>()
   const { categoryName } = route.params
@@ -943,9 +950,6 @@ const CategoryItems = () => {
   const [initialItems, setInitialItems] = useState<FoodItem[]>([])
   const [selectedSubtype, setSelectedSubtype] = useState<string>("All")
   const [activeTab, setActiveTab] = useState<string>("Item")
-  const [isFavorite, setIsFavorite] = useState<Record<string, boolean>>({})
-  const [showVegOptions, setShowVegOptions] = useState(false)
-  const [showPriceOptions, setShowPriceOptions] = useState(false)
 
   // Get category-specific subtypes
   const getSubtypes = useCallback((category: string): string[] => {
@@ -967,13 +971,6 @@ const CategoryItems = () => {
 
   const subtypes = getSubtypes(categoryName)
 
-  const toggleFavorite = (id: string) => {
-    setIsFavorite((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }))
-  }
-
   useEffect(() => {
     // Filter items based on category name
     let filtered: FoodItem[] = []
@@ -982,10 +979,10 @@ const CategoryItems = () => {
       filtered = allFoodItems.filter((item) => item.name.toLowerCase().includes("momo"))
     } else if (categoryName.toLowerCase() === "pizza") {
       filtered = allFoodItems.filter((item) => item.name.toLowerCase().includes("pizza"))
-    } else if (categoryName.toLowerCase() === "burger") {
-      filtered = allFoodItems.filter((item) => item.name.toLowerCase().includes("burger"))
     } else if (categoryName.toLowerCase() === "chowmin") {
       filtered = allFoodItems.filter((item) => item.name.toLowerCase().includes("chowmin"))
+    } else if (categoryName.toLowerCase() === "burger") {
+      filtered = allFoodItems.filter((item) => item.name.toLowerCase().includes("burger"))
     } else if (categoryName.toLowerCase() === "biryani") {
       filtered = allFoodItems.filter((item) => item.name.toLowerCase().includes("biryani"))
     } else {
@@ -1008,41 +1005,61 @@ const CategoryItems = () => {
     setFilteredItems(result)
   }, [initialItems, selectedSubtype])
 
-  const renderFoodItem = ({ item }: { item: FoodItem }) => (
-    <TouchableOpacity
-      style={styles.foodCard}
-      onPress={() =>
-        navigation.navigate("FoodItemDetail", {
-          item,
-          restaurantName: item.restaurant,
-        })
-      }
-    >
-      <Image source={item.image} style={styles.foodImage} />
-      <View style={styles.foodInfo}>
-        <View style={styles.foodHeader}>
-          <Text style={styles.foodName} numberOfLines={1}> {item.name}</Text>
-          <View style={[styles.vegBadge, { backgroundColor: item.isVeg ? "#0f8a0f" : "#b30000" }]}>
-            <Text style={styles.vegBadgeText}>{item.isVeg ? "VEG" : "NON-VEG"}</Text>
+  const renderFoodItem = ({ item }: { item: FoodItem }) => {
+    // Prepare favorite item data with proper type handling
+    const favoriteItem = {
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      description: item.description,
+      image: { uri: getImageUri(item.image) }, // Use helper function to ensure string type
+      isVeg: item.isVeg,
+      rating: item.rating,
+      preparationTime: item.preparationTime,
+      restaurant: item.restaurant,
+    }
+
+    return (
+      <TouchableOpacity
+        style={styles.foodCard}
+        onPress={() =>
+          navigation.navigate("FoodItemDetail", {
+            item,
+            restaurantName: item.restaurant,
+          })
+        }
+      >
+        <Image source={item.image} style={styles.foodImage} />
+
+        {/* Favorite Button */}
+        <View style={styles.favoriteButtonContainer}>
+          <FavoriteButton item={favoriteItem} size={20} />
+        </View>
+
+        <View style={styles.foodInfo}>
+          <View style={styles.foodHeader}>
+            <Text style={styles.foodName} numberOfLines={1}>
+              {item.name}
+            </Text>
+            <View style={[styles.vegBadge, { backgroundColor: item.isVeg ? "#0f8a0f" : "#b30000" }]}>
+              <Text style={styles.vegBadgeText}>{item.isVeg ? "VEG" : "NON-VEG"}</Text>
+            </View>
           </View>
-        </View>
-        <Text style={styles.restaurantName} numberOfLines={1}>
-          {item.restaurant}
-        </Text>
-        <View style={styles.ratingContainer}>
-          <Text style={styles.rating}>
-            {"★".repeat(Math.floor(Number.parseFloat(item.rating)))}
-            {"☆".repeat(5 - Math.floor(Number.parseFloat(item.rating)))}
+          <Text style={styles.restaurantName} numberOfLines={1}>
+            {item.restaurant}
           </Text>
-          <Text style={styles.ratingCount}>{item.rating}</Text>
+          <View style={styles.ratingContainer}>
+            <Text style={styles.rating}>
+              {"★".repeat(Math.floor(Number.parseFloat(item.rating)))}
+              {"☆".repeat(5 - Math.floor(Number.parseFloat(item.rating)))}
+            </Text>
+            <Text style={styles.ratingCount}>{item.rating}</Text>
+          </View>
+          <Text style={styles.price}>Rs. {item.price}</Text>
         </View>
-        <Text style={styles.price}>Rs. {item.price}</Text>
-      </View>
-      <TouchableOpacity style={styles.favoriteButton} onPress={() => toggleFavorite(item.id)}>
-        <MaterialIcons name={isFavorite[item.id] ? "favorite" : "favorite-border"} size={24} color="#999" />
       </TouchableOpacity>
-    </TouchableOpacity>
-  )
+    )
+  }
 
   const renderEmptyList = () => (
     <View style={styles.emptyContainer}>
@@ -1059,11 +1076,7 @@ const CategoryItems = () => {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <MaterialIcons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {categoryName.toUpperCase() }
-
-        </Text>
-       
+        <Text style={styles.headerTitle}>{categoryName.toUpperCase()}</Text>
       </View>
 
       {/* Subtype filter chips */}
@@ -1139,7 +1152,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingVertical: 10,
     paddingHorizontal: 10,
-    maxHeight: 70, // Fixed height for the scroll view container
+    maxHeight: 70,
   },
   subtypeChip: {
     paddingHorizontal: 20,
@@ -1147,15 +1160,15 @@ const styles = StyleSheet.create({
     marginRight: 10,
     borderRadius: 20,
     backgroundColor: "#f0f0f0",
-    height: 36, // Fixed height for all chips
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: 36,
+    justifyContent: "center",
+    alignItems: "center",
   },
   selectedSubtypeChip: {
     backgroundColor: "#fff",
     borderWidth: 1,
     borderColor: "red",
-    height: 36, // Same fixed height for selected state
+    height: 36,
   },
   subtypeText: {
     fontSize: 14,
@@ -1165,8 +1178,6 @@ const styles = StyleSheet.create({
     color: "red",
     fontWeight: "600",
   },
-
-
   tabContainer: {
     flexDirection: "row",
     backgroundColor: "#fff",
@@ -1239,6 +1250,12 @@ const styles = StyleSheet.create({
     height: 120,
     resizeMode: "cover",
   },
+  favoriteButtonContainer: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    zIndex: 1,
+  },
   foodInfo: {
     padding: 10,
   },
@@ -1263,7 +1280,6 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: "bold",
   },
-
   restaurantName: {
     fontSize: 14,
     color: "#666",
@@ -1287,14 +1303,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#333",
-  },
-  favoriteButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
-    borderRadius: 20,
-    padding: 5,
   },
 })
 
