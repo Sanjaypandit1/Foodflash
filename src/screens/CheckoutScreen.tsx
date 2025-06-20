@@ -1,6 +1,6 @@
 'use client';
 
-import {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -20,8 +20,9 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useCart} from '../components/CartContext';
 import {useOrders} from '../components/OrderContext';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import AddressManager, { Address } from '../MenuScreen/Address1';
+import auth from '@react-native-firebase/auth';
 
 const {} = Dimensions.get('window');
 const BOTTOM_PADDING = Platform.OS === 'ios' ? 34 : 20;
@@ -47,6 +48,10 @@ const CheckoutScreen = () => {
   const {addOrder} = useOrders();
   const navigation = useNavigation<any>();
   
+  // Authentication state
+  const [user, setUser] = useState<any>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  
   // Use React Native's built-in useColorScheme
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
@@ -60,6 +65,98 @@ const CheckoutScreen = () => {
   // State for promo code
   const [promoCode, setPromoCode] = useState<string>('');
   const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+
+  // Check authentication status when screen focuses
+  useFocusEffect(
+    React.useCallback(() => {
+      const checkAuthStatus = () => {
+        const currentUser = auth().currentUser;
+        console.log('Current user in checkout:', currentUser?.email);
+        
+        if (!currentUser) {
+          // User is not authenticated, redirect to sign in
+          Alert.alert(
+            'Sign In Required',
+            'Please sign in to continue with your order.',
+            [
+              {
+                text: 'Cancel',
+                style: 'cancel',
+                onPress: () => navigation.goBack(),
+              },
+              {
+                text: 'Sign In',
+                onPress: () => {
+                  // Navigate to sign in and pass a flag to return to checkout
+                  navigation.navigate('SignIn', { 
+                    returnToCheckout: true,
+                    cartItems: cart 
+                  });
+                },
+              },
+            ]
+          );
+          return;
+        }
+        
+        setUser(currentUser);
+        setIsCheckingAuth(false);
+      };
+
+      checkAuthStatus();
+    }, [navigation, cart])
+  );
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const unsubscribe = auth().onAuthStateChanged((authUser) => {
+      console.log('Auth state changed in checkout:', authUser?.email);
+      setUser(authUser);
+      setIsCheckingAuth(false);
+      
+      if (!authUser && !isCheckingAuth) {
+        // User signed out while on checkout screen
+        Alert.alert(
+          'Session Expired',
+          'Please sign in again to continue.',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('SignIn'),
+            },
+          ]
+        );
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, isCheckingAuth]);
+
+  // Show loading while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <SafeAreaView style={[styles.safeArea, isDarkMode && styles.darkSafeArea]}>
+        <View style={styles.loadingContainer}>
+          <Text style={[styles.loadingText, isDarkMode && styles.darkText]}>
+            Verifying authentication...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // If no user after auth check, don't render the checkout content
+  if (!user) {
+    return (
+      <SafeAreaView style={[styles.safeArea, isDarkMode && styles.darkSafeArea]}>
+        <View style={styles.loadingContainer}>
+          <Text style={[styles.loadingText, isDarkMode && styles.darkText]}>
+            Redirecting to sign in...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   // Available promo codes
   const promoCodes: PromoCode[] = [
@@ -216,6 +313,13 @@ const CheckoutScreen = () => {
 
   // Handle place order
   const handlePlaceOrder = () => {
+    // Double-check authentication before placing order
+    if (!user) {
+      Alert.alert('Authentication Required', 'Please sign in to place your order.');
+      navigation.navigate('SignIn');
+      return;
+    }
+
     // Check if an address is selected
     if (!selectedAddress) {
       Alert.alert('No Address Selected', 'Please select a delivery address.');
@@ -240,21 +344,28 @@ const CheckoutScreen = () => {
             tag: item.tag,
           }));
 
-          // Add order to context
-          addOrder({
+          // Create order object without userId/userEmail if they're not supported
+          // You may need to update your Order type definition to include these fields
+          const orderData = {
             items: orderItems,
             total: calculateTotal(),
             deliveryAddress: selectedAddress.address,
             contactPhone: selectedAddress.phone,
             paymentMethod: getPaymentMethodText(),
-         
-          });
+            // Add these fields only if your Order type supports them
+            // userId: user.uid,
+            // userEmail: user.email,
+            // orderDate: new Date().toISOString(),
+          };
+
+          // Add order to context
+          addOrder(orderData);
 
           // Simulate order placement
           setTimeout(() => {
             Alert.alert(
               'Order Placed!',
-              'Your order has been placed successfully.',
+              `Thank you ${user.displayName || user.email}! Your order has been placed successfully.`,
               [
                 {
                   text: 'View Orders',
@@ -291,7 +402,11 @@ const CheckoutScreen = () => {
             <Icon name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Checkout</Text>
-          <View style={{width: 24}} />
+          <View style={styles.userInfo}>
+            <Text style={styles.userText}>
+              {user?.displayName || user?.email?.split('@')[0] || 'User'}
+            </Text>
+          </View>
         </View>
 
         {/* Main Content */}
@@ -299,6 +414,17 @@ const CheckoutScreen = () => {
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}>
+          
+          {/* User Welcome Section */}
+          <View style={[styles.section, isDarkMode && styles.darkSection]}>
+            <View style={styles.welcomeContainer}>
+              <Icon name="person" size={22} color="#FF3F00" />
+              <Text style={[styles.welcomeText, isDarkMode && styles.darkText]}>
+                Welcome back, {user?.displayName || user?.email?.split('@')[0] || 'User'}!
+              </Text>
+            </View>
+          </View>
+
           {/* Delivery Address Section */}
           <View style={[styles.section, isDarkMode && styles.darkSection]}>
             <View style={styles.sectionHeader}>
@@ -555,6 +681,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+  },
   header: {
     backgroundColor: '#FF3F00',
     flexDirection: 'row',
@@ -574,6 +711,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     color: 'white',
+  },
+  userInfo: {
+    alignItems: 'flex-end',
+  },
+  userText: {
+    fontSize: 12,
+    color: 'white',
+    opacity: 0.9,
   },
   scrollView: {
     flex: 1,
@@ -595,6 +740,17 @@ const styles = StyleSheet.create({
   darkSection: {
     backgroundColor: '#222',
     shadowColor: '#000',
+  },
+  welcomeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  welcomeText: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 10,
+    color: '#333',
   },
   sectionHeader: {
     flexDirection: 'row',

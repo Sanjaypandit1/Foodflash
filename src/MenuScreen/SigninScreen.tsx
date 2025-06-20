@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { useState, useRef } from "react"
+import React, { useState, useRef } from "react"
 import {
   View,
   Text,
@@ -21,16 +20,18 @@ import {
 import Icon from "react-native-vector-icons/Feather"
 import auth from "@react-native-firebase/auth"
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useRoute, type RouteProp } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 type RootStackParamList = {
-  SignIn: undefined
+  SignIn: { returnToCheckout?: boolean; cartItems?: any[] }
   SignUp: undefined
   MainTabs: undefined
   FrontScreen: { user?: any }
+  CheckoutScreen: undefined
 }
 
+type SignInRouteProp = RouteProp<RootStackParamList, 'SignIn'>
 type NavigationProps = NativeStackNavigationProp<RootStackParamList>
 
 interface InputFieldProps {
@@ -87,28 +88,55 @@ const InputField: React.FC<InputFieldProps> = ({
   )
 }
 
-interface FirebaseSignUpScreenProps {
+interface FirebaseAuthScreenProps {
   onAuthSuccess?: (user: any) => void
 }
 
-const FirebaseSignUpScreen: React.FC<FirebaseSignUpScreenProps> = ({ onAuthSuccess }) => {
-  const [fullName, setFullName] = useState("")
+const FirebaseAuthScreen: React.FC<FirebaseAuthScreenProps> = ({ onAuthSuccess }) => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [agreeToTerms, setAgreeToTerms] = useState(false)
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
 
   const navigation = useNavigation<NavigationProps>()
+  const route = useRoute<SignInRouteProp>()
+  
+  // Check if we need to return to checkout after authentication
+  const returnToCheckout = route.params?.returnToCheckout || false
+  const cartItems = route.params?.cartItems || []
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
   }
 
-  const handleSignUp = async () => {
-    if (!fullName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
+  const handleSuccessfulAuth = (user: any) => {
+    if (onAuthSuccess) {
+      onAuthSuccess(user)
+    }
+
+    // If we came from checkout, return to checkout
+    if (returnToCheckout && cartItems.length > 0) {
+      Alert.alert(
+        "Welcome back!",
+        "You can now complete your order.",
+        [
+          {
+            text: "Continue to Checkout",
+            onPress: () => {
+              navigation.navigate('CheckoutScreen')
+            }
+          }
+        ]
+      )
+    } else {
+      // Normal flow - go to main tabs
+      navigation.navigate("MainTabs")
+    }
+  }
+
+  const handleSignIn = async () => {
+    if (!email.trim() || !password.trim()) {
       Alert.alert("Error", "Please fill in all fields")
       return
     }
@@ -118,80 +146,48 @@ const FirebaseSignUpScreen: React.FC<FirebaseSignUpScreenProps> = ({ onAuthSucce
       return
     }
 
-    if (password.length < 6) {
-      Alert.alert("Error", "Password must be at least 6 characters long")
-      return
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match")
-      return
-    }
-
-    if (!agreeToTerms) {
-      Alert.alert("Error", "Please agree to the Terms and Conditions")
-      return
-    }
-
     setLoading(true)
     Keyboard.dismiss()
 
     try {
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password)
+      const userCredential = await auth().signInWithEmailAndPassword(email, password)
+      console.log("User signed in successfully:", userCredential.user.email)
 
-      // Update user profile with display name
-      await userCredential.user.updateProfile({
-        displayName: fullName,
-      })
+      handleSuccessfulAuth(userCredential.user)
 
-      console.log("User account created successfully:", userCredential.user.email)
-
-      if (onAuthSuccess) {
-        onAuthSuccess(userCredential.user)
-      }
-
-      // Navigate back to MainTabs - the auth state change will handle the rest
-      navigation.navigate("MainTabs")
-
-      // Show success message
-      Alert.alert("Success", `Welcome ${fullName}! Your account has been created successfully.`, [
-        {
-          text: "OK",
-          onPress: () => {
-            // Navigate to Menu tab to show FrontScreen
-            navigation.navigate("MainTabs")
-          }
-        }
-      ])
+      Alert.alert("Success", `Welcome back ${userCredential.user.displayName || userCredential.user.email}!`)
 
     } catch (error: any) {
-      console.error("Sign up error:", error)
-      let errorMessage = "An error occurred during sign up"
+      console.error("Sign in error:", error)
+      let errorMessage = "An error occurred during sign in"
 
       switch (error.code) {
-        case "auth/email-already-in-use":
-          errorMessage = "This email address is already registered"
+        case "auth/user-not-found":
+          errorMessage = "No account found with this email address"
+          break
+        case "auth/wrong-password":
+          errorMessage = "Incorrect password"
           break
         case "auth/invalid-email":
           errorMessage = "Invalid email address"
           break
-        case "auth/weak-password":
-          errorMessage = "Password is too weak"
+        case "auth/user-disabled":
+          errorMessage = "This account has been disabled"
           break
-        case "auth/operation-not-allowed":
-          errorMessage = "Email/password accounts are not enabled"
+        case "auth/too-many-requests":
+          errorMessage = "Too many failed attempts. Please try again later"
           break
         default:
           errorMessage = error.message || errorMessage
       }
 
-      Alert.alert("Sign Up Failed", errorMessage)
+      Alert.alert("Sign In Failed", errorMessage)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleGoogleSignUp = async () => {
+  const handleGoogleSignIn = async () => {
     setGoogleLoading(true)
 
     try {
@@ -202,36 +198,22 @@ const FirebaseSignUpScreen: React.FC<FirebaseSignUpScreenProps> = ({ onAuthSucce
       const googleCredential = auth.GoogleAuthProvider.credential(idToken)
       const userCredential = await auth().signInWithCredential(googleCredential)
 
-      console.log("Google sign up successful:", userCredential.user.email)
+      console.log("Google sign in successful:", userCredential.user.email)
 
-      if (onAuthSuccess) {
-        onAuthSuccess(userCredential.user)
-      }
+      handleSuccessfulAuth(userCredential.user)
 
-      // Navigate back to MainTabs - the auth state change will handle the rest
-      navigation.navigate("MainTabs")
-
-      // Show success message
-      Alert.alert("Success", "Welcome! Your account has been created with Google successfully.", [
-        {
-          text: "OK",
-          onPress: () => {
-            // Navigate to Menu tab to show FrontScreen
-            navigation.navigate("MainTabs")
-          }
-        }
-      ])
+      Alert.alert("Success", "Welcome! Signed in with Google successfully.")
 
     } catch (error: any) {
-      console.error("Google sign up error:", error)
-      Alert.alert("Google Sign Up Failed", error.message || "Google sign up failed")
+      console.error("Google sign in error:", error)
+      Alert.alert("Google Sign In Failed", error.message || "Google sign in failed")
     } finally {
       setGoogleLoading(false)
     }
   }
 
-  const handleSignIn = () => {
-    navigation.navigate("SignIn")
+  const handleSignUp = () => {
+    navigation.navigate("SignUp")
   }
 
   return (
@@ -258,16 +240,22 @@ const FirebaseSignUpScreen: React.FC<FirebaseSignUpScreenProps> = ({ onAuthSucce
 
           {/* Form */}
           <View style={styles.formContainer}>
-            <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>Please fill in the form to continue</Text>
+            <Text style={styles.title}>Welcome Back</Text>
+            <Text style={styles.subtitle}>
+              {returnToCheckout 
+                ? "Sign in to complete your order" 
+                : "Please sign in to your account"
+              }
+            </Text>
 
-            <InputField
-              placeholder="Full Name"
-              icon="user"
-              value={fullName}
-              onChangeText={(text) => setFullName(text)}
-              autoCapitalize="words"
-            />
+            {returnToCheckout && (
+              <View style={styles.checkoutNotice}>
+                <Icon name="shopping-cart" size={16} color="#FF8C00" />
+                <Text style={styles.checkoutNoticeText}>
+                  You have {cartItems.length} item(s) waiting in your cart
+                </Text>
+              </View>
+            )}
 
             <InputField
               placeholder="Email Address"
@@ -287,31 +275,21 @@ const FirebaseSignUpScreen: React.FC<FirebaseSignUpScreenProps> = ({ onAuthSucce
               autoCapitalize="none"
             />
 
-            <InputField
-              placeholder="Confirm Password"
-              icon="lock"
-              secureTextEntry
-              value={confirmPassword}
-              onChangeText={(text) => setConfirmPassword(text)}
-              autoCapitalize="none"
-            />
-
-            <TouchableOpacity style={styles.termsContainer} onPress={() => setAgreeToTerms(!agreeToTerms)}>
-              <View style={styles.checkbox}>{agreeToTerms && <Icon name="check" size={14} color="#FF8C00" />}</View>
-              <Text style={styles.termsText}>
-                I agree to the <Text style={styles.linkText}>Terms and Conditions</Text>
-              </Text>
+            <TouchableOpacity style={styles.forgotPasswordContainer}>
+              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.signUpButton, loading && styles.signUpButtonDisabled]}
-              onPress={handleSignUp}
+              style={[styles.signInButton, loading && styles.signInButtonDisabled]}
+              onPress={handleSignIn}
               disabled={loading}
             >
               {loading ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
-                <Text style={styles.signUpButtonText}>Create Account</Text>
+                <Text style={styles.signInButtonText}>
+                  {returnToCheckout ? "Sign In & Continue" : "Sign In"}
+                </Text>
               )}
             </TouchableOpacity>
 
@@ -323,7 +301,7 @@ const FirebaseSignUpScreen: React.FC<FirebaseSignUpScreenProps> = ({ onAuthSucce
 
             <TouchableOpacity
               style={[styles.googleButton, googleLoading && styles.googleButtonDisabled]}
-              onPress={handleGoogleSignUp}
+              onPress={handleGoogleSignIn}
               disabled={googleLoading}
             >
               {googleLoading ? (
@@ -339,9 +317,9 @@ const FirebaseSignUpScreen: React.FC<FirebaseSignUpScreenProps> = ({ onAuthSucce
 
           {/* Footer */}
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Already have an account? </Text>
-            <TouchableOpacity onPress={handleSignIn}>
-              <Text style={styles.signInText}>Sign In</Text>
+            <Text style={styles.footerText}>Don't have an account? </Text>
+            <TouchableOpacity onPress={handleSignUp}>
+              <Text style={styles.signUpText}>Sign Up</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -354,7 +332,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-  
   },
   keyboardAvoidingView: {
     flex: 1,
@@ -383,7 +360,23 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: "#666",
-    marginBottom: 30,
+    marginBottom: 20,
+  },
+  checkoutNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF3EB',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 20,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FF8C00',
+  },
+  checkoutNoticeText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#FF8C00',
+    fontWeight: '500',
   },
   inputContainer: {
     flexDirection: "row",
@@ -414,31 +407,16 @@ const styles = StyleSheet.create({
     color: "#333",
     paddingVertical: 0,
   },
-  termsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+  forgotPasswordContainer: {
+    alignItems: "flex-end",
     marginBottom: 25,
   },
-  checkbox: {
-    width: 18,
-    height: 18,
-    borderWidth: 1,
-    borderColor: "#FF8C00",
-    borderRadius: 4,
-    marginRight: 8,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  termsText: {
+  forgotPasswordText: {
     fontSize: 14,
-    color: "#666",
-    flex: 1,
-  },
-  linkText: {
     color: "#FF8C00",
     fontWeight: "500",
   },
-  signUpButton: {
+  signInButton: {
     backgroundColor: "red",
     borderRadius: 10,
     height: 55,
@@ -451,10 +429,10 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  signUpButtonDisabled: {
+  signInButtonDisabled: {
     opacity: 0.7,
   },
-  signUpButtonText: {
+  signInButtonText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
@@ -507,11 +485,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
   },
-  signInText: {
+  signUpText: {
     fontSize: 14,
     color: "#FF8C00",
     fontWeight: "bold",
   },
 })
 
-export default FirebaseSignUpScreen
+export default FirebaseAuthScreen
