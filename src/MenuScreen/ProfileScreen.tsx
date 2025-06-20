@@ -325,20 +325,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ user }) => {
           )}
         </View>
 
-        {/* Account Statistics */}
-        <View style={styles.statsCard}>
-          <Text style={styles.statsTitle}>Account Statistics</Text>
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>5</Text>
-              <Text style={styles.statLabel}>Orders Placed</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>150</Text>
-              <Text style={styles.statLabel}>Loyalty Points</Text>
-            </View>
-          </View>
-        </View>
+    
       </ScrollView>
 
       {/* Image Picker Modal */}

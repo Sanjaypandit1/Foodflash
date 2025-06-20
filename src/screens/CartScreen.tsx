@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   },
   footerWrapper: {
     position: 'absolute',
-    bottom: 35, // Position the footer 20 units from the bottom
+    bottom: 80, // Position the footer 20 units from the bottom
     left: 0,
     right: 0,
     paddingHorizontal: 15,

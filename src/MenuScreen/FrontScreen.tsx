@@ -20,6 +20,7 @@ import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons"
 import FontAwesome from "react-native-vector-icons/FontAwesome"
 import { useUserContext } from "../Context/UserContex"
 import type { User } from "../MenuScreen/User"
+import LanguageSelectionScreen from "../FirstPage/Language"
 
 // Get screen dimensions for responsive layout
 const { width, height } = Dimensions.get("window")
@@ -229,12 +230,7 @@ const FrontScreen: React.FC<FrontScreenProps> = ({ user: propUser, onSignOut }) 
       icon: "map-pin",
       onPress: () => (user ? navigation.navigate("Address") : navigation.navigate("SignIn")),
     },
-    {
-      id: 3,
-      title: "Language",
-      icon: "globe",
-      onPress: () => navigation.navigate("LanguageSelectionScreen"),
-    },
+
     {
       id: 4,
       title: "Dark Mode",

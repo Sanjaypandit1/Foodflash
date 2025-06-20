@@ -1,4 +1,14 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, type ImageSourcePropType } from "react-native"
+import { 
+  View, 
+  Text, 
+  Image, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ScrollView, 
+  Alert,
+  Clipboard,
+  type ImageSourcePropType 
+} from "react-native"
 import Ionicons from "react-native-vector-icons/Ionicons"
 import { useNavigation, type NavigationProp } from "@react-navigation/native"
 
@@ -33,6 +43,9 @@ type HighlightItem = FoodItem & {
 const HighlightsForYou = () => {
   // Properly type the navigation object
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
+
+  // Promo code constant
+  const PROMO_CODE = "WELCOME10"
 
   // Highlight items with restaurant-specific details
   const highlightItems: HighlightItem[] = [
@@ -141,6 +154,37 @@ const HighlightsForYou = () => {
     })
   }
 
+  // Handle promo code claim with copy functionality
+  const handleClaimPromo = async () => {
+    try {
+      await Clipboard.setString(PROMO_CODE)
+      Alert.alert(
+        "Promo Code Copied! 🎉",
+        `Code "${PROMO_CODE}" has been copied to your clipboard. Use it at checkout to get 10% off on your first order!`,
+        [
+          {
+            text: "Got it!",
+            style: "default",
+          },
+          {
+            text: "Shop Now",
+            style: "default",
+            onPress: () => {
+              // Navigate to menu or home screen
+              // You can customize this navigation based on your app structure
+            }
+          }
+        ]
+      )
+    } catch (error) {
+      Alert.alert(
+        "Promo Code: WELCOME10",
+        "Copy this code manually: WELCOME10\n\nUse it at checkout to get 10% off on your first order!",
+        [{ text: "OK", style: "default" }]
+      )
+    }
+  }
+
   return (
     <View style={styles.container}>
       {/* Section Header */}
@@ -205,16 +249,23 @@ const HighlightsForYou = () => {
         ))}
       </ScrollView>
 
-      {/* Discount Info Card */}
+      {/* Enhanced Discount Info Card */}
       <View style={styles.discountCard}>
-        <Ionicons name="gift-outline" size={24} color="#FF3F00" />
+        <View style={styles.promoIconContainer}>
+          <Ionicons name="gift" size={24} color="#FF3F00" />
+        </View>
         <View style={styles.discountTextContainer}>
-          <Text style={styles.discountTitle}>Special Offer: 50% Off First Order</Text>
+          <Text style={styles.discountTitle}>Special Offer: 10% Off First Order</Text>
           <Text style={styles.discountDescription}>
-            Use code WELCOME50 at checkout to get 50% off on your first order (up to ₹100)
+            Use code <Text style={styles.promoCodeText}>{PROMO_CODE}</Text> at checkout to get 10% off on your first order
           </Text>
         </View>
-        <TouchableOpacity style={styles.promoButton}>
+        <TouchableOpacity 
+          style={styles.promoButton} 
+          onPress={handleClaimPromo}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="copy-outline" size={14} color="white" style={styles.copyIcon} />
           <Text style={styles.promoButtonText}>CLAIM</Text>
         </TouchableOpacity>
       </View>
@@ -398,10 +449,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#f0f0f0",
   },
+  promoIconContainer: {
+    backgroundColor: "#FFF8EE",
+    padding: 8,
+    borderRadius: 8,
+  },
   discountTextContainer: {
     flex: 1,
-    marginLeft: 10,
-    marginRight: 10,
+    marginLeft: 12,
+    marginRight: 12,
   },
   discountTitle: {
     fontSize: 16,
@@ -414,16 +470,29 @@ const styles = StyleSheet.create({
     color: "#666",
     lineHeight: 18,
   },
+  promoCodeText: {
+    fontWeight: "bold",
+    color: "#FF3F00",
+    backgroundColor: "#FFF8EE",
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 3,
+  },
   promoButton: {
     backgroundColor: "#FF3F00",
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderRadius: 8,
     shadowColor: "#FF3F00",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 2,
+  },
+  copyIcon: {
+    marginRight: 4,
   },
   promoButtonText: {
     color: "white",

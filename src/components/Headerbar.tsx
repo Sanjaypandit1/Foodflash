@@ -181,10 +181,7 @@ const HeaderBar = () => {
           text: 'Auto-Detect', 
           onPress: requestLocationPermission
         },
-        { 
-          text: 'Choose Manually', 
-          onPress: () => navigation.navigate('LocationSelection' as never)
-        }
+     
       ]
     )
   }
@@ -240,7 +237,7 @@ const HeaderBar = () => {
           <Ionicons name="notifications-outline" size={24} color="#FF3F00" />
           {/* Notification badge */}
           <View style={styles.notificationBadge}>
-            <Text style={styles.badgeText}>3</Text>
+            <Text style={styles.badgeText}>0</Text>
           </View>
         </TouchableOpacity>
       </View>

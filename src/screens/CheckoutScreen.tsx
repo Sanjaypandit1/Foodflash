@@ -14,7 +14,8 @@ import {
   Platform,
   KeyboardAvoidingView,
   Dimensions,
-  useColorScheme,StatusBar
+  useColorScheme,
+  StatusBar
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useCart} from '../components/CartContext';
@@ -27,6 +28,19 @@ const BOTTOM_PADDING = Platform.OS === 'ios' ? 34 : 20;
 
 // Payment method type
 type PaymentMethod = 'card' | 'cash' | 'wallet';
+
+// Promo code interface
+interface PromoCode {
+  id: number;
+  code: string;
+  title: string;
+  description: string;
+  expiry: string;
+  discount: string;
+  discountType: 'percentage' | 'fixed' | 'free_shipping';
+  discountValue: number;
+  minOrderValue?: number;
+}
 
 const CheckoutScreen = () => {
   const {cart, clearCart} = useCart();
@@ -45,7 +59,53 @@ const CheckoutScreen = () => {
 
   // State for promo code
   const [promoCode, setPromoCode] = useState<string>('');
-  const [promoApplied, setPromoApplied] = useState<boolean>(false);
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+
+  // Available promo codes
+  const promoCodes: PromoCode[] = [
+    {
+      id: 1,
+      code: "SAVE20",
+      title: "20% Off Your Next Order",
+      description: "Valid on orders above Rs.500",
+      expiry: "Expires: Dec 31, 2024",
+      discount: "20%",
+      discountType: "percentage",
+      discountValue: 20,
+      minOrderValue: 500,
+    },
+    {
+      id: 2,
+      code: "WELCOME10",
+      title: "Welcome Bonus",
+      description: "First time user discount",
+      expiry: "Expires: Jan 15, 2025",
+      discount: "10%",
+      discountType: "percentage",
+      discountValue: 10,
+    },
+    {
+      id: 3,
+      code: "FREESHIP",
+      title: "Free Shipping",
+      description: "Free delivery on any order",
+      expiry: "Expires: Dec 25, 2024",
+      discount: "FREE",
+      discountType: "free_shipping",
+      discountValue: 40,
+    },
+    {
+      id: 4,
+      code: "SAVE100",
+      title: "Rs.100 Off",
+      description: "Fixed discount on orders above Rs.300",
+      expiry: "Expires: Jan 31, 2025",
+      discount: "Rs.100",
+      discountType: "fixed",
+      discountValue: 100,
+      minOrderValue: 300,
+    },
+  ];
 
   // Calculate subtotal
   const calculateSubtotal = () => {
@@ -58,14 +118,35 @@ const CheckoutScreen = () => {
   // Calculate delivery fee
   const deliveryFee = 40;
 
-  // Calculate discount if promo applied (10% off)
+  // Calculate discount based on applied promo
   const calculateDiscount = () => {
-    return promoApplied ? calculateSubtotal() * 0.1 : 0;
+    if (!appliedPromo) return 0;
+
+    const subtotal = calculateSubtotal();
+    
+    switch (appliedPromo.discountType) {
+      case 'percentage':
+        return subtotal * (appliedPromo.discountValue / 100);
+      case 'fixed':
+        return appliedPromo.discountValue;
+      case 'free_shipping':
+        return deliveryFee;
+      default:
+        return 0;
+    }
+  };
+
+  // Calculate delivery fee after promo
+  const calculateDeliveryFee = () => {
+    if (appliedPromo?.discountType === 'free_shipping') {
+      return 0;
+    }
+    return deliveryFee;
   };
 
   // Calculate total
   const calculateTotal = () => {
-    return calculateSubtotal() + deliveryFee - calculateDiscount();
+    return calculateSubtotal() + calculateDeliveryFee() - calculateDiscount();
   };
 
   // Handle selecting an address
@@ -89,11 +170,47 @@ const CheckoutScreen = () => {
 
   // Handle applying promo code
   const handleApplyPromo = () => {
-    if (promoCode.toLowerCase() === 'welcome10') {
-      setPromoApplied(true);
-      Alert.alert('Success', 'Promo code applied successfully!');
-    } else {
+    const foundPromo = promoCodes.find(
+      promo => promo.code.toLowerCase() === promoCode.toLowerCase()
+    );
+
+    if (!foundPromo) {
       Alert.alert('Invalid Code', 'Please enter a valid promo code.');
+      return;
+    }
+
+    // Check minimum order value if applicable
+    if (foundPromo.minOrderValue && calculateSubtotal() < foundPromo.minOrderValue) {
+      Alert.alert(
+        'Minimum Order Not Met', 
+        `This promo code requires a minimum order of Rs.${foundPromo.minOrderValue}.`
+      );
+      return;
+    }
+
+    setAppliedPromo(foundPromo);
+    Alert.alert('Success', `${foundPromo.title} applied successfully!`);
+  };
+
+  // Handle removing promo code
+  const handleRemovePromo = () => {
+    setAppliedPromo(null);
+    setPromoCode('');
+  };
+
+  // Get discount display text
+  const getDiscountText = () => {
+    if (!appliedPromo) return '';
+    
+    switch (appliedPromo.discountType) {
+      case 'percentage':
+        return `${appliedPromo.discount} discount`;
+      case 'fixed':
+        return `Rs.${appliedPromo.discountValue} off`;
+      case 'free_shipping':
+        return 'Free shipping';
+      default:
+        return '';
     }
   };
 
@@ -130,6 +247,7 @@ const CheckoutScreen = () => {
             deliveryAddress: selectedAddress.address,
             contactPhone: selectedAddress.phone,
             paymentMethod: getPaymentMethodText(),
+         
           });
 
           // Simulate order placement
@@ -273,23 +391,64 @@ const CheckoutScreen = () => {
                 placeholderTextColor={isDarkMode ? "#888" : "#aaa"}
                 value={promoCode}
                 onChangeText={setPromoCode}
-                editable={!promoApplied}
+                editable={!appliedPromo}
               />
               <TouchableOpacity
                 style={[
                   styles.promoButton,
-                  promoApplied && styles.promoAppliedButton,
+                  appliedPromo && styles.promoAppliedButton,
                 ]}
-                onPress={handleApplyPromo}
-                disabled={promoApplied}>
+                onPress={appliedPromo ? handleRemovePromo : handleApplyPromo}
+                disabled={false}>
                 <Text style={styles.promoButtonText}>
-                  {promoApplied ? 'Applied' : 'Apply'}
+                  {appliedPromo ? 'Remove' : 'Apply'}
                 </Text>
               </TouchableOpacity>
             </View>
-            {promoApplied && (
-              <Text style={styles.promoAppliedText}>10% discount applied!</Text>
+            
+            {appliedPromo && (
+              <View style={styles.promoAppliedContainer}>
+                <Text style={styles.promoAppliedText}>
+                  {appliedPromo.title} - {getDiscountText()} applied!
+                </Text>
+                <Text style={styles.promoDescription}>
+                  {appliedPromo.description}
+                </Text>
+              </View>
             )}
+
+            {/* Available Promo Codes */}
+            <View style={styles.availablePromosContainer}>
+              <Text style={[styles.availablePromosTitle, isDarkMode && styles.darkText]}>
+                Available Offers:
+              </Text>
+              {promoCodes.map((promo) => (
+                <TouchableOpacity
+                  key={promo.id}
+                  style={[styles.promoCard, isDarkMode && styles.darkPromoCard]}
+                  onPress={() => {
+                    if (!appliedPromo) {
+                      setPromoCode(promo.code);
+                    }
+                  }}>
+                  <View style={styles.promoCardContent}>
+                    <Text style={[styles.promoCardTitle, isDarkMode && styles.darkText]}>
+                      {promo.title}
+                    </Text>
+                    <Text style={[styles.promoCardDescription, isDarkMode && styles.darkSubText]}>
+                      {promo.description}
+                    </Text>
+                    <Text style={[styles.promoCardExpiry, isDarkMode && styles.darkSubText]}>
+                      {promo.expiry}
+                    </Text>
+                  </View>
+                  <View style={styles.promoCardRight}>
+                    <Text style={styles.promoCardDiscount}>{promo.discount}</Text>
+                    <Text style={styles.promoCardCode}>Code: {promo.code}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
 
           {/* Order Summary Section */}
@@ -331,16 +490,21 @@ const CheckoutScreen = () => {
               </View>
 
               <View style={styles.priceRow}>
-                <Text style={[styles.priceLabel, isDarkMode && styles.darkSubText]}>Delivery Fee</Text>
+                <Text style={[styles.priceLabel, isDarkMode && styles.darkSubText]}>
+                  Delivery Fee
+                  {appliedPromo?.discountType === 'free_shipping' && (
+                    <Text style={styles.strikethrough}> (Rs.{deliveryFee.toFixed(2)})</Text>
+                  )}
+                </Text>
                 <Text style={[styles.priceValue, isDarkMode && styles.darkText]}>
-                  Rs.{deliveryFee.toFixed(2)}
+                  Rs.{calculateDeliveryFee().toFixed(2)}
                 </Text>
               </View>
 
-              {promoApplied && (
+              {appliedPromo && appliedPromo.discountType !== 'free_shipping' && (
                 <View style={styles.priceRow}>
                   <Text style={[styles.priceLabel, styles.discountLabel]}>
-                    Discount (10%)
+                    Discount ({getDiscountText()})
                   </Text>
                   <Text style={[styles.priceValue, styles.discountValue]}>
                     -Rs.{calculateDiscount().toFixed(2)}
@@ -384,9 +548,7 @@ const CheckoutScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-  
   },
- 
   darkSafeArea: {
     backgroundColor: '#121212',
   },
@@ -526,16 +688,84 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   promoAppliedButton: {
-    backgroundColor: '#aaa',
+    backgroundColor: '#dc3545',
   },
   promoButtonText: {
     color: 'white',
     fontWeight: '600',
   },
+  promoAppliedContainer: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#d4edda',
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#28a745',
+  },
   promoAppliedText: {
-    color: '#2E7D32',
+    color: '#155724',
     fontSize: 14,
-    marginTop: 6,
+    fontWeight: '600',
+  },
+  promoDescription: {
+    color: '#155724',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  availablePromosContainer: {
+    marginTop: 15,
+  },
+  availablePromosTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 10,
+    color: '#333',
+  },
+  promoCard: {
+    flexDirection: 'row',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  darkPromoCard: {
+    backgroundColor: '#333',
+    borderColor: '#444',
+  },
+  promoCardContent: {
+    flex: 1,
+  },
+  promoCardTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 2,
+  },
+  promoCardDescription: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 2,
+  },
+  promoCardExpiry: {
+    fontSize: 11,
+    color: '#888',
+  },
+  promoCardRight: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  promoCardDiscount: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FF3F00',
+    marginBottom: 2,
+  },
+  promoCardCode: {
+    fontSize: 11,
+    color: '#666',
+    fontWeight: '600',
   },
   orderItem: {
     flexDirection: 'row',
@@ -592,6 +822,10 @@ const styles = StyleSheet.create({
   discountValue: {
     color: '#2E7D32',
   },
+  strikethrough: {
+    textDecorationLine: 'line-through',
+    color: '#999',
+  },
   totalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -618,11 +852,6 @@ const styles = StyleSheet.create({
   darkFooter: {
     backgroundColor: '#222',
     borderColor: '#444',
-  },
-  placeOrderPrice: {
-    fontSize: 18,
-    color: 'white',
-    fontWeight: '700',
   },
   totalContainer: {
     backgroundColor: '#fff',
