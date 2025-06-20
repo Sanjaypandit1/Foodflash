@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   View,
   Text,
@@ -9,49 +9,25 @@ import {
   Switch,
   SafeAreaView,
   Dimensions,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
-import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import AddressScreen from './AddressScreen';
-
+} from 'react-native'
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native"
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import Icon from 'react-native-vector-icons/Feather'
+import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import type { User } from "../MenuScreen/User"
 
 // Get screen dimensions for responsive layout
-const {  } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window')
 
-// Define types for menu items
-interface MenuItem {
-  id: number;
-  title: string;
-  icon: string;
-  iconType?: 'feather' | 'material';
-  toggle?: boolean;
-  onPress?: () => void;
-}
-
-// Menu Item Component Props
-interface MenuItemProps {
-  title: string;
-  icon: string;
-  iconType?: 'feather' | 'material';
-  toggle?: boolean;
-  isLast?: boolean;
-  onPress?: () => void; // 👉 यो लाइन थप्नुहोस्
-}
-
-// Menu Section Component Props
-interface MenuSectionProps {
-  title: string;
-  items: MenuItem[];
-}
-
-// Navigation type
+// Navigation types
 type RootStackParamList = {
-  Settings: undefined
   SignIn: undefined
+  SignUp: undefined
+  FrontScreen: { user?: any }
   Profile: undefined
   Address: undefined
-  LanguageSelectionScreen:undefined
+  LanguageSelectionScreen: undefined
   Coupons: undefined
   LoyaltyPoints: undefined
   Wallet: undefined
@@ -62,27 +38,66 @@ type RootStackParamList = {
   Privacy: undefined
   Refund: undefined
   Cancellation: undefined
+  MainTabs: undefined
 }
 
+type FrontScreenRouteProp = RouteProp<RootStackParamList, 'FrontScreen'>
+type NavigationProps = NativeStackNavigationProp<RootStackParamList>
 
-type NavigationProps = NavigationProp<RootStackParamList, 'Settings'>;
+// Define types for menu items
+interface MenuItem {
+  id: number
+  title: string
+  icon: string
+  iconType?: 'feather' | 'material' | 'fontawesome'
+  toggle?: boolean
+  onPress?: () => void
+}
+
+// Menu Item Component Props
+interface MenuItemProps {
+  title: string
+  icon: string
+  iconType?: 'feather' | 'material' | 'fontawesome'
+  toggle?: boolean
+  isLast?: boolean
+  onPress?: () => void
+}
+
+// Menu Section Component Props
+interface MenuSectionProps {
+  title: string
+  items: MenuItem[]
+}
+
+interface FrontScreenProps {
+  user?: User | null
+  onSignOut?: () => Promise<void>
+}
 
 // Menu Item Component
 const MenuItem: React.FC<MenuItemProps> = ({ title, icon, iconType = 'feather', toggle, isLast, onPress }) => {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+  const [isEnabled, setIsEnabled] = useState(false)
+  const toggleSwitch = () => setIsEnabled(previousState => !previousState)
+
+  const renderIcon = () => {
+    switch (iconType) {
+      case 'material':
+        return <MaterialIcon name={icon} size={20} color="#000" style={styles.menuIcon} />
+      case 'fontawesome':
+        return <FontAwesome name={icon} size={20} color="#000" style={styles.menuIcon} />
+      default:
+        return <Icon name={icon} size={20} color="#000" style={styles.menuIcon} />
+    }
+  }
 
   return (
     <TouchableOpacity
-    style={[styles.menuItem, isLast ? styles.lastMenuItem : null]}
-    onPress={onPress}
+      style={[styles.menuItem, isLast ? styles.lastMenuItem : null]}
+      onPress={onPress}
     >
       <View style={styles.menuItemLeft}>
-        {iconType === 'feather' ? (
-          <Icon name={icon} size={20} color="#000" style={styles.menuIcon} />
-        ) : (
-          <MaterialIcon name={icon} size={20} color="#000" style={styles.menuIcon} />
-        )}
+        {renderIcon()}
         <Text style={styles.menuText}>{title}</Text>
       </View>
       {toggle && (
@@ -95,8 +110,8 @@ const MenuItem: React.FC<MenuItemProps> = ({ title, icon, iconType = 'feather', 
         />
       )}
     </TouchableOpacity>
-  );
-};
+  )
+}
 
 // Menu Section Component
 const MenuSection: React.FC<MenuSectionProps> = ({ title, items }) => {
@@ -117,62 +132,160 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, items }) => {
         ))}
       </View>
     </View>
-  );
-};
+  )
+}
 
-// Profile Header Component
-const ProfileHeader: React.FC = () => {
-  const navigation = useNavigation<NavigationProps>();
+const FrontScreen: React.FC<FrontScreenProps> = ({ user: propUser, onSignOut }) => {
+  const navigation = useNavigation<NavigationProps>()
+  const route = useRoute<FrontScreenRouteProp>()
+  
+  // Use user from route params if available, otherwise use prop
+  const user = route.params?.user || propUser
 
-  return (
-    <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
-      <View style={styles.header}>
-        <View style={styles.profileContainer}>
-          <Image source={require('../Assets/logo.jpg')} style={styles.profileImage} />
-          <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>Guest User</Text>
-            <Text style={styles.profileSubtitle}>Login to view all the features</Text>
+  // Get user display name with better fallback logic
+  const getUserDisplayName = () => {
+    if (!user) return "Guest User"
+    
+    // Priority: displayName > name > email (before @) > "User"
+    if (user.displayName) return user.displayName
+    if (user.name) return user.name
+    if (user.email) {
+      const emailName = user.email.split('@')[0]
+      return emailName.charAt(0).toUpperCase() + emailName.slice(1)
+    }
+    return "User"
+  }
+
+  // Profile Header Component
+  const ProfileHeader: React.FC = () => {
+    return (
+      <TouchableOpacity onPress={() => (user ? navigation.navigate("Profile") : navigation.navigate("SignIn"))}>
+        <View style={styles.header}>
+          <View style={styles.profileContainer}>
+            <Image 
+              source={
+                user?.photoURL 
+                  ? { uri: user.photoURL }
+                  : require("../Assets/logo.jpg")
+              } 
+              style={styles.profileImage} 
+            />
+            <View style={styles.profileInfo}>
+              <Text style={styles.profileName}>
+                {getUserDisplayName()}
+              </Text>
+              <Text style={styles.profileSubtitle}>
+                {user ? (user.email || "Welcome back!") : "Tap here to sign in and unlock all features"}
+              </Text>
+            </View>
           </View>
         </View>
+      </TouchableOpacity>
+    )
+  }
+
+  // Sign In/Out Button Component
+  const AuthButton: React.FC = () => {
+    const handleSignOut = async () => {
+      if (onSignOut) {
+        await onSignOut()
+      }
+    }
+
+    if (user) {
+      return (
+        <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+          <FontAwesome name="sign-out" size={20} color="#fff" />
+          <Text style={styles.signOutText}>Sign Out</Text>
+        </TouchableOpacity>
+      )
+    }
+
+    return (
+      <TouchableOpacity
+        style={styles.signInButton}
+        onPress={() => navigation.navigate("SignIn")}
+      >
+        <FontAwesome name="sign-in" size={20} color="#fff" />
+        <Text style={styles.signInText}>Sign In</Text>
+      </TouchableOpacity>
+    )
+  }
+
+  // Welcome Section Component
+  const WelcomeSection: React.FC = () => {
+    return (
+      <View style={styles.welcomeSection}>
+        <Text style={styles.welcomeText}>
+          {user ? `Welcome, ${getUserDisplayName()}!` : 'Welcome to FoodFlash!'}
+        </Text>
+        <Text style={styles.descriptionText}>
+          {user 
+            ? 'You are successfully signed in. Explore all the features available to you.'
+            : 'Sign in to unlock personalized features, track orders, and enjoy exclusive offers.'
+          }
+        </Text>
       </View>
-    </TouchableOpacity>
-  );
-};
+    )
+  }
 
-// Sign In Button Component
-const SignInButton: React.FC = () => {
-  const navigation = useNavigation<NavigationProps>();
-
-  return (
-    <TouchableOpacity
-      style={styles.signInButton}
-      onPress={() => navigation.navigate('SignIn')}
-    >
-      <Icon name="power" size={20} color="#fff" />
-      <Text style={styles.signInText}>Sign In</Text>
-    </TouchableOpacity>
-  );
-};
-
-// Settings Screen
-const SettingsScreen: React.FC = () => {
-  const navigation = useNavigation<NavigationProps>();
   // Define menu items
   const generalItems: MenuItem[] = [
-    { id: 1, title: "Profile", icon: "user", onPress: () => navigation.navigate("Profile") },
-    { id: 2, title: "My Address", icon: "map-pin", onPress: () => navigation.navigate("Address") },
-    { id: 3, title: "Language", icon: "globe", onPress: () => navigation.navigate("LanguageSelectionScreen") },
-    { id: 4, title: "Dark Mode", icon: "moon", toggle: true },
+    { 
+      id: 1, 
+      title: "Profile", 
+      icon: "user", 
+      onPress: () => user ? navigation.navigate("Profile") : navigation.navigate("SignIn")
+    },
+    { 
+      id: 2, 
+      title: "My Address", 
+      icon: "map-pin", 
+      onPress: () => user ? navigation.navigate("Address") : navigation.navigate("SignIn")
+    },
+    { 
+      id: 3, 
+      title: "Language", 
+      icon: "globe", 
+      onPress: () => navigation.navigate("LanguageSelectionScreen") 
+    },
+    { 
+      id: 4, 
+      title: "Dark Mode", 
+      icon: "moon", 
+      toggle: true 
+    },
   ]
 
   const promotionalItems: MenuItem[] = [
-    { id: 1, title: "Coupon", icon: "ticket", iconType: "material", onPress: () => navigation.navigate("Coupons") },
-    { id: 2, title: "Loyalty Points", icon: "star", onPress: () => navigation.navigate("LoyaltyPoints") },
-    { id: 3, title: "My Wallet", icon: "credit-card", onPress: () => navigation.navigate("Wallet") },
+    { 
+      id: 1, 
+      title: "Coupon", 
+      icon: "ticket", 
+      iconType: "material", 
+      onPress: () => user ? navigation.navigate("Coupons") : navigation.navigate("SignIn")
+    },
+    { 
+      id: 2, 
+      title: "Loyalty Points", 
+      icon: "star", 
+      onPress: () => user ? navigation.navigate("LoyaltyPoints") : navigation.navigate("SignIn")
+    },
+    { 
+      id: 3, 
+      title: "My Wallet", 
+      icon: "credit-card", 
+      onPress: () => user ? navigation.navigate("Wallet") : navigation.navigate("SignIn")
+    },
   ]
 
   const earningItems: MenuItem[] = [
-    { id: 1, title: "Refer & Earn", icon: "users", onPress: () => navigation.navigate("Refer") },
+    { 
+      id: 1, 
+      title: "Refer & Earn", 
+      icon: "users", 
+      onPress: () => user ? navigation.navigate("Refer") : navigation.navigate("SignIn")
+    },
   ]
 
   const helpSupportItems: MenuItem[] = [
@@ -183,7 +296,13 @@ const SettingsScreen: React.FC = () => {
       iconType: "feather",
       onPress: () => navigation.navigate("Support"),
     },
-    { id: 2, title: "About Us", icon: "info", iconType: "feather", onPress: () => navigation.navigate("About") },
+    { 
+      id: 2, 
+      title: "About Us", 
+      icon: "info", 
+      iconType: "feather", 
+      onPress: () => navigation.navigate("About") 
+    },
     {
       id: 3,
       title: "Terms & Condition",
@@ -215,6 +334,7 @@ const SettingsScreen: React.FC = () => {
   ]
 
 
+
   return (
     <SafeAreaView style={styles.container}>
       <ProfileHeader />
@@ -223,19 +343,24 @@ const SettingsScreen: React.FC = () => {
         contentContainerStyle={styles.scrollViewContent}
         showsVerticalScrollIndicator={false}
       >
+        <WelcomeSection />
+        
+       
         <MenuSection title="General" items={generalItems} />
         <MenuSection title="Promotional Activity" items={promotionalItems} />
         <MenuSection title="Earnings" items={earningItems} />
         <MenuSection title="Help & Support" items={helpSupportItems} />
-        <SignInButton />
+        
+        <AuthButton />
+        
         {/* Add extra space at the bottom to ensure content isn't hidden behind tab navigation */}
         <View style={styles.bottomSpacer} />
       </ScrollView>
     </SafeAreaView>
-  );
-};
+  )
+}
 
-// Styles
+// Styles (same as before)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -245,10 +370,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollViewContent: {
-    paddingBottom: 80, // Add padding to ensure content isn't hidden behind tab navigation
+    paddingBottom: 80,
   },
   header: {
-    backgroundColor: 'red', // Changed from red to match the theme
+    backgroundColor: 'red',
     paddingTop: 10,
     paddingBottom: 20,
   },
@@ -265,6 +390,7 @@ const styles = StyleSheet.create({
   },
   profileInfo: {
     marginLeft: 15,
+    flex: 1,
   },
   profileName: {
     fontSize: 22,
@@ -274,6 +400,25 @@ const styles = StyleSheet.create({
   profileSubtitle: {
     fontSize: 14,
     color: '#fff',
+    marginTop: 2,
+  },
+  welcomeSection: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  descriptionText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 24,
   },
   menuSection: {
     marginTop: 20,
@@ -281,7 +426,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '500',
-    color: 'red', // Changed from red to match the theme
+    color: 'red',
     marginBottom: 10,
     paddingHorizontal: 15,
   },
@@ -317,7 +462,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'red', // Changed from red to match the theme
+    backgroundColor: 'red',
     borderRadius: 25,
     paddingVertical: 12,
     marginHorizontal: 100,
@@ -330,9 +475,26 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 10,
   },
-  bottomSpacer: {
-    height: 20, // Additional space at the bottom
+  signOutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FF6B6B',
+    borderRadius: 25,
+    paddingVertical: 12,
+    marginHorizontal: 100,
+    marginTop: 20,
+    marginBottom: 20,
   },
-});
+  signOutText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 10,
+  },
+  bottomSpacer: {
+    height: 20,
+  },
+})
 
-export default SettingsScreen;
+export default FrontScreen

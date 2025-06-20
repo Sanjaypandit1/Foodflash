@@ -8,6 +8,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import Icon from "react-native-vector-icons/FontAwesome"
 import type { GestureResponderEvent } from "react-native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import auth from "@react-native-firebase/auth"
+import { Alert } from "react-native"
+
 import { CartProvider, useCart } from "./src/components/CartContext"
 import { OrderProvider } from "./src/components/OrderContext"
 import CategoryItems from "./src/components/CategoryItem"
@@ -17,13 +20,17 @@ import HomeScreen from "./src/screens/HomeScreen"
 import FavoritesScreen from "./src/screens/favorites-screen"
 import CartScreen from "./src/screens/CartScreen"
 import OrdersScreen from "./src/screens/OrdersScreen"
-import MenuScreen from "./src/screens/MenuScreen"
 import LanguageSelectionScreen from "./src/FirstPage/Language"
 import OnboardingScreen from "./src/FirstPage/OnboardingScreen"
 import OnboardingScreen2 from "./src/FirstPage/onboardingscreen2"
 import LocationSelectionScreen from "./src/FirstPage/LocationScreen"
 
-import SignInScreen from "./src/MenuScreen/SigninScreen"
+// Auth Screens
+import FirebaseAuthScreen from "./src/MenuScreen/Auth"
+import FirebaseSignUpScreen from "./src/MenuScreen/SigninScreen"
+
+// Menu Screens
+import MenuScreen from "./src/screens/MenuScreen"
 import DeliciousBite from "./src/Resturant/DelicioueBite"
 import BurgerJoint from "./src/Resturant/BurgerJoint"
 import SpiceGarden from "./src/Resturant/SpiceGarden"
@@ -44,6 +51,16 @@ import RefundScreen from "./src/MenuScreen/RefundScreen"
 import CancellationScreen from "./src/MenuScreen/CancellationScreen"
 import AllCategories from "./src/components/AllCategories"
 
+// Import FrontScreen component
+import FrontScreen from "./src/MenuScreen/FrontScreen"
+
+import type { User } from "./src/MenuScreen/User"
+
+// Extended User type to include id property
+interface ExtendedUser extends User {
+  id: string
+}
+
 // Type for bottom tab navigator
 type TabParamList = {
   Home: undefined
@@ -53,10 +70,12 @@ type TabParamList = {
   Menu: undefined
 }
 
-// Type for stack navigator
+// Updated type for stack navigator
 type RootStackParamList = {
   MainTabs: undefined
   SignIn: undefined
+  SignUp: undefined
+  FrontScreen: { user?: any }
   LanguageSelectionScreen: undefined
   LocationSelectionScreen: undefined
   AddressScreen: undefined
@@ -96,6 +115,7 @@ type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>()
 const HomeStack = createNativeStackNavigator()
 const FavoritesStack = createNativeStackNavigator()
+const MenuStack = createNativeStackNavigator()
 
 // Home Stack Navigator
 const HomeStackNavigator = () => {
@@ -124,6 +144,17 @@ const FavoritesStackNavigator = () => {
   )
 }
 
+// Menu Stack Navigator
+const MenuStackNavigator = ({ user, onSignOut }: { user: ExtendedUser | null; onSignOut: () => Promise<void> }) => {
+  return (
+    <MenuStack.Navigator screenOptions={{ headerShown: false }}>
+      <MenuStack.Screen name="MenuMain">
+        {() => <FrontScreen user={user} onSignOut={onSignOut} />}
+      </MenuStack.Screen>
+    </MenuStack.Navigator>
+  )
+}
+
 // Floating Cart Button Component
 const FloatingCartButton = ({ onPress }: { onPress?: (event: GestureResponderEvent) => void }) => {
   const { getCartCount } = useCart()
@@ -141,8 +172,8 @@ const FloatingCartButton = ({ onPress }: { onPress?: (event: GestureResponderEve
   )
 }
 
-// Main Tab Navigator
-const MainTabNavigator = () => {
+// Main Tab Navigator with Auth
+const MainTabNavigator = ({ user, onSignOut }: { user: ExtendedUser | null; onSignOut: () => Promise<void> }) => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -187,7 +218,9 @@ const MainTabNavigator = () => {
         }}
       />
       <Tab.Screen name="Orders" component={OrdersScreen} />
-      <Tab.Screen name="Menu" component={MenuScreen} />
+      <Tab.Screen name="Menu">
+        {() => <MenuStackNavigator user={user} onSignOut={onSignOut} />}
+      </Tab.Screen>
     </Tab.Navigator>
   )
 }
@@ -195,18 +228,116 @@ const MainTabNavigator = () => {
 // Bottom Tab Navigator
 const Tab = createBottomTabNavigator<TabParamList>()
 
-// Main App Component with Root Stack
-function MainApp() {
+// Auth Navigator Component
+const AuthNavigator = () => {
+  const [user, setUser] = useState<ExtendedUser | null>(null)
+  const [initializing, setInitializing] = useState(true)
+
+  // Handle user state changes
+  function onAuthStateChanged(firebaseUser: any) {
+    console.log('Auth state changed:', firebaseUser ? 'User logged in' : 'User logged out')
+    
+    if (firebaseUser) {
+      const userData: ExtendedUser = {
+        id: firebaseUser.uid,
+        uid: firebaseUser.uid,
+        name: firebaseUser.displayName || undefined,
+        displayName: firebaseUser.displayName || null,
+        email: firebaseUser.email || "",
+        emailVerified: firebaseUser.emailVerified || false,
+      }
+      setUser(userData)
+    } else {
+      setUser(null)
+    }
+
+    if (initializing) setInitializing(false)
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged)
+    return subscriber // unsubscribe on unmount
+  }, [initializing])
+
+  const handleSignOut = async () => {
+    try {
+      await auth().signOut()
+      setUser(null)
+      Alert.alert("Success", "Signed out successfully!")
+    } catch (error: any) {
+      console.error('Sign out error:', error)
+      Alert.alert("Error", "Failed to sign out: " + error.message)
+    }
+  }
+
+  const handleAuthSuccess = (firebaseUser: any) => {
+    console.log('Auth success:', firebaseUser.email)
+    const userData: ExtendedUser = {
+      id: firebaseUser.uid,
+      uid: firebaseUser.uid,
+      name: firebaseUser.displayName || undefined,
+      displayName: firebaseUser.displayName || null,
+      email: firebaseUser.email || "",
+      emailVerified: firebaseUser.emailVerified || false,
+    }
+    setUser(userData)
+  }
+
+  if (initializing) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#F7931A" />
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    )
+  }
+
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
-      <Stack.Screen name="SignIn" component={SignInScreen} />
+    <Stack.Navigator 
+      screenOptions={{ headerShown: false }}
+      initialRouteName="MainTabs"
+    >
+      <Stack.Screen name="MainTabs">
+        {() => <MainTabNavigator user={user} onSignOut={handleSignOut} />}
+      </Stack.Screen>
+      
+      {/* Authentication Screens */}
+      <Stack.Screen name="SignIn">
+        {(props) => (
+          <FirebaseAuthScreen
+            {...props}
+            onAuthSuccess={handleAuthSuccess}
+          />
+        )}
+      </Stack.Screen>
+
+      <Stack.Screen name="SignUp">
+        {(props) => (
+          <FirebaseSignUpScreen
+            {...props}
+            onAuthSuccess={handleAuthSuccess}
+          />
+        )}
+      </Stack.Screen>
+      
+      {/* Profile and Settings Screens */}
       <Stack.Screen name="AddressScreen" component={AddressScreen} />
-      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="Profile">
+        {(props) => <ProfileScreen {...props} user={user || undefined} />}
+      </Stack.Screen>
       <Stack.Screen name="Address" component={AddressScreen} />
-      <Stack.Screen name="Coupons" component={CouponsScreen} />
-      <Stack.Screen name="LoyaltyPoints" component={LoyaltyPointsScreen} />
-      <Stack.Screen name="Wallet" component={WalletScreen} />
+      <Stack.Screen name="Coupons">
+        {(props) => <CouponsScreen {...props} user={user || undefined} />}
+      </Stack.Screen>
+      <Stack.Screen name="LoyaltyPoints">
+        {(props) => <LoyaltyPointsScreen {...props} user={user ? {
+          ...user,
+          displayName: user.displayName || undefined
+        } : undefined} />}
+      </Stack.Screen>
+      <Stack.Screen name="Wallet">
+        {(props) => <WalletScreen {...props} user={user || undefined} />}
+      </Stack.Screen>
       <Stack.Screen name="Refer" component={ReferScreen} />
       <Stack.Screen name="Support" component={SupportScreen} />
       <Stack.Screen name="About" component={AboutScreen} />
@@ -214,13 +345,17 @@ function MainApp() {
       <Stack.Screen name="Privacy" component={PrivacyScreen} />
       <Stack.Screen name="Refund" component={RefundScreen} />
       <Stack.Screen name="Cancellation" component={CancellationScreen} />
-      {/* Add FoodItemDetail to root stack as well for global access */}
-      <Stack.Screen name="FoodItemDetail" component={FoodItemDetail} options={{ headerShown: false }} />
+      <Stack.Screen name="FoodItemDetail" component={FoodItemDetail} />
     </Stack.Navigator>
   )
 }
 
-// Wrapper App Component
+// Main App Component with Root Stack
+function MainApp() {
+  return <AuthNavigator />
+}
+
+// Wrapper App Component with Onboarding Flow
 export default function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [showLanguageScreen, setShowLanguageScreen] = useState(false)
@@ -278,6 +413,7 @@ export default function App() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#F7931A" />
+        <Text style={styles.loadingText}>Initializing...</Text>
       </View>
     )
   }
@@ -347,5 +483,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#666",
   },
 })
