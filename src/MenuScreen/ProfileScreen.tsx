@@ -9,13 +9,17 @@ import {
   SafeAreaView,
   ScrollView,
   TextInput,
-  StatusBar,
   Platform,
   Alert,
+  Image,
+  Modal,
 } from "react-native"
 import Icon from "react-native-vector-icons/Feather"
 import { type NavigationProp, useNavigation } from "@react-navigation/native"
 import { useState } from "react"
+import { launchImageLibrary, launchCamera, type ImagePickerResponse, type MediaType } from "react-native-image-picker"
+import { request, PERMISSIONS, RESULTS } from "react-native-permissions"
+import { useUserContext } from "../Context/UserContex"
 import type { User } from "./User"
 
 type RootStackParamList = {
@@ -31,7 +35,9 @@ interface ProfileScreenProps {
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ user }) => {
   const navigation = useNavigation<NavigationProps>()
+  const { profileImage, setProfileImage } = useUserContext()
   const [isEditing, setIsEditing] = useState(false)
+  const [showImagePicker, setShowImagePicker] = useState(false)
   const [profileData, setProfileData] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -39,10 +45,151 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ user }) => {
     address: "123 Main St, City, State 12345",
   })
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsEditing(false)
     Alert.alert("Success", "Profile updated successfully!")
   }
+
+  const requestCameraPermission = async () => {
+    try {
+      const result = await request(Platform.OS === "ios" ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA)
+      return result === RESULTS.GRANTED
+    } catch (error) {
+      console.log("Permission request error:", error)
+      return false
+    }
+  }
+
+  const requestGalleryPermission = async () => {
+    try {
+      const result = await request(
+        Platform.OS === "ios" ? PERMISSIONS.IOS.PHOTO_LIBRARY : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+      )
+      return result === RESULTS.GRANTED
+    } catch (error) {
+      console.log("Permission request error:", error)
+      return false
+    }
+  }
+
+  const selectImageFromGallery = async () => {
+    const hasPermission = await requestGalleryPermission()
+    if (!hasPermission) {
+      Alert.alert("Permission Required", "Please grant gallery access to select photos.")
+      return
+    }
+
+    const options = {
+      mediaType: "photo" as MediaType,
+      includeBase64: false,
+      maxHeight: 2000,
+      maxWidth: 2000,
+      quality: 0.8 as const,
+    }
+
+    launchImageLibrary(options, async (response: ImagePickerResponse) => {
+      if (response.didCancel || response.errorMessage) {
+        return
+      }
+
+      if (response.assets && response.assets[0]) {
+        const imageUri = response.assets[0].uri
+        if (imageUri) {
+          await setProfileImage(imageUri)
+          setShowImagePicker(false)
+          Alert.alert("Success", "Profile photo updated!")
+        }
+      }
+    })
+  }
+
+  const selectImageFromCamera = async () => {
+    const hasPermission = await requestCameraPermission()
+    if (!hasPermission) {
+      Alert.alert("Permission Required", "Please grant camera access to take photos.")
+      return
+    }
+
+    const options = {
+      mediaType: "photo" as MediaType,
+      includeBase64: false,
+      maxHeight: 2000,
+      maxWidth: 2000,
+      quality: 0.8 as const,
+    }
+
+    launchCamera(options, async (response: ImagePickerResponse) => {
+      if (response.didCancel || response.errorMessage) {
+        return
+      }
+
+      if (response.assets && response.assets[0]) {
+        const imageUri = response.assets[0].uri
+        if (imageUri) {
+          await setProfileImage(imageUri)
+          setShowImagePicker(false)
+          Alert.alert("Success", "Profile photo updated!")
+        }
+      }
+    })
+  }
+
+  const removeProfileImage = () => {
+    Alert.alert("Remove Photo", "Are you sure you want to remove your profile photo?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Remove",
+        style: "destructive",
+        onPress: async () => {
+          await setProfileImage(null)
+          setShowImagePicker(false)
+          Alert.alert("Success", "Profile photo removed!")
+        },
+      },
+    ])
+  }
+
+  // Get the current profile image (priority: context > user.photoURL > null)
+  const getCurrentProfileImage = () => {
+    return profileImage || user?.photoURL || null
+  }
+
+  // Image Picker Modal Component
+  const ImagePickerModal = () => (
+    <Modal
+      visible={showImagePicker}
+      transparent={true}
+      animationType="slide"
+      onRequestClose={() => setShowImagePicker(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Select Profile Photo</Text>
+
+          <TouchableOpacity style={styles.modalOption} onPress={selectImageFromCamera}>
+            <Icon name="camera" size={24} color="#333" />
+            <Text style={styles.modalOptionText}>Take Photo</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.modalOption} onPress={selectImageFromGallery}>
+            <Icon name="image" size={24} color="#333" />
+            <Text style={styles.modalOptionText}>Choose from Gallery</Text>
+          </TouchableOpacity>
+
+          {getCurrentProfileImage() && (
+            <TouchableOpacity style={styles.modalOption} onPress={removeProfileImage}>
+              <Icon name="trash-2" size={24} color="#FF6B6B" />
+              <Text style={[styles.modalOptionText, { color: "#FF6B6B" }]}>Remove Photo</Text>
+            </TouchableOpacity>
+          )}
+
+          <TouchableOpacity style={styles.modalCancelButton} onPress={() => setShowImagePicker(false)}>
+            <Text style={styles.modalCancelText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  )
 
   // If user is not signed in, show sign-in prompt
   if (!user) {
@@ -84,13 +231,21 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ user }) => {
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Profile Header */}
+        {/* Profile Header with Photo Upload */}
         <View style={styles.profileHeader}>
-          <View style={styles.avatarContainer}>
-            <Icon name="user" size={40} color="#fff" />
-          </View>
+          <TouchableOpacity style={styles.avatarContainer} onPress={() => setShowImagePicker(true)}>
+            {getCurrentProfileImage() ? (
+              <Image source={{ uri: getCurrentProfileImage()! }} style={styles.avatarImage} />
+            ) : (
+              <Icon name="user" size={40} color="#fff" />
+            )}
+            <View style={styles.cameraIconContainer}>
+              <Icon name="camera" size={16} color="#fff" />
+            </View>
+          </TouchableOpacity>
           <Text style={styles.profileName}>{user.name}</Text>
           <Text style={styles.profileEmail}>{user.email}</Text>
+          <Text style={styles.photoHint}>Tap photo to change</Text>
         </View>
 
         {/* Profile Information */}
@@ -185,6 +340,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ user }) => {
           </View>
         </View>
       </ScrollView>
+
+      {/* Image Picker Modal */}
+      <ImagePickerModal />
     </SafeAreaView>
   )
 }
@@ -193,7 +351,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFF5EB",
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0,
   },
   header: {
     backgroundColor: "red",
@@ -215,7 +372,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 15,
   },
-  // Original sign-in prompt styles
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -247,7 +403,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  // Authenticated user styles
   profileHeader: {
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -261,13 +416,32 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   avatarContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: "red",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 15,
+    position: "relative",
+  },
+  avatarImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  cameraIconContainer: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: "#333",
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#fff",
   },
   profileName: {
     fontSize: 24,
@@ -278,6 +452,56 @@ const styles = StyleSheet.create({
   profileEmail: {
     fontSize: 16,
     color: "#666",
+    marginBottom: 5,
+  },
+  photoHint: {
+    fontSize: 12,
+    color: "#999",
+    fontStyle: "italic",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    paddingBottom: 40,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+    color: "#333",
+  },
+  modalOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  modalOptionText: {
+    fontSize: 16,
+    marginLeft: 15,
+    color: "#333",
+  },
+  modalCancelButton: {
+    marginTop: 10,
+    paddingVertical: 15,
+    alignItems: "center",
+    backgroundColor: "#f8f8f8",
+    borderRadius: 10,
+  },
+  modalCancelText: {
+    fontSize: 16,
+    color: "#666",
+    fontWeight: "500",
   },
   infoCard: {
     backgroundColor: "#fff",

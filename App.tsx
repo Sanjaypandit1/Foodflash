@@ -14,6 +14,7 @@ import { Alert } from "react-native"
 import { CartProvider, useCart } from "./src/components/CartContext"
 import { OrderProvider } from "./src/components/OrderContext"
 import CategoryItems from "./src/components/CategoryItem"
+import { UserProvider } from "./src/Context/UserContex"
 
 // Importing Screens
 import HomeScreen from "./src/screens/HomeScreen"
@@ -419,24 +420,27 @@ export default function App() {
   }
 
   return (
-    <CartProvider>
-      <OrderProvider>
-        <NavigationContainer>
-          {showLanguageScreen ? (
-            <LanguageSelectionScreen onLanguageSelect={handleLanguageSelection} />
-          ) : showOnboarding ? (
-            <OnboardingScreen onFinish={handleOnboardingFinish} />
-          ) : showOnboarding2 ? (
-            <OnboardingScreen2 onFinish={handleOnboardingFinish2} />
-          ) : showLocationSelection ? (
-            <LocationSelectionScreen onFinish={handleLocationSelectionFinish} />
-          ) : (
-            <MainApp />
-          )}
-        </NavigationContainer>
-      </OrderProvider>
-    </CartProvider>
+      <UserProvider>
+      <CartProvider>
+        <OrderProvider>
+          <NavigationContainer>
+            {showLanguageScreen ? (
+              <LanguageSelectionScreen onLanguageSelect={handleLanguageSelection} />
+            ) : showOnboarding ? (
+              <OnboardingScreen onFinish={handleOnboardingFinish} />
+            ) : showOnboarding2 ? (
+              <OnboardingScreen2 onFinish={handleOnboardingFinish2} />
+            ) : showLocationSelection ? (
+              <LocationSelectionScreen onFinish={handleLocationSelectionFinish} />
+            ) : (
+              <MainApp />
+            )}
+          </NavigationContainer>
+        </OrderProvider>
+      </CartProvider>
+    </UserProvider>
   )
+  
 }
 
 // Styles
