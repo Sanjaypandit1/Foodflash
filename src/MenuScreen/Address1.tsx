@@ -13,33 +13,46 @@ import {
   Alert,
   FlatList,
   useColorScheme,
-  StatusBar,
-  Platform,
+  ActivityIndicator,
 } from "react-native"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useNavigation } from "@react-navigation/native"
+import {
+  validatePhoneNumber,
+  validateEmail,
+  requestLocationPermission,
+  getCurrentLocation,
+  formatLocationAddress,
+  type LocationData,
+} from "../utils/addressUtils"
 
-// Address type
+// Enhanced Address type with location data
 export type Address = {
   id: string
   name: string
-  fullName: string // Added full name field
+  fullName: string
   address: string
   phone: string
-  email: string // Added email field
+  email: string
   isDefault: boolean
+  // Optional location data
+  coordinates?: {
+    latitude: number
+    longitude: number
+  }
+  city?: string
+  postalCode?: string
 }
 
 interface AddressManagerProps {
   onSelectAddress?: (address: Address) => void
   selectedAddressId?: string
-  mode?: "select" | "manage" // 'select' for checkout, 'manage' for settings
+  mode?: "select" | "manage"
 }
 
 const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, selectedAddressId, mode = "select" }) => {
   const navigation = useNavigation()
-  // Use React Native's built-in useColorScheme
   const colorScheme = useColorScheme()
   const isDarkMode = colorScheme === "dark"
 
@@ -54,7 +67,12 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
   const [newAddressDefault, setNewAddressDefault] = useState<boolean>(false)
   const [selectedId, setSelectedId] = useState<string | undefined>(selectedAddressId)
 
-  // Add these state variables after the other state declarations (around line 45)
+  // Location-related state
+  const [currentLocationData, setCurrentLocationData] = useState<LocationData | null>(null)
+  const [loadingLocation, setLoadingLocation] = useState<boolean>(false)
+  const [locationDetected, setLocationDetected] = useState<boolean>(false)
+
+  // Validation state
   const [validationStatus, setValidationStatus] = useState<{
     fullName: boolean | null
     address: boolean | null
@@ -70,45 +88,6 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
     overall: null,
     message: "",
   })
-
-  // Add these functions to validate on blur
-  const validateFullName = () => {
-    const isValid = newAddressFullName.trim().length > 0
-    setValidationStatus((prev) => ({
-      ...prev,
-      fullName: isValid,
-      message: isValid ? prev.message : "Full name is required",
-    }))
-  }
-
-  const validateAddress = () => {
-    const isValid = newAddressText.trim().length > 0
-    setValidationStatus((prev) => ({
-      ...prev,
-      address: isValid,
-      message: isValid ? prev.message : "Address is required",
-    }))
-  }
-
-  const validatePhone = () => {
-    const phoneRegex = /^\+977\d{10}$/
-    const isValid = phoneRegex.test(newAddressPhone)
-    setValidationStatus((prev) => ({
-      ...prev,
-      phone: isValid,
-      message: isValid ? prev.message : "Phone number must start with +977 followed by 10 digits",
-    }))
-  }
-
-  const validateEmail = () => {
-    const emailRegex = /^[^\s@]+@gmail\.com$/i
-    const isValid = emailRegex.test(newAddressEmail)
-    setValidationStatus((prev) => ({
-      ...prev,
-      email: isValid,
-      message: isValid ? prev.message : "Please enter a valid Gmail address",
-    }))
-  }
 
   // Load addresses on component mount
   useEffect(() => {
@@ -130,7 +109,6 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
         const parsedAddresses = JSON.parse(savedAddresses)
         setAddresses(parsedAddresses)
 
-        // If no address is selected, select the default one
         if (!selectedId && parsedAddresses.length > 0 && mode === "select") {
           const defaultAddress = parsedAddresses.find((addr: Address) => addr.isDefault)
           if (defaultAddress) {
@@ -147,7 +125,6 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
     }
   }
 
-  // Rest of your component remains the same...
   // Save addresses to AsyncStorage
   const saveAddresses = async (updatedAddresses: Address[]) => {
     try {
@@ -158,8 +135,8 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
     }
   }
 
-  // Open modal to add a new address
-  const openAddAddressModal = () => {
+  // Reset form and validation
+  const resetForm = () => {
     setEditingAddress(null)
     setNewAddressName("")
     setNewAddressFullName("")
@@ -167,7 +144,8 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
     setNewAddressPhone("")
     setNewAddressEmail("")
     setNewAddressDefault(false)
-    setAddressModalVisible(true)
+    setCurrentLocationData(null)
+    setLocationDetected(false)
     setValidationStatus({
       fullName: null,
       address: null,
@@ -176,6 +154,12 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
       overall: null,
       message: "",
     })
+  }
+
+  // Open modal to add a new address
+  const openAddAddressModal = () => {
+    resetForm()
+    setAddressModalVisible(true)
   }
 
   // Open modal to edit an existing address
@@ -187,6 +171,18 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
     setNewAddressPhone(address.phone)
     setNewAddressEmail(address.email || "")
     setNewAddressDefault(address.isDefault)
+
+    // If address has coordinates, set location data
+    if (address.coordinates) {
+      setCurrentLocationData({
+        address: address.address,
+        coordinates: address.coordinates,
+        city: address.city || "Unknown City",
+        country: "Nepal",
+      })
+      setLocationDetected(true)
+    }
+
     setAddressModalVisible(true)
     setValidationStatus({
       fullName: null,
@@ -198,9 +194,52 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
     })
   }
 
-  // Add this function before the handleSaveAddress function
+  // Get current location and populate address
+  const handleGetCurrentLocation = async () => {
+    setLoadingLocation(true)
+
+    try {
+      const hasPermission = await requestLocationPermission()
+
+      if (!hasPermission) {
+        Alert.alert("Permission Required", "Location permission is needed to automatically detect your address.", [
+          { text: "OK" },
+        ])
+        setLoadingLocation(false)
+        return
+      }
+
+      const locationData = await getCurrentLocation()
+
+      if (locationData) {
+        setCurrentLocationData(locationData)
+        setLocationDetected(true)
+
+        // Auto-populate the address field
+        const formattedAddress = formatLocationAddress(locationData)
+        setNewAddressText(formattedAddress)
+
+        // If address name is empty, suggest one based on location
+        if (!newAddressName.trim()) {
+          setNewAddressName(locationData.city || "Current Location")
+        }
+
+        Alert.alert(
+          "Location Detected",
+          "Your current location has been automatically added to the address field. You can edit it if needed.",
+          [{ text: "OK" }],
+        )
+      }
+    } catch (error) {
+      console.error("Error getting location:", error)
+      Alert.alert("Location Error", "Unable to get your current location. Please enter your address manually.")
+    } finally {
+      setLoadingLocation(false)
+    }
+  }
+
+  // Validation functions
   const validateFields = () => {
-    // Reset validation status
     const newStatus = {
       fullName: null as boolean | null,
       address: null as boolean | null,
@@ -210,7 +249,6 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
       message: "",
     }
 
-    // Validate full name
     if (!newAddressFullName.trim()) {
       newStatus.fullName = false
       newStatus.message = "Full name is required"
@@ -219,7 +257,6 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
     }
     newStatus.fullName = true
 
-    // Validate address
     if (!newAddressText.trim()) {
       newStatus.address = false
       newStatus.message = "Address is required"
@@ -228,9 +265,7 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
     }
     newStatus.address = true
 
-    // Validate phone number
-    const phoneRegex = /^\+977\d{10}$/
-    if (!phoneRegex.test(newAddressPhone)) {
+    if (!validatePhoneNumber(newAddressPhone)) {
       newStatus.phone = false
       newStatus.message = "Phone number must start with +977 followed by 10 digits"
       setValidationStatus(newStatus)
@@ -238,9 +273,7 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
     }
     newStatus.phone = true
 
-    // Validate email
-    const emailRegex = /^[^\s@]+@gmail\.com$/i
-    if (!emailRegex.test(newAddressEmail)) {
+    if (!validateEmail(newAddressEmail)) {
       newStatus.email = false
       newStatus.message = "Please enter a valid Gmail address"
       setValidationStatus(newStatus)
@@ -248,16 +281,14 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
     }
     newStatus.email = true
 
-    // All validations passed
     newStatus.overall = true
     newStatus.message = "All fields are valid"
     setValidationStatus(newStatus)
     return true
   }
 
-  // Modify the handleSaveAddress function to use the validateFields function
+  // Handle saving address
   const handleSaveAddress = () => {
-    // Validate inputs
     if (!validateFields()) {
       return
     }
@@ -276,24 +307,34 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
             phone: newAddressPhone,
             email: newAddressEmail,
             isDefault: newAddressDefault,
+            // Update location data if available
+            ...(currentLocationData && {
+              coordinates: currentLocationData.coordinates,
+              city: currentLocationData.city,
+              postalCode: currentLocationData.postalCode,
+            }),
           }
         }
-        // If this address is set as default, remove default from others
         return newAddressDefault ? { ...addr, isDefault: false } : addr
       })
     } else {
       // Adding new address
       const newAddress: Address = {
-        id: Date.now().toString(), // Generate unique ID
+        id: Date.now().toString(),
         name: newAddressName,
         fullName: newAddressFullName,
         address: newAddressText,
         phone: newAddressPhone,
         email: newAddressEmail,
-        isDefault: newAddressDefault || addresses.length === 0, // First address is default
+        isDefault: newAddressDefault || addresses.length === 0,
+        // Add location data if available
+        ...(currentLocationData && {
+          coordinates: currentLocationData.coordinates,
+          city: currentLocationData.city,
+          postalCode: currentLocationData.postalCode,
+        }),
       }
 
-      // If new address is default, update other addresses
       if (newAddress.isDefault) {
         updatedAddresses = updatedAddresses.map((addr) => ({
           ...addr,
@@ -301,10 +342,8 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
         }))
       }
 
-      // Add new address to list
       updatedAddresses = [...updatedAddresses, newAddress]
 
-      // Select the new address if in select mode
       if (mode === "select") {
         setSelectedId(newAddress.id)
         if (onSelectAddress) onSelectAddress(newAddress)
@@ -312,23 +351,7 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
     }
 
     saveAddresses(updatedAddresses)
-
-    // Reset form and close modal
-    setEditingAddress(null)
-    setNewAddressName("")
-    setNewAddressFullName("")
-    setNewAddressText("")
-    setNewAddressPhone("")
-    setNewAddressEmail("")
-    setNewAddressDefault(false)
-    setValidationStatus({
-      fullName: null,
-      address: null,
-      phone: null,
-      email: null,
-      overall: null,
-      message: "",
-    })
+    resetForm()
     setAddressModalVisible(false)
   }
 
@@ -359,14 +382,12 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
         onPress: () => {
           const updatedAddresses = addresses.filter((addr) => addr.id !== id)
 
-          // If we're deleting the selected address, select another one
           if (id === selectedId && updatedAddresses.length > 0 && mode === "select") {
             const newSelectedAddress = updatedAddresses.find((addr) => addr.isDefault) || updatedAddresses[0]
             setSelectedId(newSelectedAddress.id)
             if (onSelectAddress) onSelectAddress(newSelectedAddress)
           }
 
-          // If we're deleting the default address, make another one default
           if (updatedAddresses.length > 0 && !updatedAddresses.some((addr) => addr.isDefault)) {
             updatedAddresses[0].isDefault = true
           }
@@ -376,6 +397,43 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
         style: "destructive",
       },
     ])
+  }
+
+  // Individual field validation functions
+  const validateFullName = () => {
+    const isValid = newAddressFullName.trim().length > 0
+    setValidationStatus((prev) => ({
+      ...prev,
+      fullName: isValid,
+      message: isValid ? prev.message : "Full name is required",
+    }))
+  }
+
+  const validateAddress = () => {
+    const isValid = newAddressText.trim().length > 0
+    setValidationStatus((prev) => ({
+      ...prev,
+      address: isValid,
+      message: isValid ? prev.message : "Address is required",
+    }))
+  }
+
+  const validatePhone = () => {
+    const isValid = validatePhoneNumber(newAddressPhone)
+    setValidationStatus((prev) => ({
+      ...prev,
+      phone: isValid,
+      message: isValid ? prev.message : "Phone number must start with +977 followed by 10 digits",
+    }))
+  }
+
+  const validateEmailField = () => {
+    const isValid = validateEmail(newAddressEmail)
+    setValidationStatus((prev) => ({
+      ...prev,
+      email: isValid,
+      message: isValid ? prev.message : "Please enter a valid Gmail address",
+    }))
   }
 
   // Render address list or selector based on mode
@@ -393,7 +451,6 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
     }
 
     if (mode === "select") {
-      // Show address selector (for checkout)
       return (
         <View>
           {addresses.map((address) => (
@@ -414,6 +471,11 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
                     <Text style={styles.defaultText}>Default</Text>
                   </View>
                 )}
+                {address.coordinates && (
+                  <View style={styles.locationBadge}>
+                    <Icon name="location-on" size={12} color="#4CAF50" />
+                  </View>
+                )}
               </View>
               <Text style={[styles.addressText, isDarkMode && styles.darkText]}>{address.fullName}</Text>
               <Text style={[styles.addressText, isDarkMode && styles.darkText]}>{address.address}</Text>
@@ -432,7 +494,6 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
         </View>
       )
     } else {
-      // Show address management (for settings)
       return (
         <FlatList
           data={addresses}
@@ -446,11 +507,22 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
                     <Text style={styles.defaultText}>Default</Text>
                   </View>
                 )}
+                {item.coordinates && (
+                  <View style={styles.locationBadge}>
+                    <Icon name="location-on" size={12} color="#4CAF50" />
+                    <Text style={styles.locationBadgeText}>GPS</Text>
+                  </View>
+                )}
               </View>
               <Text style={[styles.addressName, isDarkMode && styles.darkText]}>Name: {item.fullName}</Text>
               <Text style={[styles.addressText, isDarkMode && styles.darkText]}>{item.address}</Text>
               <Text style={[styles.phoneText, isDarkMode && styles.darkText]}>Phone: {item.phone}</Text>
               <Text style={[styles.phoneText, isDarkMode && styles.darkText]}>Email: {item.email}</Text>
+              {item.coordinates && (
+                <Text style={[styles.coordinatesText, isDarkMode && styles.darkText]}>
+                  📍 {item.coordinates.latitude.toFixed(6)}, {item.coordinates.longitude.toFixed(6)}
+                </Text>
+              )}
               <View style={styles.addressActions}>
                 <TouchableOpacity style={styles.actionButton} onPress={() => openEditAddressModal(item)}>
                   <Text style={styles.actionButtonText}>Edit</Text>
@@ -481,7 +553,7 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
     <View style={styles.container}>
       {renderAddresses()}
 
-      {/* Add/Edit Address Modal */}
+      {/* Enhanced Add/Edit Address Modal */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -500,6 +572,31 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
             </View>
 
             <ScrollView>
+              {/* Location Detection Section */}
+              <View style={styles.locationSection}>
+                <TouchableOpacity
+                  style={[styles.locationButton, loadingLocation && styles.locationButtonDisabled]}
+                  onPress={handleGetCurrentLocation}
+                  disabled={loadingLocation}
+                >
+                  {loadingLocation ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Icon name="my-location" size={20} color="#fff" />
+                  )}
+                  <Text style={styles.locationButtonText}>
+                    {loadingLocation ? "Detecting Location..." : "Use Current Location"}
+                  </Text>
+                </TouchableOpacity>
+
+                {locationDetected && currentLocationData && (
+                  <View style={styles.detectedLocationContainer}>
+                    <Icon name="location-on" size={16} color="#4CAF50" />
+                    <Text style={styles.detectedLocationText}>Location detected: {currentLocationData.city}</Text>
+                  </View>
+                )}
+              </View>
+
               {validationStatus.overall === false && (
                 <View style={styles.validationErrorContainer}>
                   <Icon name="error-outline" size={20} color="#d32f2f" />
@@ -541,13 +638,17 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
               </View>
 
               <View style={styles.formGroup}>
-                <Text style={[styles.formLabel, isDarkMode && styles.darkText]}>Full Address</Text>
+                <Text style={[styles.formLabel, isDarkMode && styles.darkText]}>
+                  Full Address
+                  {locationDetected && <Text style={styles.autoFilledLabel}> (Auto-filled)</Text>}
+                </Text>
                 <TextInput
                   style={[
                     styles.formInput,
                     styles.textArea,
                     isDarkMode && styles.darkFormInput,
                     validationStatus.address === false && styles.inputError,
+                    locationDetected && styles.autoFilledInput,
                   ]}
                   placeholder="Enter your full address with landmarks"
                   placeholderTextColor={isDarkMode ? "#888" : "#aaa"}
@@ -577,11 +678,9 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
                   placeholderTextColor={isDarkMode ? "#888" : "#aaa"}
                   value={newAddressPhone}
                   onChangeText={(text) => {
-                    // Ensure the phone number starts with +977
                     if (!text.startsWith("+977") && text.length > 0) {
                       text = "+977" + text.replace(/^\+977/, "")
                     }
-                    // Limit to +977 followed by 10 digits
                     if (text.startsWith("+977")) {
                       const digits = text.substring(4)
                       if (digits.length <= 10) {
@@ -592,7 +691,7 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
                     }
                   }}
                   keyboardType="phone-pad"
-                  maxLength={14} // +977 + 10 digits
+                  maxLength={14}
                   onBlur={validatePhone}
                 />
                 {validationStatus.phone === false && (
@@ -617,7 +716,7 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
                   onChangeText={setNewAddressEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  onBlur={validateEmail}
+                  onBlur={validateEmailField}
                 />
                 {validationStatus.email === false && (
                   <View style={styles.fieldErrorContainer}>
@@ -668,12 +767,8 @@ const AddressManager: React.FC<AddressManagerProps> = ({ onSelectAddress, select
 }
 
 const styles = StyleSheet.create({
-  // Your existing styles...
   container: {
     width: "100%",
-  },
-  safeArea: {
-    flex: 1,
   },
   emptyContainer: {
     alignItems: "center",
@@ -732,6 +827,21 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "500",
   },
+  locationBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#E8F5E8",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginLeft: 8,
+  },
+  locationBadgeText: {
+    color: "#2E7D32",
+    fontSize: 10,
+    fontWeight: "500",
+    marginLeft: 2,
+  },
   addressText: {
     fontSize: 14,
     color: "#555",
@@ -743,6 +853,12 @@ const styles = StyleSheet.create({
     color: "#555",
     marginTop: 4,
     paddingRight: 30,
+  },
+  coordinatesText: {
+    fontSize: 12,
+    color: "#4CAF50",
+    marginTop: 4,
+    fontFamily: "monospace",
   },
   radioButton: {
     position: "absolute",
@@ -809,7 +925,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "90%",
-    maxHeight: "80%",
+    maxHeight: "85%",
     backgroundColor: "white",
     borderRadius: 16,
     padding: 20,
@@ -835,6 +951,51 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#333",
+  },
+  // Location section styles
+  locationSection: {
+    marginBottom: 20,
+  },
+  locationButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#4CAF50",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    gap: 8,
+  },
+  locationButtonDisabled: {
+    backgroundColor: "#A5D6A7",
+  },
+  locationButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  detectedLocationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    padding: 8,
+    backgroundColor: "#E8F5E8",
+    borderRadius: 6,
+  },
+  detectedLocationText: {
+    color: "#2E7D32",
+    fontSize: 12,
+    marginLeft: 6,
+    fontWeight: "500",
+  },
+  autoFilledLabel: {
+    color: "#4CAF50",
+    fontSize: 12,
+    fontWeight: "500",
+  },
+  autoFilledInput: {
+    borderColor: "#4CAF50",
+    backgroundColor: "#F1F8E9",
   },
   formGroup: {
     marginBottom: 16,

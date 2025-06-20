@@ -73,33 +73,7 @@ const FavoritesScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const fadeAnim = new Animated.Value(0);
 
-  // Sample data for testing
-  const sampleFavorites: FavoriteItem[] = [
-    {
-      id: "1",
-      name: "Veg Pizza",
-      price: "300",
-      description: "Fresh vegetables, mozzarella cheese and basil on a crispy pizza base.",
-      image: { uri: "https://images.unsplash.com/photo-1506354666786-959d6d497f1a" },
-      isVeg: true,
-      rating: "4.5",
-      preparationTime: "20 min",
-      restaurant: "Pizza Palace",
-      dateAdded: new Date().toISOString(),
-    },
-    {
-      id: "2",
-      name: "Chicken Burger",
-      price: "180",
-      description: "Juicy fried chicken patty topped with cheese and sauces.",
-      image: { uri: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd" },
-      isVeg: false,
-      rating: "4.5",
-      preparationTime: "10 min",
-      restaurant: "Burger Joint",
-      dateAdded: new Date(Date.now() - 86400000).toISOString(), // Yesterday
-    },
-  ];
+  
 
   // Load favorites from AsyncStorage with enhanced error handling
   const loadFavorites = useCallback(async () => {
@@ -163,15 +137,7 @@ const FavoritesScreen = () => {
   }, [favorites, filter, sortBy]);
 
   // Add sample data for testing
-  const addSampleData = async () => {
-    try {
-      await AsyncStorage.setItem("favorites", JSON.stringify(sampleFavorites));
-      setFavorites(sampleFavorites);
-    } catch (error) {
-      console.error("Error adding sample data:", error);
-      Alert.alert("Error", "Failed to add sample data");
-    }
-  };
+
 
   // Clear all favorites
   const clearAllFavorites = async () => {
@@ -425,15 +391,7 @@ const FavoritesScreen = () => {
         <Text style={styles.exploreButtonText}>Explore Food</Text>
       </TouchableOpacity>
       
-      {/* Developer tools - only show in development */}
-      {__DEV__ && (
-        <TouchableOpacity 
-          style={styles.debugButton}
-          onPress={addSampleData}
-        >
-          <Text style={styles.debugButtonText}>Add Sample Data (Dev Only)</Text>
-        </TouchableOpacity>
-      )}
+  
     </View>
   );
 

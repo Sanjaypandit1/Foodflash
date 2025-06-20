@@ -12,21 +12,27 @@ import {
   ScrollView,
   TextInput,
   Alert,
-  StatusBar,
-  Platform,
+  ActivityIndicator,
 } from "react-native"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import AddressManager, { type Address } from "./Address1"
 import { useColorScheme } from "react-native"
 import type { StackNavigationProp } from "@react-navigation/stack"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import {
+  validatePhoneNumber,
+  validateEmail,
+  requestLocationPermission,
+  getCurrentLocation,
+  formatLocationAddress,
+  type LocationData,
+} from "../utils/addressUtils"
 
 // Define the navigation type
 type RootStackParamList = {
   Home: undefined
   AddressScreen: undefined
   Settings: undefined
-  // Add other screens as needed
 }
 
 type AddressScreenNavigationProp = StackNavigationProp<RootStackParamList, "AddressScreen">
@@ -36,7 +42,6 @@ interface AddressScreenProps {
 }
 
 const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
-  // Use React Native's built-in useColorScheme instead of @react-navigation/native's useTheme
   const colorScheme = useColorScheme()
   const isDarkMode = colorScheme === "dark"
 
@@ -47,12 +52,15 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
   const [newAddressPhone, setNewAddressPhone] = useState<string>("")
   const [newAddressDefault, setNewAddressDefault] = useState<boolean>(false)
   const [addresses, setAddresses] = useState<Address[]>([])
-
-  // Add state variables for the new fields
   const [newAddressFullName, setNewAddressFullName] = useState<string>("")
   const [newAddressEmail, setNewAddressEmail] = useState<string>("")
 
-  // Add this state variable after the other state declarations (around line 40)
+  // Location-related state
+  const [currentLocationData, setCurrentLocationData] = useState<LocationData | null>(null)
+  const [loadingLocation, setLoadingLocation] = useState<boolean>(false)
+  const [locationDetected, setLocationDetected] = useState<boolean>(false)
+
+  // Validation state
   const [validationStatus, setValidationStatus] = useState<{
     fullName: boolean | null
     address: boolean | null
@@ -100,12 +108,70 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
     setNewAddressPhone("")
     setNewAddressEmail("")
     setNewAddressDefault(false)
+    setCurrentLocationData(null)
+    setLocationDetected(false)
     setAddressModalVisible(true)
+    resetValidationStatus()
   }
 
-  // Add this function before the handleSaveAddress function
+  // Reset validation status
+  const resetValidationStatus = () => {
+    setValidationStatus({
+      fullName: null,
+      address: null,
+      phone: null,
+      email: null,
+      overall: null,
+      message: "",
+    })
+  }
+
+  // Get current location and populate address
+  const handleGetCurrentLocation = async () => {
+    setLoadingLocation(true)
+
+    try {
+      const hasPermission = await requestLocationPermission()
+
+      if (!hasPermission) {
+        Alert.alert("Permission Required", "Location permission is needed to automatically detect your address.", [
+          { text: "OK" },
+        ])
+        setLoadingLocation(false)
+        return
+      }
+
+      const locationData = await getCurrentLocation()
+
+      if (locationData) {
+        setCurrentLocationData(locationData)
+        setLocationDetected(true)
+
+        // Auto-populate the address field
+        const formattedAddress = formatLocationAddress(locationData)
+        setNewAddressText(formattedAddress)
+
+        // If address name is empty, suggest one based on location
+        if (!newAddressName.trim()) {
+          setNewAddressName(locationData.city || "Current Location")
+        }
+
+        Alert.alert(
+          "Location Detected",
+          "Your current location has been automatically added to the address field. You can edit it if needed.",
+          [{ text: "OK" }],
+        )
+      }
+    } catch (error) {
+      console.error("Error getting location:", error)
+      Alert.alert("Location Error", "Unable to get your current location. Please enter your address manually.")
+    } finally {
+      setLoadingLocation(false)
+    }
+  }
+
+  // Validation functions
   const validateFields = () => {
-    // Reset validation status
     const newStatus = {
       fullName: null as boolean | null,
       address: null as boolean | null,
@@ -134,8 +200,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
     newStatus.address = true
 
     // Validate phone number
-    const phoneRegex = /^\+977\d{10}$/
-    if (!phoneRegex.test(newAddressPhone)) {
+    if (!validatePhoneNumber(newAddressPhone)) {
       newStatus.phone = false
       newStatus.message = "Phone number must start with +977 followed by 10 digits"
       setValidationStatus(newStatus)
@@ -144,8 +209,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
     newStatus.phone = true
 
     // Validate email
-    const emailRegex = /^[^\s@]+@gmail\.com$/i
-    if (!emailRegex.test(newAddressEmail)) {
+    if (!validateEmail(newAddressEmail)) {
       newStatus.email = false
       newStatus.message = "Please enter a valid Gmail address"
       setValidationStatus(newStatus)
@@ -160,19 +224,17 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
     return true
   }
 
-  // Modify the handleSaveAddress function to use the validateFields function
+  // Handle saving address
   const handleSaveAddress = async () => {
-    // Validate inputs
     if (!validateFields()) {
       return
     }
 
     try {
-      // Load current addresses
       const savedAddresses = await AsyncStorage.getItem("userAddresses")
       let currentAddresses: Address[] = savedAddresses ? JSON.parse(savedAddresses) : []
 
-      // Create new address
+      // Create new address with location data if available
       const newAddress: Address = {
         id: Date.now().toString(),
         name: newAddressName,
@@ -181,6 +243,12 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
         phone: newAddressPhone,
         email: newAddressEmail,
         isDefault: newAddressDefault || currentAddresses.length === 0,
+        // Add location coordinates if available
+        ...(currentLocationData && {
+          coordinates: currentLocationData.coordinates,
+          city: currentLocationData.city,
+          postalCode: currentLocationData.postalCode,
+        }),
       }
 
       // If new address is default, update other addresses
@@ -197,29 +265,19 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
       // Save updated addresses
       await AsyncStorage.setItem("userAddresses", JSON.stringify(updatedAddresses))
 
-      // Close modal and refresh AddressManager
+      // Close modal and refresh
       setAddressModalVisible(false)
-
-      // Reset validation status
-      setValidationStatus({
-        fullName: null,
-        address: null,
-        phone: null,
-        email: null,
-        overall: null,
-        message: "",
-      })
-
-      // Force refresh of the AddressManager component
-      // This is a simple way to trigger a refresh - in a real app you might use context or state management
+      resetValidationStatus()
       navigation.navigate("AddressScreen")
+
+      Alert.alert("Success", "Address saved successfully!")
     } catch (error) {
       console.error("Failed to save address:", error)
       Alert.alert("Error", "Failed to save address. Please try again.")
     }
   }
 
-  // Add these functions to validate on blur
+  // Individual field validation functions
   const validateFullName = () => {
     const isValid = newAddressFullName.trim().length > 0
     setValidationStatus((prev) => ({
@@ -239,8 +297,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
   }
 
   const validatePhone = () => {
-    const phoneRegex = /^\+977\d{10}$/
-    const isValid = phoneRegex.test(newAddressPhone)
+    const isValid = validatePhoneNumber(newAddressPhone)
     setValidationStatus((prev) => ({
       ...prev,
       phone: isValid,
@@ -248,9 +305,8 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
     }))
   }
 
-  const validateEmail = () => {
-    const emailRegex = /^[^\s@]+@gmail\.com$/i
-    const isValid = emailRegex.test(newAddressEmail)
+  const validateEmailField = () => {
+    const isValid = validateEmail(newAddressEmail)
     setValidationStatus((prev) => ({
       ...prev,
       email: isValid,
@@ -281,7 +337,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
         <AddressManager mode="manage" />
       </View>
 
-      {/* Add Address Modal */}
+      {/* Enhanced Add Address Modal */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -298,6 +354,31 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
             </View>
 
             <ScrollView>
+              {/* Location Detection Section */}
+              <View style={styles.locationSection}>
+                <TouchableOpacity
+                  style={[styles.locationButton, loadingLocation && styles.locationButtonDisabled]}
+                  onPress={handleGetCurrentLocation}
+                  disabled={loadingLocation}
+                >
+                  {loadingLocation ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Icon name="my-location" size={20} color="#fff" />
+                  )}
+                  <Text style={styles.locationButtonText}>
+                    {loadingLocation ? "Detecting Location..." : "Use Current Location"}
+                  </Text>
+                </TouchableOpacity>
+
+                {locationDetected && currentLocationData && (
+                  <View style={styles.detectedLocationContainer}>
+                    <Icon name="location-on" size={16} color="#4CAF50" />
+                    <Text style={styles.detectedLocationText}>Location detected: {currentLocationData.city}</Text>
+                  </View>
+                )}
+              </View>
+
               {validationStatus.overall === false && (
                 <View style={styles.validationErrorContainer}>
                   <Icon name="error-outline" size={20} color="#d32f2f" />
@@ -339,13 +420,17 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
               </View>
 
               <View style={styles.formGroup}>
-                <Text style={[styles.formLabel, isDarkMode && styles.darkText]}>Full Address</Text>
+                <Text style={[styles.formLabel, isDarkMode && styles.darkText]}>
+                  Full Address
+                  {locationDetected && <Text style={styles.autoFilledLabel}> (Auto-filled)</Text>}
+                </Text>
                 <TextInput
                   style={[
                     styles.formInput,
                     styles.textArea,
                     isDarkMode && styles.darkFormInput,
                     validationStatus.address === false && styles.inputError,
+                    locationDetected && styles.autoFilledInput,
                   ]}
                   placeholder="Enter your full address with landmarks"
                   placeholderTextColor={isDarkMode ? "#888" : "#aaa"}
@@ -375,11 +460,9 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
                   placeholderTextColor={isDarkMode ? "#888" : "#aaa"}
                   value={newAddressPhone}
                   onChangeText={(text) => {
-                    // Ensure the phone number starts with +977
                     if (!text.startsWith("+977") && text.length > 0) {
                       text = "+977" + text.replace(/^\+977/, "")
                     }
-                    // Limit to +977 followed by 10 digits
                     if (text.startsWith("+977")) {
                       const digits = text.substring(4)
                       if (digits.length <= 10) {
@@ -390,7 +473,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
                     }
                   }}
                   keyboardType="phone-pad"
-                  maxLength={14} // +977 + 10 digits
+                  maxLength={14}
                   onBlur={validatePhone}
                 />
                 {validationStatus.phone === false && (
@@ -415,7 +498,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ navigation }) => {
                   onChangeText={setNewAddressEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  onBlur={validateEmail}
+                  onBlur={validateEmailField}
                 />
                 {validationStatus.email === false && (
                   <View style={styles.fieldErrorContainer}>
@@ -469,10 +552,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f9f9f9",
-    
-  },
-  safeArea: {
-    flex: 1,
   },
   darkContainer: {
     backgroundColor: "#121212",
@@ -529,7 +608,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "90%",
-    maxHeight: "80%",
+    maxHeight: "85%",
     backgroundColor: "white",
     borderRadius: 16,
     padding: 20,
@@ -558,6 +637,51 @@ const styles = StyleSheet.create({
   },
   darkText: {
     color: "#f0f0f0",
+  },
+  // Location section styles
+  locationSection: {
+    marginBottom: 20,
+  },
+  locationButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#4CAF50",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    gap: 8,
+  },
+  locationButtonDisabled: {
+    backgroundColor: "#A5D6A7",
+  },
+  locationButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  detectedLocationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    padding: 8,
+    backgroundColor: "#E8F5E8",
+    borderRadius: 6,
+  },
+  detectedLocationText: {
+    color: "#2E7D32",
+    fontSize: 12,
+    marginLeft: 6,
+    fontWeight: "500",
+  },
+  autoFilledLabel: {
+    color: "#4CAF50",
+    fontSize: 12,
+    fontWeight: "500",
+  },
+  autoFilledInput: {
+    borderColor: "#4CAF50",
+    backgroundColor: "#F1F8E9",
   },
   formGroup: {
     marginBottom: 16,
