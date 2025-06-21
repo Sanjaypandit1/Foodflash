@@ -21,6 +21,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome"
 import { useUserContext } from "../Context/UserContex"
 import { useTranslation } from 'react-i18next'
 import type { User } from "../MenuScreen/User"
+import LanguageSelectionScreen from "../FirstPage/Language"
 
 // Get screen dimensions for responsive layout
 const { width, height } = Dimensions.get("window")
@@ -236,12 +237,6 @@ const FrontScreen: React.FC<FrontScreenProps> = ({ user: propUser, onSignOut }) 
       title: t('profile.language'),
       icon: "globe",
       onPress: () => navigation.navigate("LanguageSelectionScreen"),
-    },
-    {
-      id: 4,
-      title: t('profile.darkMode'),
-      icon: "moon",
-      toggle: true,
     },
   ]
 

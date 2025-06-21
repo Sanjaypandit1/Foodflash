@@ -357,6 +357,7 @@ const AuthNavigator = () => {
         {(props) => <ProfileScreen {...props} user={user || undefined} />}
       </Stack.Screen>
       <Stack.Screen name="Address" component={AddressScreen} />
+      <Stack.Screen name='LanguageSelectionScreen' component={LanguageSelectionScreen}/>
       <Stack.Screen name="Coupons">
         {(props) => <CouponsScreen {...props} user={user || undefined} />}
       </Stack.Screen>
