@@ -4,6 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useNavigation } from '@react-navigation/native'
+import { useTranslation } from 'react-i18next'
 import Geolocation from 'react-native-geolocation-service'
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions'
 
@@ -19,7 +20,8 @@ type LocationData = {
 
 const HeaderBar = () => {
   const navigation = useNavigation()
-  const [location, setLocation] = useState('Select Location')
+  const { t } = useTranslation()
+  const [location, setLocation] = useState(t('header.selectLocation'))
   const [locationData, setLocationData] = useState<LocationData | null>(null)
   const [isDetectingLocation, setIsDetectingLocation] = useState(false)
 
@@ -30,7 +32,7 @@ const HeaderBar = () => {
       if (savedLocation) {
         const locationData: LocationData = JSON.parse(savedLocation)
         setLocationData(locationData)
-        setLocation(locationData.city || locationData.country || 'Current Location')
+        setLocation(locationData.city || locationData.country || t('header.currentLocation'))
       }
     } catch (error) {
       console.log('Error loading saved location:', error)
@@ -50,13 +52,13 @@ const HeaderBar = () => {
         getCurrentLocation()
       } else {
         Alert.alert(
-          'Permission Required',
-          'Location permission is needed to find nearby restaurants and deliver food to you.',
+          t('header.permissionRequired'),
+          t('header.locationPermissionMessage'),
           [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Try Again', onPress: requestLocationPermission },
+            { text: t('common.cancel'), style: 'cancel' },
+            { text: t('header.tryAgain'), onPress: requestLocationPermission },
             { 
-              text: 'Manual Entry', 
+              text: t('header.manualEntry'), 
               onPress: () => navigation.navigate('LocationSelection' as never)
             }
           ]
@@ -79,13 +81,13 @@ const HeaderBar = () => {
       error => {
         setIsDetectingLocation(false)
         Alert.alert(
-          'Location Error', 
-          'Unable to get your location. Please check your GPS settings and try again.',
+          t('header.locationError'), 
+          t('header.locationErrorMessage'),
           [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Try Again', onPress: getCurrentLocation },
+            { text: t('common.cancel'), style: 'cancel' },
+            { text: t('header.tryAgain'), onPress: getCurrentLocation },
             { 
-              text: 'Manual Entry', 
+              text: t('header.manualEntry'), 
               onPress: () => navigation.navigate('LocationSelection' as never)
             }
           ]
@@ -125,7 +127,7 @@ const HeaderBar = () => {
         }
         
         setLocationData(locationData)
-        setLocation(locationData.city || locationData.country || 'Current Location')
+        setLocation(locationData.city || locationData.country || t('header.currentLocation'))
         
         // Save location to AsyncStorage
         await AsyncStorage.setItem('userLocation', JSON.stringify(locationData))
@@ -133,8 +135,8 @@ const HeaderBar = () => {
         
         // Show success message
         Alert.alert(
-          'Location Updated',
-          `Your delivery location has been set to ${locationData.city || locationData.country}`,
+          t('header.locationUpdated'),
+          t('header.locationSetMessage', { location: locationData.city || locationData.country }),
           [{ text: 'OK' }]
         )
       } else {
@@ -147,18 +149,18 @@ const HeaderBar = () => {
       const fallbackLocation: LocationData = {
         address: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
         coordinates: { latitude, longitude },
-        city: 'Current Location',
+        city: t('header.currentLocation'),
         country: 'Unknown'
       }
       
       setLocationData(fallbackLocation)
-      setLocation('Current Location')
+      setLocation(t('header.currentLocation'))
       await AsyncStorage.setItem('userLocation', JSON.stringify(fallbackLocation))
       await AsyncStorage.setItem('locationConfirmed', 'true')
       
       Alert.alert(
-        'Location Updated',
-        'Your location has been detected using GPS coordinates.',
+        t('header.locationUpdated'),
+        t('header.locationDetectedGPS'),
         [{ text: 'OK' }]
       )
     } finally {
@@ -173,22 +175,21 @@ const HeaderBar = () => {
     }
 
     Alert.alert(
-      'Update Location',
-      'How would you like to update your delivery location?',
+      t('header.updateLocation'),
+      t('header.locationPermissionMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         { 
-          text: 'Auto-Detect', 
+          text: t('header.autoDetect'), 
           onPress: requestLocationPermission
         },
-     
       ]
     )
   }
 
   // Handle notification press
   const handleNotificationPress = () => {
-    Alert.alert('Notifications', 'No new notifications')
+    Alert.alert(t('header.notifications'), t('header.noNotifications'))
   }
 
   // Handle search press
@@ -222,9 +223,9 @@ const HeaderBar = () => {
             <Ionicons name="location-outline" size={24} color="white" style={{ marginRight: 6 }} />
           )}
           <View style={styles.locationTextContainer}>
-            <Text style={styles.locationTitle}>Deliver to</Text>
+            <Text style={styles.locationTitle}>{t('header.deliverTo')}</Text>
             <Text style={styles.locationText} numberOfLines={1}>
-              {isDetectingLocation ? 'Detecting location...' : location}
+              {isDetectingLocation ? t('header.detectingLocation') : location}
             </Text>
           </View>
           {!isDetectingLocation && (
@@ -245,7 +246,7 @@ const HeaderBar = () => {
       {/* Search Box */}
       <TouchableOpacity style={styles.searchbox} onPress={handleSearchPress}>
         <AntDesign name="search1" size={24} color="#FF3F00" style={styles.searchicon} />
-        <Text style={styles.input}>What are you craving today?</Text>
+        <Text style={styles.input}>{t('header.searchPlaceholder')}</Text>
       </TouchableOpacity>
     </View>
   )

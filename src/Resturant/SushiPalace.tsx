@@ -4,6 +4,7 @@ import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navig
 import {ImageSourcePropType} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import LinearGradient from "react-native-linear-gradient"
+import { useTranslation } from "react-i18next"
 
 
 // Define types
@@ -323,6 +324,7 @@ const foodItems: FoodItem[] = [
 export default function SushilPalace() {
  const route = useRoute<RouteProp<RootStackParamList, 'RestaurantDetails'>>();
   const { restaurant } = route.params;
+    const { t } = useTranslation()
   const [filter, setFilter] = useState<FilterOption>('all');
 
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -331,7 +333,11 @@ export default function SushilPalace() {
   const filteredFoodItems = foodItems.filter(item => {
     if (filter === 'all') return true;
     return item.category === filter;
-  });
+  })
+    const getCategoryDisplayName = (category: string) => {
+    if (category === "all") return t("categories.subtypes.all")
+    return t(`categories.subtypes.${category}`, category.charAt(0).toUpperCase() + category.slice(1))
+  }
 
   const renderFoodItem = ({ item }: { item: FoodItem }) => (
     <TouchableOpacity
@@ -379,64 +385,57 @@ export default function SushilPalace() {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Restaurant Header with Image */}
-      <View style={styles.restaurantHeader}>
-        <Image 
-          source={{ uri: restaurant.image }} 
-          style={styles.restaurantImage}
-          resizeMode="cover"
-        />
-        <LinearGradient
-          colors={['rgba(0,0,0,0.7)', 'transparent']}
-          style={styles.imageOverlay}
-        />
-        
-        <View style={styles.headerContent}>
-          <Text style={styles.restaurantName}>{restaurant.name}</Text>
-          <View style={styles.restaurantInfoContainer}>
-            <Text style={styles.restaurantInfo}>{restaurant.cuisine}</Text>
-            <View style={styles.infoSeparator} />
-            <View style={styles.ratingContainer}>
-              <MaterialIcons name="star" size={16} color="#FFD700" />
-              <Text style={styles.restaurantInfo}>{restaurant.rating}</Text>
-            </View>
-            <View style={styles.infoSeparator} />
-            <Text style={styles.restaurantInfo}>{restaurant.deliveryTime}</Text>
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.filterContainer}>
-        <Text style={styles.filterLabel}>Filter by Category</Text>
-        <FlatList
-          data={filterCategories}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item}
-          renderItem={({ item: category }) => (
-            <TouchableOpacity
-              style={[styles.filterOption, filter === category && styles.filterOptionActive]}
-              onPress={() => setFilter(category)}
-            >
-              <Text style={[styles.filterText, filter === category && styles.filterTextActive]}>
-                {category === 'all' ? 'All' : category.charAt(0).toUpperCase() + category.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          )}
-          contentContainerStyle={styles.filterOptions}
-        />
-      </View>
-
-      <FlatList
-        data={filteredFoodItems}
-        renderItem={renderFoodItem}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.foodList}
-      />
-    </View>
-  );
+     <View style={styles.container}>
+       {/* Restaurant Header with Image */}
+       <View style={styles.restaurantHeader}>
+         <Image source={{ uri: restaurant.image }} style={styles.restaurantImage} resizeMode="cover" />
+         <LinearGradient colors={["rgba(0,0,0,0.7)", "transparent"]} style={styles.imageOverlay} />
+ 
+         <View style={styles.headerContent}>
+           <Text style={styles.restaurantName}>{restaurant.name}</Text>
+           <View style={styles.restaurantInfoContainer}>
+             <Text style={styles.restaurantInfo}>{restaurant.cuisine}</Text>
+             <View style={styles.infoSeparator} />
+             <View style={styles.ratingContainer}>
+               <MaterialIcons name="star" size={16} color="#FFD700" />
+               <Text style={styles.restaurantInfo}>{restaurant.rating}</Text>
+             </View>
+             <View style={styles.infoSeparator} />
+             <Text style={styles.restaurantInfo}>{restaurant.deliveryTime}</Text>
+           </View>
+         </View>
+       </View>
+ 
+       <View style={styles.filterContainer}>
+         <Text style={styles.filterLabel}>{t("categories.title")}</Text>
+         <FlatList
+           data={filterCategories}
+           horizontal
+           showsHorizontalScrollIndicator={false}
+           keyExtractor={(item) => item}
+           renderItem={({ item: category }) => (
+             <TouchableOpacity
+               style={[styles.filterOption, filter === category && styles.filterOptionActive]}
+               onPress={() => setFilter(category)}
+             >
+               <Text style={[styles.filterText, filter === category && styles.filterTextActive]}>
+                 {getCategoryDisplayName(category)}
+               </Text>
+             </TouchableOpacity>
+           )}
+           contentContainerStyle={styles.filterOptions}
+         />
+       </View>
+ 
+       <FlatList
+         data={filteredFoodItems}
+         renderItem={renderFoodItem}
+         keyExtractor={(item) => item.id}
+         showsVerticalScrollIndicator={false}
+         contentContainerStyle={styles.foodList}
+       />
+     </View>
+   )
 }
 
 const styles = StyleSheet.create({

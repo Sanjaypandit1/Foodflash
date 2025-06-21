@@ -19,8 +19,8 @@ import Icon from "react-native-vector-icons/Feather"
 import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons"
 import FontAwesome from "react-native-vector-icons/FontAwesome"
 import { useUserContext } from "../Context/UserContex"
+import { useTranslation } from 'react-i18next'
 import type { User } from "../MenuScreen/User"
-import LanguageSelectionScreen from "../FirstPage/Language"
 
 // Get screen dimensions for responsive layout
 const { width, height } = Dimensions.get("window")
@@ -141,13 +141,14 @@ const FrontScreen: React.FC<FrontScreenProps> = ({ user: propUser, onSignOut }) 
   const navigation = useNavigation<NavigationProps>()
   const route = useRoute<FrontScreenRouteProp>()
   const { profileImage } = useUserContext()
+  const { t } = useTranslation()
 
   // Use user from route params if available, otherwise use prop
   const user = route.params?.user || propUser
 
   // Get user display name with better fallback logic
   const getUserDisplayName = () => {
-    if (!user) return "Guest User"
+    if (!user) return t('profile.guestUser')
 
     // Priority: displayName > name > email (before @) > "User"
     if (user.displayName) return user.displayName
@@ -182,7 +183,7 @@ const FrontScreen: React.FC<FrontScreenProps> = ({ user: propUser, onSignOut }) 
             <View style={styles.profileInfo}>
               <Text style={styles.profileName}>{getUserDisplayName()}</Text>
               <Text style={styles.profileSubtitle}>
-                {user ? user.email || "Welcome back!" : "Tap here to sign in and unlock all features"}
+                {user ? user.email || t('profile.welcomeBack') : t('profile.tapToSignIn')}
               </Text>
             </View>
           </View>
@@ -203,7 +204,7 @@ const FrontScreen: React.FC<FrontScreenProps> = ({ user: propUser, onSignOut }) 
       return (
         <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
           <FontAwesome name="sign-out" size={20} color="#fff" />
-          <Text style={styles.signOutText}>Sign Out</Text>
+          <Text style={styles.signOutText}>{t('profile.signOut')}</Text>
         </TouchableOpacity>
       )
     }
@@ -211,29 +212,34 @@ const FrontScreen: React.FC<FrontScreenProps> = ({ user: propUser, onSignOut }) 
     return (
       <TouchableOpacity style={styles.signInButton} onPress={() => navigation.navigate("SignIn")}>
         <FontAwesome name="sign-in" size={20} color="#fff" />
-        <Text style={styles.signInText}>Sign In</Text>
+        <Text style={styles.signInText}>{t('profile.signIn')}</Text>
       </TouchableOpacity>
     )
   }
 
-  // Define menu items
+  // Define menu items with translations
   const generalItems: MenuItem[] = [
     {
       id: 1,
-      title: "Profile",
+      title: t('profile.profile'),
       icon: "user",
       onPress: () => (user ? navigation.navigate("Profile") : navigation.navigate("SignIn")),
     },
     {
       id: 2,
-      title: "My Address",
+      title: t('profile.myAddress'),
       icon: "map-pin",
       onPress: () => (user ? navigation.navigate("Address") : navigation.navigate("SignIn")),
     },
-
+    {
+      id: 3,
+      title: t('profile.language'),
+      icon: "globe",
+      onPress: () => navigation.navigate("LanguageSelectionScreen"),
+    },
     {
       id: 4,
-      title: "Dark Mode",
+      title: t('profile.darkMode'),
       icon: "moon",
       toggle: true,
     },
@@ -242,20 +248,20 @@ const FrontScreen: React.FC<FrontScreenProps> = ({ user: propUser, onSignOut }) 
   const promotionalItems: MenuItem[] = [
     {
       id: 1,
-      title: "Coupon",
+      title: t('profile.coupon'),
       icon: "ticket",
       iconType: "material",
       onPress: () => (user ? navigation.navigate("Coupons") : navigation.navigate("SignIn")),
     },
     {
       id: 2,
-      title: "Loyalty Points",
+      title: t('profile.loyaltyPoints'),
       icon: "star",
       onPress: () => (user ? navigation.navigate("LoyaltyPoints") : navigation.navigate("SignIn")),
     },
     {
       id: 3,
-      title: "My Wallet",
+      title: t('profile.myWallet'),
       icon: "credit-card",
       onPress: () => (user ? navigation.navigate("Wallet") : navigation.navigate("SignIn")),
     },
@@ -264,7 +270,7 @@ const FrontScreen: React.FC<FrontScreenProps> = ({ user: propUser, onSignOut }) 
   const earningItems: MenuItem[] = [
     {
       id: 1,
-      title: "Refer & Earn",
+      title: t('profile.referEarn'),
       icon: "users",
       onPress: () => (user ? navigation.navigate("Refer") : navigation.navigate("SignIn")),
     },
@@ -273,42 +279,42 @@ const FrontScreen: React.FC<FrontScreenProps> = ({ user: propUser, onSignOut }) 
   const helpSupportItems: MenuItem[] = [
     {
       id: 1,
-      title: "Help & Support",
+      title: t('profile.helpSupportItem'),
       icon: "headphones",
       iconType: "feather",
       onPress: () => navigation.navigate("Support"),
     },
     {
       id: 2,
-      title: "About Us",
+      title: t('profile.aboutUs'),
       icon: "info",
       iconType: "feather",
       onPress: () => navigation.navigate("About"),
     },
     {
       id: 3,
-      title: "Terms & Condition",
+      title: t('profile.termsCondition'),
       icon: "file-text",
       iconType: "feather",
       onPress: () => navigation.navigate("Terms"),
     },
     {
       id: 4,
-      title: "Privacy Policy",
+      title: t('profile.privacyPolicy'),
       icon: "shield",
       iconType: "feather",
       onPress: () => navigation.navigate("Privacy"),
     },
     {
       id: 5,
-      title: "Refund Policy",
+      title: t('profile.refundPolicy'),
       icon: "refresh-cw",
       iconType: "feather",
       onPress: () => navigation.navigate("Refund"),
     },
     {
       id: 6,
-      title: "Cancellation Policy",
+      title: t('profile.cancellationPolicy'),
       icon: "x-circle",
       iconType: "feather",
       onPress: () => navigation.navigate("Cancellation"),
@@ -323,10 +329,10 @@ const FrontScreen: React.FC<FrontScreenProps> = ({ user: propUser, onSignOut }) 
         contentContainerStyle={styles.scrollViewContent}
         showsVerticalScrollIndicator={false}
       >
-        <MenuSection title="General" items={generalItems} />
-        <MenuSection title="Promotional Activity" items={promotionalItems} />
-        <MenuSection title="Earnings" items={earningItems} />
-        <MenuSection title="Help & Support" items={helpSupportItems} />
+        <MenuSection title={t('profile.general')} items={generalItems} />
+        <MenuSection title={t('profile.promotionalActivity')} items={promotionalItems} />
+        <MenuSection title={t('profile.earnings')} items={earningItems} />
+        <MenuSection title={t('profile.helpSupport')} items={helpSupportItems} />
 
         <AuthButton />
 

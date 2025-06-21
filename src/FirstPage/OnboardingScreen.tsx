@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'rea
 import Swiper from 'react-native-swiper';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
+import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 
@@ -11,6 +12,8 @@ type OnboardingScreenProps = {
 };
 
 const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onFinish }) => {
+  const { t } = useTranslation();
+
   return (
     <Swiper
       loop={false}
@@ -20,18 +23,18 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onFinish }) => {
     >
       <View style={styles.slide}>
         <Image
-          source={require('../Assets/breakfast.jpg')} // Replace with actual image path
+          source={require('../Assets/breakfast.jpg')}
           style={styles.image}
           resizeMode="contain"
         />
         <View style={styles.textContainer}>
-          <Text style={styles.title}>Choose Yummy Food</Text>
+          <Text style={styles.title}>{t('onboarding.chooseYummyFood.title')}</Text>
           <Text style={styles.description}>
-            Purchase your favorite food with addons and proceed to easy checkout.
+            {t('onboarding.chooseYummyFood.description')}
           </Text>
         </View>
         <TouchableOpacity style={styles.skipButton} onPress={onFinish}>
-          <Text style={styles.skipText}>Skip</Text>
+          <Text style={styles.skipText}>{t('common.skip')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.nextButton} onPress={onFinish}>
           <LinearGradient colors={['red', 'red']} style={styles.gradient}>

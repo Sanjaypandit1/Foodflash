@@ -1,17 +1,18 @@
+// Updated src/FirstPage/Language.tsx
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 // Language Data
 const languages = [
   { id: 'en', name: 'English', flag: '🇺🇸' },
-  { id: 'ne', name: 'Nepali', flag: '🇳🇵' },
+  { id: 'ne', name: 'नेपाली', flag: '🇳🇵' },
   { id: 'ar', name: 'عربي', flag: '🇸🇩' },
-  { id: 'es', name: 'Spanish', flag: '🇪🇸' },
-  { id: 'bn', name: 'Bengali', flag: '🇧🇩' },
+  { id: 'es', name: 'Español', flag: '🇪🇸' },
+  { id: 'bn', name: 'বাংলা', flag: '🇧🇩' },
 ];
-
 
 type LanguageScreenProps = {
   onLanguageSelect?: () => void;
@@ -20,22 +21,34 @@ type LanguageScreenProps = {
 const LanguageSelectionScreen = ({ onLanguageSelect }: LanguageScreenProps) => {
   const [selectedLang, setSelectedLang] = useState('en');
   const navigation = useNavigation();
+  const { t, i18n } = useTranslation();
 
   const handleLanguageSelection = async () => {
-    await AsyncStorage.setItem('selectedLanguage', selectedLang);
+    try {
+      // Change the app language immediately
+      await i18n.changeLanguage(selectedLang);
+      
+      // Save the actual language code for i18n system
+      await AsyncStorage.setItem('currentAppLanguage', selectedLang);
+      
+      // Save the flag that language has been selected for app flow
+      await AsyncStorage.setItem('selectedLanguage', 'true');
 
-    if (onLanguageSelect) {
-      onLanguageSelect();
-    } else {
-      navigation.goBack();
+      if (onLanguageSelect) {
+        onLanguageSelect();
+      } else {
+        navigation.goBack();
+      }
+    } catch (error) {
+      console.error('Error changing language:', error);
     }
   };
 
   return (
     <View style={styles.container}>
       <Image source={require('../Assets/flag.jpg')} style={styles.image} resizeMode="contain" />
-      <Text style={styles.title}>Choose Your Language</Text>
-      <Text style={styles.subtitle}>Choose your language to proceed</Text>
+      <Text style={styles.title}>{t('language.title')}</Text>
+      <Text style={styles.subtitle}>{t('language.subtitle')}</Text>
 
       <FlatList
         data={languages}
@@ -56,7 +69,7 @@ const LanguageSelectionScreen = ({ onLanguageSelect }: LanguageScreenProps) => {
       />
 
       <TouchableOpacity style={styles.nextButton} onPress={handleLanguageSelection}>
-        <Text style={styles.nextText}>Next</Text>
+        <Text style={styles.nextText}>{t('common.next')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -64,7 +77,7 @@ const LanguageSelectionScreen = ({ onLanguageSelect }: LanguageScreenProps) => {
 
 export default LanguageSelectionScreen;
 
-// Styles
+// Keep your existing styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -119,8 +132,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
-    marginTop: 10, // Moved up slightly
-    marginBottom: 30, // Added spacing from bottom
+    marginTop: 10,
+    marginBottom: 30,
   },
   nextText: {
     color: 'white',

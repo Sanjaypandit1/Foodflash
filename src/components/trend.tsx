@@ -1,6 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View, Image, ScrollView } from 'react-native';
 import React from 'react';
 import { NavigationProp } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 // Define prop types
 type Props = {
@@ -8,6 +9,8 @@ type Props = {
 };
 
 const TodayTrends: React.FC<Props> = ({ navigation }) => {
+  const { t } = useTranslation();
+
   // Updated trending items with restaurant-specific images and restaurant names
   const trendingItems = [
     {
@@ -83,8 +86,8 @@ const TodayTrends: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.head}>Today's Trends</Text>
-      <Text style={styles.subhead}>Here's what you might like to taste</Text>
+      <Text style={styles.head}>{t('todayTrends.title')}</Text>
+      <Text style={styles.subhead}>{t('todayTrends.subtitle')}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollView}>
         {trendingItems.map((item) => (
           <TouchableOpacity
@@ -105,7 +108,9 @@ const TodayTrends: React.FC<Props> = ({ navigation }) => {
             })}
           >
             <Image source={item.image} style={styles.image} />
-            <View style={styles.discountTag}><Text style={styles.discountText}>{item.discount}% OFF</Text></View>
+            <View style={styles.discountTag}>
+              <Text style={styles.discountText}>{item.discount}% {t('common.off')}</Text>
+            </View>
 
             {/* Restaurant name with icon */}
             <View style={styles.restaurantContainer}>

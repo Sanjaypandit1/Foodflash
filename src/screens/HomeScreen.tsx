@@ -1,5 +1,5 @@
 import React from 'react';
-import {  StyleSheet, StatusBar,  Platform } from 'react-native';
+import { StyleSheet, StatusBar, Platform } from 'react-native';
 import Headerbar from '../components/Headerbar';
 import Categories from '../components/Categories';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
@@ -9,7 +9,6 @@ import HighlightsForYou from '../components/HighLights';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Resturant from '../components/Resturant';
 
-
 // Define stack param list (adjust based on your app structure)
 type RootStackParamList = {
   Home: undefined;
@@ -18,11 +17,9 @@ type RootStackParamList = {
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
-
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ScrollView
@@ -36,7 +33,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Categories navigation={navigation}/>
         <TodayTrends navigation={navigation} />
         <HighlightsForYou />
-        {/* Remove the navigation prop from Resturant */}
         <Resturant />
       </ScrollView>
     </GestureHandlerRootView>
@@ -47,7 +43,6 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: '#FFF5EB',
-  
   },
   safeArea: {
     flex: 1,

@@ -1,3 +1,6 @@
+// Updated App.tsx - Add this import at the very top
+import './src/Language/Setup'; // Import i18n configuration
+
 "use client"
 
 import { useEffect, useState } from "react"
@@ -10,13 +13,14 @@ import type { GestureResponderEvent } from "react-native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import auth from "@react-native-firebase/auth"
 import { Alert } from "react-native"
+import { useTranslation } from 'react-i18next' // Add this import
 
 import { CartProvider, useCart } from "./src/components/CartContext"
 import { OrderProvider } from "./src/components/OrderContext"
 import CategoryItems from "./src/components/CategoryItem"
 import { UserProvider } from "./src/Context/UserContex"
 
-// Importing Screens
+// Keep all your existing imports exactly as they are
 import HomeScreen from "./src/screens/HomeScreen"
 import FavoritesScreen from "./src/screens/favorites-screen"
 import CartScreen from "./src/screens/CartScreen"
@@ -57,12 +61,11 @@ import FrontScreen from "./src/MenuScreen/FrontScreen"
 
 import type { User } from "./src/MenuScreen/User"
 
-// Extended User type to include id property
+// Keep all your existing types
 interface ExtendedUser extends User {
   id: string
 }
 
-// Type for bottom tab navigator
 type TabParamList = {
   Home: undefined
   Favorites: undefined
@@ -71,7 +74,6 @@ type TabParamList = {
   Menu: undefined
 }
 
-// Updated type for stack navigator
 type RootStackParamList = {
   MainTabs: undefined
   SignIn: undefined
@@ -118,7 +120,7 @@ const HomeStack = createNativeStackNavigator()
 const FavoritesStack = createNativeStackNavigator()
 const MenuStack = createNativeStackNavigator()
 
-// Home Stack Navigator
+// Keep all your existing stack navigators exactly as they are
 const HomeStackNavigator = () => {
   return (
     <HomeStack.Navigator>
@@ -135,7 +137,6 @@ const HomeStackNavigator = () => {
   )
 }
 
-// Favorites Stack Navigator
 const FavoritesStackNavigator = () => {
   return (
     <FavoritesStack.Navigator>
@@ -145,7 +146,6 @@ const FavoritesStackNavigator = () => {
   )
 }
 
-// Menu Stack Navigator
 const MenuStackNavigator = ({ user, onSignOut }: { user: ExtendedUser | null; onSignOut: () => Promise<void> }) => {
   return (
     <MenuStack.Navigator screenOptions={{ headerShown: false }}>
@@ -156,7 +156,7 @@ const MenuStackNavigator = ({ user, onSignOut }: { user: ExtendedUser | null; on
   )
 }
 
-// Floating Cart Button Component
+// Keep your existing FloatingCartButton
 const FloatingCartButton = ({ onPress }: { onPress?: (event: GestureResponderEvent) => void }) => {
   const { getCartCount } = useCart()
   const cartCount = getCartCount()
@@ -173,8 +173,10 @@ const FloatingCartButton = ({ onPress }: { onPress?: (event: GestureResponderEve
   )
 }
 
-// Main Tab Navigator with Auth
+// Updated MainTabNavigator with translations
 const MainTabNavigator = ({ user, onSignOut }: { user: ExtendedUser | null; onSignOut: () => Promise<void> }) => {
+  const { t } = useTranslation(); // Add this line
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -205,7 +207,35 @@ const MainTabNavigator = ({ user, onSignOut }: { user: ExtendedUser | null; onSi
         tabBarActiveTintColor: "red",
         tabBarInactiveTintColor: "gray",
         tabBarStyle: styles.tabBarStyle,
-        tabBarLabel: () => null,
+        // Update tabBarLabel to use translations
+        tabBarLabel: ({ focused, color }) => {
+          let labelKey: string;
+          switch (route.name) {
+            case "Home":
+              labelKey = "tabs.home";
+              break;
+            case "Favorites":
+              labelKey = "tabs.favorites";
+              break;
+            case "Cart":
+              labelKey = "tabs.cart";
+              break;
+            case "Orders":
+              labelKey = "tabs.orders";
+              break;
+            case "Menu":
+              labelKey = "tabs.menu";
+              break;
+            default:
+              labelKey = "tabs.home";
+              break;
+          }
+          return (
+            <Text style={{ color, fontSize: 10, textAlign: 'center' }}>
+              {t(labelKey)}
+            </Text>
+          );
+        },
         headerShown: false,
       })}
     >
@@ -229,12 +259,13 @@ const MainTabNavigator = ({ user, onSignOut }: { user: ExtendedUser | null; onSi
 // Bottom Tab Navigator
 const Tab = createBottomTabNavigator<TabParamList>()
 
-// Auth Navigator Component
+// Keep your existing AuthNavigator with translation for loading text
 const AuthNavigator = () => {
   const [user, setUser] = useState<ExtendedUser | null>(null)
   const [initializing, setInitializing] = useState(true)
+  const { t } = useTranslation(); // Add this line
 
-  // Handle user state changes
+  // Keep all your existing auth logic exactly as it is
   function onAuthStateChanged(firebaseUser: any) {
     console.log('Auth state changed:', firebaseUser ? 'User logged in' : 'User logged out')
     
@@ -257,17 +288,17 @@ const AuthNavigator = () => {
 
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged)
-    return subscriber // unsubscribe on unmount
+    return subscriber
   }, [initializing])
 
   const handleSignOut = async () => {
     try {
       await auth().signOut()
       setUser(null)
-      Alert.alert("Success", "Signed out successfully!")
+      Alert.alert(t('common.success'), t('auth.signedOutSuccess'))
     } catch (error: any) {
       console.error('Sign out error:', error)
-      Alert.alert("Error", "Failed to sign out: " + error.message)
+      Alert.alert(t('common.error'), t('auth.signOutError') + ": " + error.message)
     }
   }
 
@@ -288,11 +319,12 @@ const AuthNavigator = () => {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#F7931A" />
-        <Text style={styles.loadingText}>Loading...</Text>
+        <Text style={styles.loadingText}>{t('common.loading')}</Text>
       </View>
     )
   }
 
+  // Keep all your existing Stack.Navigator structure exactly as it is
   return (
     <Stack.Navigator 
       screenOptions={{ headerShown: false }}
@@ -302,7 +334,6 @@ const AuthNavigator = () => {
         {() => <MainTabNavigator user={user} onSignOut={handleSignOut} />}
       </Stack.Screen>
       
-      {/* Authentication Screens */}
       <Stack.Screen name="SignIn">
         {(props) => (
           <FirebaseAuthScreen
@@ -321,7 +352,6 @@ const AuthNavigator = () => {
         )}
       </Stack.Screen>
       
-      {/* Profile and Settings Screens */}
       <Stack.Screen name="AddressScreen" component={AddressScreen} />
       <Stack.Screen name="Profile">
         {(props) => <ProfileScreen {...props} user={user || undefined} />}
@@ -351,12 +381,12 @@ const AuthNavigator = () => {
   )
 }
 
-// Main App Component with Root Stack
+// Keep your existing MainApp
 function MainApp() {
   return <AuthNavigator />
 }
 
-// Wrapper App Component with Onboarding Flow
+// Updated main App component with translation for loading text
 export default function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [showLanguageScreen, setShowLanguageScreen] = useState(false)
@@ -364,27 +394,38 @@ export default function App() {
   const [showOnboarding2, setShowOnboarding2] = useState(false)
   const [showLocationSelection, setShowLocationSelection] = useState(false)
 
+  // Keep all your existing logic exactly as it is
   useEffect(() => {
-    const checkFirstLaunch = async () => {
-      try {
-        const hasSelectedLanguage = await AsyncStorage.getItem("selectedLanguage")
-        const hasSeenOnboarding = await AsyncStorage.getItem("hasSeenOnboarding")
-        const hasSelectedLocation = await AsyncStorage.getItem("locationConfirmed")
+// Add this debugging code to your App.tsx in the checkFirstLaunch function
+const checkFirstLaunch = async () => {
+  try {
+    const hasSelectedLanguage = await AsyncStorage.getItem("selectedLanguage")
+    const hasSeenOnboarding = await AsyncStorage.getItem("hasSeenOnboarding")
+    const hasSelectedLocation = await AsyncStorage.getItem("locationConfirmed")
 
-        if (!hasSelectedLanguage) {
-          setShowLanguageScreen(true)
-        } else if (!hasSeenOnboarding) {
-          setShowOnboarding(true)
-        } else if (!hasSelectedLocation) {
-          setShowLocationSelection(true)
-        }
-      } catch (error) {
-        console.error("Error reading AsyncStorage:", error)
-      } finally {
-        setIsLoading(false)
-      }
+    // Add these debug logs
+    console.log('Debug - hasSelectedLanguage:', hasSelectedLanguage);
+    console.log('Debug - hasSeenOnboarding:', hasSeenOnboarding);
+    console.log('Debug - hasSelectedLocation:', hasSelectedLocation);
+
+    if (!hasSelectedLanguage) {
+      console.log('Debug - Showing language screen');
+      setShowLanguageScreen(true)
+    } else if (!hasSeenOnboarding) {
+      console.log('Debug - Showing onboarding');
+      setShowOnboarding(true)
+    } else if (!hasSelectedLocation) {
+      console.log('Debug - Showing location selection');
+      setShowLocationSelection(true)
+    } else {
+      console.log('Debug - Going to main app');
     }
-
+  } catch (error) {
+    console.error("Error reading AsyncStorage:", error)
+  } finally {
+    setIsLoading(false)
+  }
+}
     checkFirstLaunch()
   }, [])
 
@@ -410,17 +451,23 @@ export default function App() {
     setShowLocationSelection(false)
   }
 
-  if (isLoading) {
+  // Add LoadingComponent to use translations
+  const LoadingComponent = () => {
+    const { t } = useTranslation();
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#F7931A" />
-        <Text style={styles.loadingText}>Initializing...</Text>
+        <Text style={styles.loadingText}>{t('common.initializing')}</Text>
       </View>
-    )
+    );
+  };
+
+  if (isLoading) {
+    return <LoadingComponent />;
   }
 
   return (
-      <UserProvider>
+    <UserProvider>
       <CartProvider>
         <OrderProvider>
           <NavigationContainer>
@@ -440,10 +487,9 @@ export default function App() {
       </CartProvider>
     </UserProvider>
   )
-  
 }
 
-// Styles
+// Keep all your existing styles exactly as they are
 const styles = StyleSheet.create({
   tabBarStyle: {
     backgroundColor: "white",

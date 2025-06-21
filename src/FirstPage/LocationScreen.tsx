@@ -12,11 +12,11 @@ import {
 } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import Icon from 'react-native-vector-icons/MaterialIcons'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import Geolocation from 'react-native-geolocation-service'
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import LinearGradient from 'react-native-linear-gradient';
+import LinearGradient from 'react-native-linear-gradient'
+import { useTranslation } from 'react-i18next'
 
 const { width, height } = Dimensions.get('window')
 
@@ -30,12 +30,12 @@ type LocationData = {
   country: string
 }
 
-// Add props interface
 interface LocationSelectionScreenProps {
   onFinish: () => void
 }
 
 const LocationSelectionScreen: React.FC<LocationSelectionScreenProps> = ({ onFinish }) => {
+  const { t } = useTranslation()
   const [currentLocation, setCurrentLocation] = useState<LocationData | null>(null)
   const [loading, setLoading] = useState(false)
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false)
@@ -54,11 +54,11 @@ const LocationSelectionScreen: React.FC<LocationSelectionScreenProps> = ({ onFin
         getCurrentLocation()
       } else {
         Alert.alert(
-          'Permission Required',
-          'Location permission is needed to find nearby restaurants and deliver food to you.',
+          t('location.permissionRequired'),
+          t('location.permissionMessage'),
           [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Try Again', onPress: requestLocationPermission }
+            { text: t('common.cancel'), style: 'cancel' },
+            { text: t('location.tryAgain'), onPress: requestLocationPermission }
           ]
         )
       }
@@ -79,9 +79,9 @@ const LocationSelectionScreen: React.FC<LocationSelectionScreenProps> = ({ onFin
       error => {
         setLoading(false)
         Alert.alert(
-          'Location Error', 
-          'Unable to get your location. Please check your GPS settings and try again.',
-          [{ text: 'OK' }]
+          t('location.locationError'),
+          t('location.locationErrorMessage'),
+          [{ text: t('common.ok') }]
         )
         console.log('Error getting location:', error)
       },
@@ -131,7 +131,7 @@ const LocationSelectionScreen: React.FC<LocationSelectionScreenProps> = ({ onFin
       const fallbackLocation: LocationData = {
         address: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
         coordinates: { latitude, longitude },
-        city: 'Current Location',
+        city: t('location.currentLocation'),
         country: 'Unknown'
       }
       
@@ -142,15 +142,15 @@ const LocationSelectionScreen: React.FC<LocationSelectionScreenProps> = ({ onFin
     }
   }
 
-  // Handle location confirmation - Use onFinish prop
+  // Handle location confirmation
   const handleConfirmLocation = async () => {
     if (currentLocation) {
       try {
         await AsyncStorage.setItem('locationConfirmed', 'true')
-        onFinish() // Use the onFinish prop
+        onFinish()
       } catch (error) {
         console.log('Error saving location confirmation:', error)
-        onFinish() // Still call onFinish even if saving fails
+        onFinish()
       }
     }
   }
@@ -158,40 +158,38 @@ const LocationSelectionScreen: React.FC<LocationSelectionScreenProps> = ({ onFin
   // Handle manual location entry
   const handleManualLocation = () => {
     Alert.alert(
-      'Manual Location',
-      'This feature will allow you to enter your address manually.',
-      [{ text: 'OK' }]
+      t('location.manualLocation'),
+      t('location.manualLocationMessage'),
+      [{ text: t('common.ok') }]
     )
   }
 
-  // Handle Next button - Use onFinish prop
+  // Handle Next button
   const handleNext = async () => {
     try {
-      // Mark location selection as completed (even if not set)
       await AsyncStorage.setItem('locationSelectionCompleted', 'true')
       
-      // If location is available, save it as confirmed
       if (currentLocation) {
         await AsyncStorage.setItem('locationConfirmed', 'true')
       }
       
-      onFinish() // Use the onFinish prop
+      onFinish()
     } catch (error) {
       console.log('Error saving location selection status:', error)
-      onFinish() // Still call onFinish even if saving fails
+      onFinish()
     }
   }
 
-  // Skip location selection - Use onFinish prop
+  // Skip location selection
   const handleSkip = () => {
     Alert.alert(
-      'Skip Location',
-      'You can set your location later in settings. Some features may be limited.',
+      t('location.skipLocation'),
+      t('location.skipLocationMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         { 
-          text: 'Skip', 
-          onPress: handleNext // Use handleNext which calls onFinish
+          text: t('common.skip'), 
+          onPress: handleNext
         }
       ]
     )
@@ -205,7 +203,7 @@ const LocationSelectionScreen: React.FC<LocationSelectionScreenProps> = ({ onFin
         const locationConfirmed = await AsyncStorage.getItem('locationConfirmed')
         
         if (savedLocation && locationConfirmed) {
-          onFinish() // Use the onFinish prop
+          onFinish()
         }
       } catch (error) {
         console.log('Error checking saved location:', error)
@@ -221,7 +219,7 @@ const LocationSelectionScreen: React.FC<LocationSelectionScreenProps> = ({ onFin
       
       {/* Skip Button */}
       <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
-        <Text style={styles.skipText}>Skip</Text>
+        <Text style={styles.skipText}>{t('common.skip')}</Text>
       </TouchableOpacity>
 
       {/* Main Content */}
@@ -248,16 +246,16 @@ const LocationSelectionScreen: React.FC<LocationSelectionScreenProps> = ({ onFin
               <View style={styles.personBody} />
             </View>
             <View style={styles.deliveryBag}>
-              <Text style={styles.deliveryText}>FOOD</Text>
+              <Text style={styles.deliveryText}>{t('location.food')}</Text>
             </View>
           </View>
         </View>
 
         {/* Title and Description */}
         <View style={styles.textContainer}>
-          <Text style={styles.title}>Select Your Location</Text>
+          <Text style={styles.title}>{t('location.selectYourLocation')}</Text>
           <Text style={styles.description}>
-            Discover nearby restaurants, cuisines, and favorite foods that you crave.
+            {t('location.discoverNearbyRestaurants')}
           </Text>
         </View>
 
@@ -266,7 +264,7 @@ const LocationSelectionScreen: React.FC<LocationSelectionScreenProps> = ({ onFin
           <View style={styles.currentLocationContainer}>
             <Icon name="location-on" size={24} color="#FF3F00" />
             <View style={styles.locationInfo}>
-              <Text style={styles.locationTitle}>Current Location</Text>
+              <Text style={styles.locationTitle}>{t('location.currentLocation')}</Text>
               <Text style={styles.locationAddress} numberOfLines={2}>
                 {currentLocation.address}
               </Text>
@@ -287,17 +285,17 @@ const LocationSelectionScreen: React.FC<LocationSelectionScreenProps> = ({ onFin
               <Icon name="my-location" size={20} color="white" />
             )}
             <Text style={styles.primaryButtonText}>
-              {loading ? 'Getting Location...' : 'Use Current Location'}
+              {loading ? t('location.gettingLocation') : t('location.useCurrentLocation')}
             </Text>
           </TouchableOpacity>
         </View>
       </View>
-     <TouchableOpacity style={styles.nextButton} onPress={onFinish}>
-             <LinearGradient colors={['red', 'red']} style={styles.gradient}>
-               <Icon name="arrow-forward" size={24} color="#fff" />
-             </LinearGradient>
-           </TouchableOpacity>
-
+      
+      <TouchableOpacity style={styles.nextButton} onPress={onFinish}>
+        <LinearGradient colors={['red', 'red']} style={styles.gradient}>
+          <Icon name="arrow-forward" size={24} color="#fff" />
+        </LinearGradient>
+      </TouchableOpacity>
     </SafeAreaView>
   )
 }
@@ -470,31 +468,11 @@ const styles = StyleSheet.create({
   primaryButton: {
     backgroundColor: '#FF3F00',
   },
-  secondaryButton: {
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#FF3F00',
-  },
-  confirmButton: {
-    backgroundColor: '#0f8a0f',
-  },
   primaryButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
   },
-  secondaryButtonText: {
-    color: '#FF3F00',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  bottomSection: {
-    paddingHorizontal: 20,
-    paddingBottom: Platform.OS === 'ios' ? 34 : 20,
-    paddingTop: 20,
-  },
-
-
   nextButton: {
     position: 'absolute',
     bottom: 30,
@@ -506,8 +484,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     backgroundColor:'red',
   },
-
-    gradient: {
+  gradient: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',

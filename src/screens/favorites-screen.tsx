@@ -21,6 +21,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useCart } from "../components/CartContext";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useTranslation } from 'react-i18next';
 import type { NavigationProp } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
@@ -71,9 +72,8 @@ const FavoritesScreen = () => {
   // Hooks
   const { addToCart } = useCart();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { t } = useTranslation();
   const fadeAnim = new Animated.Value(0);
-
-  
 
   // Load favorites from AsyncStorage with enhanced error handling
   const loadFavorites = useCallback(async () => {
@@ -99,7 +99,7 @@ const FavoritesScreen = () => {
       }
     } catch (error) {
       console.error("Failed to load favorites:", error);
-      Alert.alert("Error", "Failed to load favorites. Please try again.");
+      Alert.alert(t('common.error'), t('favorites.failedToLoad'));
       setFavorites([]);
     } finally {
       setLoading(false);
@@ -109,7 +109,7 @@ const FavoritesScreen = () => {
         useNativeDriver: true,
       }).start();
     }
-  }, []);
+  }, [t]);
 
   // Filter and sort favorites
   const filteredAndSortedFavorites = useMemo(() => {
@@ -136,18 +136,15 @@ const FavoritesScreen = () => {
     }
   }, [favorites, filter, sortBy]);
 
-  // Add sample data for testing
-
-
   // Clear all favorites
   const clearAllFavorites = async () => {
     Alert.alert(
-      "Clear All Favorites",
-      "Are you sure you want to remove all items from your favorites?",
+      t('favorites.clearAllFavorites'),
+      t('favorites.clearAllConfirm'),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t('common.cancel'), style: "cancel" },
         {
-          text: "Clear All",
+          text: t('favorites.clearAll'),
           style: "destructive",
           onPress: async () => {
             try {
@@ -165,12 +162,12 @@ const FavoritesScreen = () => {
   // Remove single item from favorites
   const removeFromFavorites = async (itemId: string) => {
     Alert.alert(
-      "Remove from Favorites",
-      "Are you sure you want to remove this item from your favorites?",
+      t('favorites.removeFromFavorites'),
+      t('favorites.removeConfirm'),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t('common.cancel'), style: "cancel" },
         {
-          text: "Remove",
+          text: t('common.remove'),
           style: "destructive",
           onPress: async () => {
             try {
@@ -194,13 +191,16 @@ const FavoritesScreen = () => {
       price: item.price,
       image: item.image,
       description: item.description,
-      tag: item.isVeg ? "Vegetarian" : "Non-Vegetarian",
+      tag: item.isVeg ? t('favorites.veg') : t('favorites.nonVeg'),
       rating: Number.parseFloat(item.rating),
       restaurantName: item.restaurant,
     };
     
     addToCart(cartItem);
-    Alert.alert("Added to Cart", `${item.name} has been added to your cart!`);
+    Alert.alert(
+      t('favorites.addedToCart'), 
+      t('favorites.addedToCartMessage', { itemName: item.name })
+    );
   };
 
   // Navigate to food detail screen
@@ -234,6 +234,33 @@ const FavoritesScreen = () => {
     }, [loadFavorites])
   );
 
+  // Get filter label with count
+  const getFilterLabel = (type: FilterType) => {
+    const counts = {
+      all: favorites.length,
+      veg: favorites.filter(i => i.isVeg).length,
+      'non-veg': favorites.filter(i => !i.isVeg).length
+    };
+    
+    const labels = {
+      all: t('favorites.all'),
+      veg: t('favorites.veg'),
+      'non-veg': t('favorites.nonVeg')
+    };
+    
+    return `${labels[type]} (${counts[type]})`;
+  };
+
+  // Get sort label
+  const getSortLabel = (type: SortType) => {
+    const labels = {
+      recent: t('favorites.recent'),
+      name: t('favorites.name'),
+      price: t('favorites.price')
+    };
+    return labels[type];
+  };
+
   // Render filter buttons
   const renderFilterButtons = () => (
     <View style={styles.filterContainer}>
@@ -264,9 +291,7 @@ const FavoritesScreen = () => {
             type === "veg" && filter !== type && { color: "#0f8a0f" },
             type === "non-veg" && filter !== type && { color: "#b30000" },
           ]}>
-            {type === "all" ? `All (${favorites.length})` :
-             type === "veg" ? `Veg (${favorites.filter(i => i.isVeg).length})` : 
-             `Non-Veg (${favorites.filter(i => !i.isVeg).length})`}
+            {getFilterLabel(type)}
           </Text>
         </TouchableOpacity>
       ))}
@@ -276,7 +301,7 @@ const FavoritesScreen = () => {
   // Render sort options
   const renderSortOptions = () => (
     <View style={styles.sortContainer}>
-      <Text style={styles.sortLabel}>Sort by:</Text>
+      <Text style={styles.sortLabel}>{t('favorites.sortBy')}</Text>
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}
@@ -295,7 +320,7 @@ const FavoritesScreen = () => {
               styles.sortButtonText,
               sortBy === type && styles.activeSortButtonText,
             ]}>
-              {type.charAt(0).toUpperCase() + type.slice(1)}
+              {getSortLabel(type)}
             </Text>
           </TouchableOpacity>
         ))}
@@ -326,7 +351,7 @@ const FavoritesScreen = () => {
               { backgroundColor: item.isVeg ? "#0f8a0f" : "#b30000" }
             ]}>
               <Text style={styles.vegBadgeText}>
-                {item.isVeg ? "VEG" : "NON-VEG"}
+                {item.isVeg ? t('favorites.veg').toUpperCase() : t('favorites.nonVeg').toUpperCase()}
               </Text>
             </View>
           </View>
@@ -362,7 +387,7 @@ const FavoritesScreen = () => {
           onPress={() => removeFromFavorites(item.id)}
         >
           <MaterialIcons name="delete" size={16} color="white" />
-          <Text style={styles.buttonText}>Remove</Text>
+          <Text style={styles.buttonText}>{t('common.remove')}</Text>
         </TouchableOpacity>
         
         <TouchableOpacity 
@@ -370,7 +395,7 @@ const FavoritesScreen = () => {
           onPress={() => handleAddToCart(item)}
         >
           <MaterialIcons name="shopping-cart" size={16} color="white" />
-          <Text style={styles.buttonText}>Add to Cart</Text>
+          <Text style={styles.buttonText}>{t('common.addToCart')}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -380,18 +405,16 @@ const FavoritesScreen = () => {
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
       <MaterialIcons name="favorite-border" size={80} color="#ccc" />
-      <Text style={styles.emptyTitle}>No Favorites Yet</Text>
+      <Text style={styles.emptyTitle}>{t('favorites.empty')}</Text>
       <Text style={styles.emptySubtitle}>
-        Your favorite items will appear here when you tap the heart icon
+        {t('favorites.emptySubtitle')}
       </Text>
       <TouchableOpacity 
         style={styles.exploreButton}
         onPress={() => navigation.navigate("Home")}
       >
-        <Text style={styles.exploreButtonText}>Explore Food</Text>
+        <Text style={styles.exploreButtonText}>{t('favorites.exploreFood')}</Text>
       </TouchableOpacity>
-      
-  
     </View>
   );
 
@@ -400,11 +423,11 @@ const FavoritesScreen = () => {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>My Favorites</Text>
+          <Text style={styles.headerTitle}>{t('favorites.title')}</Text>
         </View>
         <View style={styles.loadingContainer}>
           <MaterialIcons name="favorite" size={50} color="#FF3F00" />
-          <Text style={styles.loadingText}>Loading your favorites...</Text>
+          <Text style={styles.loadingText}>{t('favorites.loadingFavorites')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -414,7 +437,7 @@ const FavoritesScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Favorites</Text>
+        <Text style={styles.headerTitle}>{t('favorites.title')}</Text>
         {favorites.length > 0 && (
           <TouchableOpacity onPress={clearAllFavorites}>
             <MaterialIcons name="delete-sweep" size={24} color="white" />
@@ -451,13 +474,16 @@ const FavoritesScreen = () => {
           {/* Summary Footer */}
           <View style={styles.summaryFooter}>
             <Text style={styles.summaryText}>
-              Showing {filteredAndSortedFavorites.length} of {favorites.length} items
+              {t('favorites.showingItems', { 
+                count: filteredAndSortedFavorites.length, 
+                total: favorites.length 
+              })}
             </Text>
             <TouchableOpacity 
               style={styles.continueShoppingButton}
               onPress={() => navigation.navigate("Home")}
             >
-              <Text style={styles.continueShoppingText}>Continue Shopping</Text>
+              <Text style={styles.continueShoppingText}>{t('favorites.continueShopping')}</Text>
             </TouchableOpacity>
           </View>
         </>
@@ -466,12 +492,11 @@ const FavoritesScreen = () => {
   );
 };
 
-// Styles
+// Styles remain the same as the original
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-   
   },
   header: {
     flexDirection: "row",
@@ -715,16 +740,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
-  },
-  debugButton: {
-    marginTop: 16,
-    padding: 10,
-    backgroundColor: "#666",
-    borderRadius: 8,
-  },
-  debugButtonText: {
-    color: "white",
-    fontSize: 12,
   },
   loadingContainer: {
     flex: 1,

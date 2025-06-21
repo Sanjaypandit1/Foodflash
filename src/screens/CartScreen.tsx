@@ -13,6 +13,7 @@ import {
 import { useCart } from '../components/CartContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { type RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 
@@ -33,10 +34,11 @@ type RootStackParamList = {
     restaurantName?: string
   }
 }
+
 const CartScreen = () => {
   const { cart, removeFromCart, clearCart } = useCart();
-  // Use any type for navigation as a workaround
   const navigation = useNavigation<any>();
+  const { t } = useTranslation();
 
   // Calculate total price
   const calculateTotal = () => {
@@ -70,9 +72,10 @@ const CartScreen = () => {
       });
     } catch (error) {
       console.error('Navigation error:', error);
-      Alert.alert('Navigation Error', 'Could not navigate to product details.');
+      Alert.alert(t('common.error'), t('cart.navigationError'));
     }
   };
+
   const handleBuyNow = () => {
     navigation.navigate('Home', {
       screen: 'CheckoutScreen',
@@ -83,11 +86,11 @@ const CartScreen = () => {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Your Cart</Text>
+          <Text style={styles.headerTitle}>{t('cart.title')}</Text>
         </View>
         <View style={styles.emptyContainer}>
           <Icon name="shopping-cart" size={80} color="#ccc" />
-          <Text style={styles.emptyText}>Your cart is empty</Text>
+          <Text style={styles.emptyText}>{t('cart.empty')}</Text>
           <TouchableOpacity
             style={styles.shopNowButton}
             onPress={() => {
@@ -98,7 +101,7 @@ const CartScreen = () => {
               }
             }}
           >
-            <Text style={styles.shopNowText}>Shop Now</Text>
+            <Text style={styles.shopNowText}>{t('cart.shopNow')}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -109,10 +112,10 @@ const CartScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       {/* Fixed Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Your Cart</Text>
+        <Text style={styles.headerTitle}>{t('cart.title')}</Text>
         {cart.length > 0 && (
           <TouchableOpacity onPress={clearCart} style={styles.clearButton}>
-            <Text style={styles.clearButtonText}>Clear All</Text>
+            <Text style={styles.clearButtonText}>{t('cart.clearAll')}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -138,15 +141,20 @@ const CartScreen = () => {
                   <Text style={styles.itemTag}>{item.tag}</Text>
                   <View style={styles.priceRow}>
                     <Text style={styles.itemPrice}>{item.price}</Text>
-                    <Text style={styles.itemQuantity}>Qty: {item.quantity}</Text>
+                    <Text style={styles.itemQuantity}>
+                      {t('cart.quantity', { count: item.quantity })}
+                    </Text>
                   </View>
                 </View>
               </TouchableOpacity>
 
               {/* Separate TouchableOpacity for the remove button */}
-              <TouchableOpacity style={styles.removeButton} onPress={() => removeFromCart(item.cartId)}>
+              <TouchableOpacity 
+                style={styles.removeButton} 
+                onPress={() => removeFromCart(item.cartId)}
+              >
                 <Icon name="delete" size={18} color="white" />
-                <Text style={styles.removeText}>Remove</Text>
+                <Text style={styles.removeText}>{t('common.remove')}</Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -158,12 +166,12 @@ const CartScreen = () => {
         <View style={styles.footerWrapper}>
           <View style={styles.footer}>
             <View style={styles.totalContainer}>
-              <Text style={styles.totalLabel}>Total:</Text>
+              <Text style={styles.totalLabel}>{t('common.total')}:</Text>
               <Text style={styles.totalAmount}>Rs.{calculateTotal().toFixed(2)}</Text>
             </View>
 
             <TouchableOpacity style={styles.checkoutButton} onPress={handleBuyNow}>
-              <Text style={styles.checkoutText}>Proceed to Checkout</Text>
+              <Text style={styles.checkoutText}>{t('cart.proceedToCheckout')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -176,7 +184,7 @@ const CartScreen = () => {
                 }
               }}
             >
-              <Text style={styles.addToCartText}>Add More Items</Text>
+              <Text style={styles.addToCartText}>{t('cart.addMoreItems')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -185,14 +193,12 @@ const CartScreen = () => {
   );
 };
 
+// Keep all your existing styles
 const styles = StyleSheet.create({
-  
   safeArea: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-
   },
-
   header: {
     backgroundColor: 'red',
     padding: 15,
@@ -242,7 +248,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    marginBottom: 200, // Add margin to make room for the footer
+    marginBottom: 200,
   },
   scrollContentContainer: {
     padding: 15,
@@ -313,7 +319,7 @@ const styles = StyleSheet.create({
   },
   footerWrapper: {
     position: 'absolute',
-    bottom: 80, // Position the footer 20 units from the bottom
+    bottom: 80,
     left: 0,
     right: 0,
     paddingHorizontal: 15,

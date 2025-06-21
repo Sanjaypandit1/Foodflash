@@ -1,11 +1,12 @@
 "use client"
 
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity,   StatusBar, Platform } from "react-native"
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, StatusBar, Platform } from "react-native"
 import { useState } from "react"
 import { type RouteProp, useNavigation, useRoute, type NavigationProp } from "@react-navigation/native"
 import type { ImageSourcePropType } from "react-native"
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import LinearGradient from "react-native-linear-gradient"
+import { useTranslation } from 'react-i18next'
 
 // Define types
 type RootStackParamList = {
@@ -13,7 +14,7 @@ type RootStackParamList = {
   RestaurantDetails: { restaurant: Restaurant }
   FoodItemDetail: {
     item: FoodItem
-    restaurantName?: string // Add this line to include restaurantName
+    restaurantName?: string
   }
 }
 
@@ -35,10 +36,9 @@ type FoodItem = {
   isVeg: boolean
   rating: string
   preparationTime: string
-  category: string // Added category field
+  category: string
 }
 
-// Changed from FilterOption type to string for more flexibility
 type FilterOption = string
 
 // Sample food items data with fixed image format and added category
@@ -321,6 +321,7 @@ const foodItems: FoodItem[] = [
 ]
 
 export default function BurgerJoint() {
+  const { t } = useTranslation()
   const route = useRoute<RouteProp<RootStackParamList, "RestaurantDetails">>()
   const { restaurant } = route.params
   const [filter, setFilter] = useState<FilterOption>("all")
@@ -348,7 +349,9 @@ export default function BurgerJoint() {
         <View style={styles.foodHeader}>
           <Text style={styles.foodName}>{item.name}</Text>
           <View style={[styles.vegBadge, { backgroundColor: item.isVeg ? "#0f8a0f" : "#b30000" }]}>
-            <Text style={styles.vegBadgeText}>{item.isVeg ? "VEG" : "NON-VEG"}</Text>
+            <Text style={styles.vegBadgeText}>
+              {item.isVeg ? t('foodDetail.veg') : t('foodDetail.nonVeg')}
+            </Text>
           </View>
         </View>
 
@@ -372,7 +375,7 @@ export default function BurgerJoint() {
           style={styles.addButton} 
           onPress={() => navigation.navigate("FoodItemDetail", { item })}
         >
-          <Text style={styles.addButtonText}>ADD +</Text>
+          <Text style={styles.addButtonText}>{t('common.addToCart').toUpperCase()}</Text>
         </TouchableOpacity>
       </View>
 
@@ -380,19 +383,24 @@ export default function BurgerJoint() {
     </TouchableOpacity>
   )
 
+  const getCategoryDisplayName = (category: string) => {
+    if (category === 'all') return t('categories.subtypes.all')
+    return t(`categories.subtypes.${category}`, category.charAt(0).toUpperCase() + category.slice(1))
+  }
+
   return (
     <View style={styles.container}>
       {/* Restaurant Header with Image */}
       <View style={styles.restaurantHeader}>
-  <Image 
-           source={{ uri: restaurant.image }} 
-           style={styles.restaurantImage}
-           resizeMode="cover"
-         />
-  <LinearGradient
-    colors={['rgba(0,0,0,0.7)', 'transparent']}
-    style={styles.imageOverlay}
-  />
+        <Image 
+          source={{ uri: restaurant.image }} 
+          style={styles.restaurantImage}
+          resizeMode="cover"
+        />
+        <LinearGradient
+          colors={['rgba(0,0,0,0.7)', 'transparent']}
+          style={styles.imageOverlay}
+        />
         
         <View style={styles.headerContent}>
           <Text style={styles.restaurantName}>{restaurant.name}</Text>
@@ -410,7 +418,7 @@ export default function BurgerJoint() {
       </View>
 
       <View style={styles.filterContainer}>
-        <Text style={styles.filterLabel}>Filter by Category</Text>
+        <Text style={styles.filterLabel}>{t('categories.title')}</Text>
         <FlatList
           data={filterCategories}
           horizontal
@@ -422,7 +430,7 @@ export default function BurgerJoint() {
               onPress={() => setFilter(category)}
             >
               <Text style={[styles.filterText, filter === category && styles.filterTextActive]}>
-                {category === 'all' ? 'All' : category.charAt(0).toUpperCase() + category.slice(1)}
+                {getCategoryDisplayName(category)}
               </Text>
             </TouchableOpacity>
           )}
@@ -445,7 +453,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFF",
-   
   },
   restaurantHeader: {
     height: 220,

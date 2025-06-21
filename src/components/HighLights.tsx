@@ -11,6 +11,7 @@ import {
 } from "react-native"
 import Ionicons from "react-native-vector-icons/Ionicons"
 import { useNavigation, type NavigationProp } from "@react-navigation/native"
+import { useTranslation } from 'react-i18next'
 
 // Define types for navigation and data
 type RootStackParamList = {
@@ -43,6 +44,7 @@ type HighlightItem = FoodItem & {
 const HighlightsForYou = () => {
   // Properly type the navigation object
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
+  const { t } = useTranslation()
 
   // Promo code constant
   const PROMO_CODE = "WELCOME10"
@@ -159,15 +161,15 @@ const HighlightsForYou = () => {
     try {
       await Clipboard.setString(PROMO_CODE)
       Alert.alert(
-        "Promo Code Copied! 🎉",
-        `Code "${PROMO_CODE}" has been copied to your clipboard. Use it at checkout to get 10% off on your first order!`,
+        t('highlights.promoCopied'),
+        t('highlights.promoCodeCopiedMessage', { code: PROMO_CODE }),
         [
           {
-            text: "Got it!",
+            text: t('highlights.gotIt'),
             style: "default",
           },
           {
-            text: "Shop Now",
+            text: t('highlights.shopNow'),
             style: "default",
             onPress: () => {
               // Navigate to menu or home screen
@@ -178,8 +180,8 @@ const HighlightsForYou = () => {
       )
     } catch (error) {
       Alert.alert(
-        "Promo Code: WELCOME10",
-        "Copy this code manually: WELCOME10\n\nUse it at checkout to get 10% off on your first order!",
+        `${t('highlights.title')}: ${PROMO_CODE}`,
+        t('highlights.promoCodeManual', { code: PROMO_CODE }),
         [{ text: "OK", style: "default" }]
       )
     }
@@ -190,10 +192,10 @@ const HighlightsForYou = () => {
       {/* Section Header */}
       <View style={styles.header}>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Highlights for you</Text>
+          <Text style={styles.title}>{t('highlights.title')}</Text>
           <Ionicons name="sparkles" size={20} color="#FF3F00" />
         </View>
-        <Text style={styles.subtitle}>Special dishes from our top restaurants</Text>
+        <Text style={styles.subtitle}>{t('highlights.subtitle')}</Text>
       </View>
 
       {/* Highlights Carousel */}
@@ -210,12 +212,14 @@ const HighlightsForYou = () => {
 
               {/* Discount Badge */}
               <View style={styles.discountBadge}>
-                <Text style={styles.discountText}>{item.discount} OFF</Text>
+                <Text style={styles.discountText}>{item.discount} {t('common.off')}</Text>
               </View>
 
               {/* Veg/Non-Veg Indicator */}
               <View style={[styles.vegBadge, { backgroundColor: item.isVeg ? "#0f8a0f" : "#b30000" }]}>
-                <Text style={styles.vegBadgeText}>{item.isVeg ? "VEG" : "NON-VEG"}</Text>
+                <Text style={styles.vegBadgeText}>
+                  {item.isVeg ? t('foodDetail.veg') : t('foodDetail.nonVeg')}
+                </Text>
               </View>
             </View>
 
@@ -243,7 +247,7 @@ const HighlightsForYou = () => {
 
             {/* Order Button */}
             <TouchableOpacity style={styles.orderButton} onPress={() => handleHighlightPress(item)}>
-              <Text style={styles.orderButtonText}>Order Now</Text>
+              <Text style={styles.orderButtonText}>{t('highlights.orderNow')}</Text>
             </TouchableOpacity>
           </TouchableOpacity>
         ))}
@@ -255,9 +259,9 @@ const HighlightsForYou = () => {
           <Ionicons name="gift" size={24} color="#FF3F00" />
         </View>
         <View style={styles.discountTextContainer}>
-          <Text style={styles.discountTitle}>Special Offer: 10% Off First Order</Text>
+          <Text style={styles.discountTitle}>{t('highlights.specialOffer')}</Text>
           <Text style={styles.discountDescription}>
-            Use code <Text style={styles.promoCodeText}>{PROMO_CODE}</Text> at checkout to get 10% off on your first order
+            {t('highlights.promoDescription', { code: PROMO_CODE })}
           </Text>
         </View>
         <TouchableOpacity 
@@ -266,7 +270,7 @@ const HighlightsForYou = () => {
           activeOpacity={0.8}
         >
           <Ionicons name="copy-outline" size={14} color="white" style={styles.copyIcon} />
-          <Text style={styles.promoButtonText}>CLAIM</Text>
+          <Text style={styles.promoButtonText}>{t('highlights.claim')}</Text>
         </TouchableOpacity>
       </View>
     </View>

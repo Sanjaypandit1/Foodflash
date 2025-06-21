@@ -1,6 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View, Image, ScrollView } from "react-native"
 import type React from "react"
 import type { NavigationProp } from "@react-navigation/native"
+import { useTranslation } from 'react-i18next'
 
 // Define prop types
 type Props = {
@@ -8,6 +9,8 @@ type Props = {
 }
 
 const Categories: React.FC<Props> = ({ navigation }) => {
+  const { t } = useTranslation()
+
   // Category data with restaurant-specific food items
   const categoryItems = [
     {
@@ -76,8 +79,8 @@ const Categories: React.FC<Props> = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <View>
-          <Text style={styles.head}>Categories</Text>
-          <Text style={styles.subhead}>Explore food by category</Text>
+          <Text style={styles.head}>{t('categories.title')}</Text>
+          <Text style={styles.subhead}>{t('categories.subtitle')}</Text>
         </View>
         <TouchableOpacity
           onPress={() =>
@@ -95,7 +98,7 @@ const Categories: React.FC<Props> = ({ navigation }) => {
             })
           }
         >
-          <Text style={styles.seeAll}>See All</Text>
+          <Text style={styles.seeAll}>{t('common.seeAll')}</Text>
         </TouchableOpacity>
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollView}>

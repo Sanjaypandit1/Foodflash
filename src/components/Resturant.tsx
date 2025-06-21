@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 // Define types for data
 type Restaurant = {
@@ -48,9 +49,10 @@ const restaurantData: Restaurant[] = [
   },
 ];
 
-export default function Resturant() {
+export default function Restaurant() {
   // Use the useNavigation hook
   const navigation = useNavigation();
+  const { t } = useTranslation();
 
   const handleRestaurantPress = (restaurant: Restaurant) => {
     try {
@@ -58,29 +60,29 @@ export default function Resturant() {
       switch(restaurant.id) {
         case '1': // Delicious Bites
           (navigation as any).navigate('DeliciousBite', { restaurant });
-          console.log('Navigating to Delicious Bites details');
+          console.log(`${t('restaurant.navigatingTo')} ${restaurant.name}`);
           break;
         case '2': // Spice Garden
           // You can create specific screens for each restaurant
           // For now, we'll just navigate to a generic screen with the restaurant data
           (navigation as any).navigate('SpiceGarden', { restaurant });
-          console.log('Navigating to Spice Garden details');
+          console.log(`${t('restaurant.navigatingTo')} ${restaurant.name}`);
           break;
         case '3': // Sushi Palace
           (navigation as any).navigate('SushilPalace', { restaurant });
-          console.log('Navigating to Sushi Palace details');
+          console.log(`${t('restaurant.navigatingTo')} ${restaurant.name}`);
           break;
         case '4': // Burger Joint
           (navigation as any).navigate('BurgerJoint', { restaurant });
-          console.log('Navigating to Burger Joint details');
+          console.log(`${t('restaurant.navigatingTo')} ${restaurant.name}`);
           break;
         default:
           // Fallback for any other restaurants
           (navigation as any).navigate('DelicioudBite', { restaurant });
-          console.log('Navigating to restaurant details:', restaurant.name);
+          console.log(`${t('restaurant.navigatingTo')} ${restaurant.name}`);
       }
     } catch (error) {
-      console.error('Navigation error:', error);
+      console.error(`${t('restaurant.navigationError')}:`, error);
     }
   };
 
@@ -89,11 +91,19 @@ export default function Resturant() {
       style={styles.restaurantCard}
       onPress={() => handleRestaurantPress(item)}
       activeOpacity={0.8}
+      accessibilityLabel={t('restaurant.restaurantCardAccessibility', { 
+        name: item.name, 
+        rating: item.rating, 
+        location: item.cuisine, 
+        deliveryTime: item.deliveryTime 
+      })}
+      accessibilityRole="button"
     >
       <Image
         source={{ uri: item.image }}
         style={styles.restaurantImage}
         resizeMode="cover"
+        accessibilityLabel={t('restaurant.restaurantImageAlt', { name: item.name })}
       />
       <View style={styles.restaurantInfo}>
         <Text style={styles.restaurantName}>{item.name}</Text>
@@ -109,9 +119,9 @@ export default function Resturant() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.sectionTitle}>Popular Restaurants</Text>
-        <TouchableOpacity>
-          <Text style={styles.seeAllText}>See All</Text>
+        <Text style={styles.sectionTitle}>{t('restaurant.popularRestaurants')}</Text>
+        <TouchableOpacity accessibilityLabel={t('restaurant.seeAllRestaurants')} accessibilityRole="button">
+          <Text style={styles.seeAllText}>{t('common.seeAll')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -122,6 +132,7 @@ export default function Resturant() {
         horizontal={false}
         showsVerticalScrollIndicator={false}
         scrollEnabled={false} // Disable scrolling as parent ScrollView handles it
+        accessibilityLabel={t('restaurant.restaurantList')}
       />
     </View>
   );

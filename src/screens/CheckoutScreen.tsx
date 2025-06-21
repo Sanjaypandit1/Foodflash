@@ -23,6 +23,7 @@ import {useOrders} from '../components/OrderContext';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import AddressManager, { Address } from '../MenuScreen/Address1';
 import auth from '@react-native-firebase/auth';
+import { useTranslation } from 'react-i18next';
 
 const {} = Dimensions.get('window');
 const BOTTOM_PADDING = Platform.OS === 'ios' ? 34 : 20;
@@ -47,6 +48,7 @@ const CheckoutScreen = () => {
   const {cart, clearCart} = useCart();
   const {addOrder} = useOrders();
   const navigation = useNavigation<any>();
+  const { t } = useTranslation();
   
   // Authentication state
   const [user, setUser] = useState<any>(null);
@@ -76,16 +78,16 @@ const CheckoutScreen = () => {
         if (!currentUser) {
           // User is not authenticated, redirect to sign in
           Alert.alert(
-            'Sign In Required',
-            'Please sign in to continue with your order.',
+            t('checkout.signInRequired'),
+            t('checkout.signInMessage'),
             [
               {
-                text: 'Cancel',
+                text: t('common.cancel'),
                 style: 'cancel',
                 onPress: () => navigation.goBack(),
               },
               {
-                text: 'Sign In',
+                text: t('checkout.signIn'),
                 onPress: () => {
                   // Navigate to sign in and pass a flag to return to checkout
                   navigation.navigate('SignIn', { 
@@ -104,7 +106,7 @@ const CheckoutScreen = () => {
       };
 
       checkAuthStatus();
-    }, [navigation, cart])
+    }, [navigation, cart, t])
   );
 
   // Listen for auth state changes
@@ -117,8 +119,8 @@ const CheckoutScreen = () => {
       if (!authUser && !isCheckingAuth) {
         // User signed out while on checkout screen
         Alert.alert(
-          'Session Expired',
-          'Please sign in again to continue.',
+          t('checkout.sessionExpired'),
+          t('checkout.sessionExpiredMessage'),
           [
             {
               text: 'OK',
@@ -130,7 +132,7 @@ const CheckoutScreen = () => {
     });
 
     return unsubscribe;
-  }, [navigation, isCheckingAuth]);
+  }, [navigation, isCheckingAuth, t]);
 
   // Show loading while checking authentication
   if (isCheckingAuth) {
@@ -138,7 +140,7 @@ const CheckoutScreen = () => {
       <SafeAreaView style={[styles.safeArea, isDarkMode && styles.darkSafeArea]}>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, isDarkMode && styles.darkText]}>
-            Verifying authentication...
+            {t('checkout.verifyingAuth')}
           </Text>
         </View>
       </SafeAreaView>
@@ -151,7 +153,7 @@ const CheckoutScreen = () => {
       <SafeAreaView style={[styles.safeArea, isDarkMode && styles.darkSafeArea]}>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, isDarkMode && styles.darkText]}>
-            Redirecting to sign in...
+            {t('checkout.redirectingSignIn')}
           </Text>
         </View>
       </SafeAreaView>
@@ -163,9 +165,9 @@ const CheckoutScreen = () => {
     {
       id: 1,
       code: "SAVE20",
-      title: "20% Off Your Next Order",
-      description: "Valid on orders above Rs.500",
-      expiry: "Expires: Dec 31, 2024",
+      title: t('checkout.promos.save20.title'),
+      description: t('checkout.promos.save20.description'),
+      expiry: t('checkout.promos.save20.expiry'),
       discount: "20%",
       discountType: "percentage",
       discountValue: 20,
@@ -174,9 +176,9 @@ const CheckoutScreen = () => {
     {
       id: 2,
       code: "WELCOME10",
-      title: "Welcome Bonus",
-      description: "First time user discount",
-      expiry: "Expires: Jan 15, 2025",
+      title: t('checkout.promos.welcome10.title'),
+      description: t('checkout.promos.welcome10.description'),
+      expiry: t('checkout.promos.welcome10.expiry'),
       discount: "10%",
       discountType: "percentage",
       discountValue: 10,
@@ -184,9 +186,9 @@ const CheckoutScreen = () => {
     {
       id: 3,
       code: "FREESHIP",
-      title: "Free Shipping",
-      description: "Free delivery on any order",
-      expiry: "Expires: Dec 25, 2024",
+      title: t('checkout.promos.freeship.title'),
+      description: t('checkout.promos.freeship.description'),
+      expiry: t('checkout.promos.freeship.expiry'),
       discount: "FREE",
       discountType: "free_shipping",
       discountValue: 40,
@@ -194,9 +196,9 @@ const CheckoutScreen = () => {
     {
       id: 4,
       code: "SAVE100",
-      title: "Rs.100 Off",
-      description: "Fixed discount on orders above Rs.300",
-      expiry: "Expires: Jan 31, 2025",
+      title: t('checkout.promos.save100.title'),
+      description: t('checkout.promos.save100.description'),
+      expiry: t('checkout.promos.save100.expiry'),
       discount: "Rs.100",
       discountType: "fixed",
       discountValue: 100,
@@ -255,13 +257,13 @@ const CheckoutScreen = () => {
   const getPaymentMethodText = () => {
     switch (paymentMethod) {
       case 'card':
-        return 'Credit/Debit Card';
+        return t('checkout.creditCard');
       case 'cash':
-        return 'Cash on Delivery';
+        return t('checkout.cashOnDelivery');
       case 'wallet':
-        return 'Digital Wallet';
+        return t('checkout.digitalWallet');
       default:
-        return 'Credit/Debit Card';
+        return t('checkout.creditCard');
     }
   };
 
@@ -272,21 +274,21 @@ const CheckoutScreen = () => {
     );
 
     if (!foundPromo) {
-      Alert.alert('Invalid Code', 'Please enter a valid promo code.');
+      Alert.alert(t('checkout.invalidCode'), t('checkout.invalidCodeMessage'));
       return;
     }
 
     // Check minimum order value if applicable
     if (foundPromo.minOrderValue && calculateSubtotal() < foundPromo.minOrderValue) {
       Alert.alert(
-        'Minimum Order Not Met', 
-        `This promo code requires a minimum order of Rs.${foundPromo.minOrderValue}.`
+        t('checkout.minimumOrderNotMet'), 
+        t('checkout.minimumOrderMessage', { amount: foundPromo.minOrderValue })
       );
       return;
     }
 
     setAppliedPromo(foundPromo);
-    Alert.alert('Success', `${foundPromo.title} applied successfully!`);
+    Alert.alert(t('common.success'), `${foundPromo.title} ${t('checkout.promoApplied')}`);
   };
 
   // Handle removing promo code
@@ -301,11 +303,11 @@ const CheckoutScreen = () => {
     
     switch (appliedPromo.discountType) {
       case 'percentage':
-        return `${appliedPromo.discount} discount`;
+        return `${appliedPromo.discount} ${t('checkout.discount')}`;
       case 'fixed':
         return `Rs.${appliedPromo.discountValue} off`;
       case 'free_shipping':
-        return 'Free shipping';
+        return t('checkout.freeShipping');
       default:
         return '';
     }
@@ -315,78 +317,79 @@ const CheckoutScreen = () => {
   const handlePlaceOrder = () => {
     // Double-check authentication before placing order
     if (!user) {
-      Alert.alert('Authentication Required', 'Please sign in to place your order.');
+      Alert.alert(t('checkout.authRequired'), t('checkout.authRequiredMessage'));
       navigation.navigate('SignIn');
       return;
     }
 
     // Check if an address is selected
     if (!selectedAddress) {
-      Alert.alert('No Address Selected', 'Please select a delivery address.');
+      Alert.alert(t('checkout.noAddressSelected'), t('checkout.selectAddressMessage'));
       return;
     }
 
-    Alert.alert('Confirm Order', 'Are you sure you want to place this order?', [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-      {
-        text: 'Place Order',
-        onPress: () => {
-          // Create order items from cart
-          const orderItems = cart.map(item => ({
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            image: item.image,
-            quantity: item.quantity,
-            tag: item.tag,
-          }));
-
-          // Create order object without userId/userEmail if they're not supported
-          // You may need to update your Order type definition to include these fields
-          const orderData = {
-            items: orderItems,
-            total: calculateTotal(),
-            deliveryAddress: selectedAddress.address,
-            contactPhone: selectedAddress.phone,
-            paymentMethod: getPaymentMethodText(),
-            // Add these fields only if your Order type supports them
-            // userId: user.uid,
-            // userEmail: user.email,
-            // orderDate: new Date().toISOString(),
-          };
-
-          // Add order to context
-          addOrder(orderData);
-
-          // Simulate order placement
-          setTimeout(() => {
-            Alert.alert(
-              'Order Placed!',
-              `Thank you ${user.displayName || user.email}! Your order has been placed successfully.`,
-              [
-                {
-                  text: 'View Orders',
-                  onPress: () => {
-                    clearCart();
-                    navigation.navigate('Orders');
-                  },
-                },
-                {
-                  text: 'Continue Shopping',
-                  onPress: () => {
-                    clearCart();
-                    navigation.navigate('Home', {screen: 'Homescreen'});
-                  },
-                },
-              ],
-            );
-          }, 1000);
+    Alert.alert(
+      t('checkout.confirmOrder'), 
+      t('checkout.confirmOrderMessage'), 
+      [
+        {
+          text: t('common.cancel'),
+          style: 'cancel',
         },
-      },
-    ]);
+        {
+          text: t('checkout.placeOrder'),
+          onPress: () => {
+            // Create order items from cart
+            const orderItems = cart.map(item => ({
+              id: item.id,
+              name: item.name,
+              price: item.price,
+              image: item.image,
+              quantity: item.quantity,
+              tag: item.tag,
+            }));
+
+            // Create order object
+            const orderData = {
+              items: orderItems,
+              total: calculateTotal(),
+              deliveryAddress: selectedAddress.address,
+              contactPhone: selectedAddress.phone,
+              paymentMethod: getPaymentMethodText(),
+            };
+
+            // Add order to context
+            addOrder(orderData);
+
+            // Simulate order placement
+            setTimeout(() => {
+              Alert.alert(
+                t('checkout.orderPlaced'),
+                t('checkout.orderPlacedMessage', { 
+                  name: user.displayName || user.email 
+                }),
+                [
+                  {
+                    text: t('checkout.viewOrders'),
+                    onPress: () => {
+                      clearCart();
+                      navigation.navigate('Orders');
+                    },
+                  },
+                  {
+                    text: t('checkout.continueShopping'),
+                    onPress: () => {
+                      clearCart();
+                      navigation.navigate('Home', {screen: 'Homescreen'});
+                    },
+                  },
+                ],
+              );
+            }, 1000);
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -401,7 +404,7 @@ const CheckoutScreen = () => {
             onPress={() => navigation.goBack()}>
             <Icon name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Checkout</Text>
+          <Text style={styles.headerTitle}>{t('checkout.title')}</Text>
           <View style={styles.userInfo}>
             <Text style={styles.userText}>
               {user?.displayName || user?.email?.split('@')[0] || 'User'}
@@ -420,7 +423,7 @@ const CheckoutScreen = () => {
             <View style={styles.welcomeContainer}>
               <Icon name="person" size={22} color="#FF3F00" />
               <Text style={[styles.welcomeText, isDarkMode && styles.darkText]}>
-                Welcome back, {user?.displayName || user?.email?.split('@')[0] || 'User'}!
+                {t('checkout.welcomeBack')}, {user?.displayName || user?.email?.split('@')[0] || 'User'}!
               </Text>
             </View>
           </View>
@@ -429,7 +432,9 @@ const CheckoutScreen = () => {
           <View style={[styles.section, isDarkMode && styles.darkSection]}>
             <View style={styles.sectionHeader}>
               <Icon name="location-on" size={22} color="#FF3F00" />
-              <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>Delivery Address</Text>
+              <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>
+                {t('checkout.deliveryAddress')}
+              </Text>
             </View>
 
             <AddressManager 
@@ -442,7 +447,9 @@ const CheckoutScreen = () => {
           <View style={[styles.section, isDarkMode && styles.darkSection]}>
             <View style={styles.sectionHeader}>
               <Icon name="payment" size={22} color="#FF3F00" />
-              <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>Payment Method</Text>
+              <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>
+                {t('checkout.paymentMethod')}
+              </Text>
             </View>
 
             <TouchableOpacity
@@ -455,7 +462,9 @@ const CheckoutScreen = () => {
               onPress={() => setPaymentMethod('card')}>
               <View style={styles.paymentOptionContent}>
                 <Icon name="credit-card" size={24} color={isDarkMode ? "#f0f0f0" : "#333"} />
-                <Text style={[styles.paymentOptionText, isDarkMode && styles.darkText]}>Credit/Debit Card</Text>
+                <Text style={[styles.paymentOptionText, isDarkMode && styles.darkText]}>
+                  {t('checkout.creditCard')}
+                </Text>
               </View>
               <View style={styles.radioButton}>
                 {paymentMethod === 'card' && (
@@ -474,7 +483,9 @@ const CheckoutScreen = () => {
               onPress={() => setPaymentMethod('cash')}>
               <View style={styles.paymentOptionContent}>
                 <Icon name="attach-money" size={24} color={isDarkMode ? "#f0f0f0" : "#333"} />
-                <Text style={[styles.paymentOptionText, isDarkMode && styles.darkText]}>Cash on Delivery</Text>
+                <Text style={[styles.paymentOptionText, isDarkMode && styles.darkText]}>
+                  {t('checkout.cashOnDelivery')}
+                </Text>
               </View>
               <View style={styles.radioButton}>
                 {paymentMethod === 'cash' && (
@@ -493,7 +504,9 @@ const CheckoutScreen = () => {
               onPress={() => setPaymentMethod('wallet')}>
               <View style={styles.paymentOptionContent}>
                 <Icon name="account-balance-wallet" size={24} color={isDarkMode ? "#f0f0f0" : "#333"} />
-                <Text style={[styles.paymentOptionText, isDarkMode && styles.darkText]}>Digital Wallet</Text>
+                <Text style={[styles.paymentOptionText, isDarkMode && styles.darkText]}>
+                  {t('checkout.digitalWallet')}
+                </Text>
               </View>
               <View style={styles.radioButton}>
                 {paymentMethod === 'wallet' && (
@@ -507,13 +520,15 @@ const CheckoutScreen = () => {
           <View style={[styles.section, isDarkMode && styles.darkSection]}>
             <View style={styles.sectionHeader}>
               <Icon name="local-offer" size={22} color="#FF3F00" />
-              <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>Promo Code</Text>
+              <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>
+                {t('checkout.promoCode')}
+              </Text>
             </View>
 
             <View style={styles.promoContainer}>
               <TextInput
                 style={[styles.promoInput, isDarkMode && styles.darkPromoInput]}
-                placeholder="Enter promo code"
+                placeholder={t('checkout.enterPromoCode')}
                 placeholderTextColor={isDarkMode ? "#888" : "#aaa"}
                 value={promoCode}
                 onChangeText={setPromoCode}
@@ -527,7 +542,7 @@ const CheckoutScreen = () => {
                 onPress={appliedPromo ? handleRemovePromo : handleApplyPromo}
                 disabled={false}>
                 <Text style={styles.promoButtonText}>
-                  {appliedPromo ? 'Remove' : 'Apply'}
+                  {appliedPromo ? t('common.remove') : t('common.apply')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -535,7 +550,7 @@ const CheckoutScreen = () => {
             {appliedPromo && (
               <View style={styles.promoAppliedContainer}>
                 <Text style={styles.promoAppliedText}>
-                  {appliedPromo.title} - {getDiscountText()} applied!
+                  {appliedPromo.title} - {getDiscountText()} {t('checkout.promoApplied')}
                 </Text>
                 <Text style={styles.promoDescription}>
                   {appliedPromo.description}
@@ -546,7 +561,7 @@ const CheckoutScreen = () => {
             {/* Available Promo Codes */}
             <View style={styles.availablePromosContainer}>
               <Text style={[styles.availablePromosTitle, isDarkMode && styles.darkText]}>
-                Available Offers:
+                {t('checkout.availableOffers')}
               </Text>
               {promoCodes.map((promo) => (
                 <TouchableOpacity
@@ -570,7 +585,7 @@ const CheckoutScreen = () => {
                   </View>
                   <View style={styles.promoCardRight}>
                     <Text style={styles.promoCardDiscount}>{promo.discount}</Text>
-                    <Text style={styles.promoCardCode}>Code: {promo.code}</Text>
+                    <Text style={styles.promoCardCode}>{t('checkout.code')}: {promo.code}</Text>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -581,7 +596,9 @@ const CheckoutScreen = () => {
           <View style={[styles.section, isDarkMode && styles.darkSection]}>
             <View style={styles.sectionHeader}>
               <Icon name="receipt" size={22} color="#FF3F00" />
-              <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>Order Summary</Text>
+              <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>
+                {t('checkout.orderSummary')}
+              </Text>
             </View>
 
             {/* Order Items */}
@@ -590,7 +607,9 @@ const CheckoutScreen = () => {
                 <View style={styles.orderItemLeft}>
                   <Image source={item.image} style={styles.orderItemImage} />
                   <View style={styles.orderItemDetails}>
-                    <Text style={[styles.orderItemName, isDarkMode && styles.darkText]}>{item.name}</Text>
+                    <Text style={[styles.orderItemName, isDarkMode && styles.darkText]}>
+                      {item.name}
+                    </Text>
                     <Text style={[styles.orderItemPrice, isDarkMode && styles.darkSubText]}>
                       {item.price} × {item.quantity}
                     </Text>
@@ -609,7 +628,9 @@ const CheckoutScreen = () => {
             {/* Price Breakdown */}
             <View style={styles.priceBreakdown}>
               <View style={styles.priceRow}>
-                <Text style={[styles.priceLabel, isDarkMode && styles.darkSubText]}>Subtotal</Text>
+                <Text style={[styles.priceLabel, isDarkMode && styles.darkSubText]}>
+                  {t('checkout.subtotal')}
+                </Text>
                 <Text style={[styles.priceValue, isDarkMode && styles.darkText]}>
                   Rs.{calculateSubtotal().toFixed(2)}
                 </Text>
@@ -617,7 +638,7 @@ const CheckoutScreen = () => {
 
               <View style={styles.priceRow}>
                 <Text style={[styles.priceLabel, isDarkMode && styles.darkSubText]}>
-                  Delivery Fee
+                  {t('checkout.deliveryFee')}
                   {appliedPromo?.discountType === 'free_shipping' && (
                     <Text style={styles.strikethrough}> (Rs.{deliveryFee.toFixed(2)})</Text>
                   )}
@@ -630,7 +651,7 @@ const CheckoutScreen = () => {
               {appliedPromo && appliedPromo.discountType !== 'free_shipping' && (
                 <View style={styles.priceRow}>
                   <Text style={[styles.priceLabel, styles.discountLabel]}>
-                    Discount ({getDiscountText()})
+                    {t('checkout.discount')} ({getDiscountText()})
                   </Text>
                   <Text style={[styles.priceValue, styles.discountValue]}>
                     -Rs.{calculateDiscount().toFixed(2)}
@@ -639,7 +660,9 @@ const CheckoutScreen = () => {
               )}
 
               <View style={styles.totalRow}>
-                <Text style={[styles.totalLabel, isDarkMode && styles.darkText]}>Total</Text>
+                <Text style={[styles.totalLabel, isDarkMode && styles.darkText]}>
+                  {t('common.total')}
+                </Text>
                 <Text style={[styles.totalValue, isDarkMode && styles.darkText]}>
                   Rs.{calculateTotal().toFixed(2)}
                 </Text>
@@ -654,7 +677,9 @@ const CheckoutScreen = () => {
         {/* Place Order Button */}
         <View style={[styles.footer, isDarkMode && styles.darkFooter]}>
           <View style={[styles.totalContainer, isDarkMode && styles.darkTotalContainer]}>
-            <Text style={[styles.totalLabelFooter, isDarkMode && styles.darkSubText]}>Total</Text>
+            <Text style={[styles.totalLabelFooter, isDarkMode && styles.darkSubText]}>
+              {t('common.total')}
+            </Text>
             <Text style={[styles.totalValueFooter, isDarkMode && styles.darkText]}>
               Rs.{calculateTotal().toFixed(2)}
             </Text>
@@ -663,7 +688,7 @@ const CheckoutScreen = () => {
           <TouchableOpacity
             style={styles.placeOrderButton}
             onPress={handlePlaceOrder}>
-            <Text style={styles.placeOrderText}>Place Order</Text>
+            <Text style={styles.placeOrderText}>{t('checkout.placeOrder')}</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

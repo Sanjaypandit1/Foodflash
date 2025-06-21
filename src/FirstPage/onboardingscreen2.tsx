@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
+import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 
 const onboardingData = [
   {
     id: 1,
-    image: require('../Assets/deliveryboy.webp'), // Replace with actual image path
-    title: 'Enjoy On-Time Food Delivery!',
-    description: 'Get the food delivered to your doorstep at the preferred time and schedule.',
+    image: require('../Assets/deliveryboy.webp'),
+    titleKey: 'onboarding.onTimeDelivery.title',
+    descriptionKey: 'onboarding.onTimeDelivery.description',
   },
-  // You can add more slides if needed
 ];
 
 interface OnboardingScreen2Props {
@@ -20,7 +20,8 @@ interface OnboardingScreen2Props {
   onFinish: () => void;
 }
 
-const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({  onFinish }) => {
+const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({ onFinish }) => {
+  const { t } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleNext = () => {
@@ -39,18 +40,18 @@ const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({  onFinish }) => {
         resizeMode="contain"
       />
       <View style={styles.textContainer}>
-        <Text style={styles.title}>{onboardingData[currentIndex].title}</Text>
-        <Text style={styles.description}>{onboardingData[currentIndex].description}</Text>
+        <Text style={styles.title}>{t(onboardingData[currentIndex].titleKey)}</Text>
+        <Text style={styles.description}>{t(onboardingData[currentIndex].descriptionKey)}</Text>
       </View>
-          <TouchableOpacity style={styles.skipButton} onPress={onFinish}>
-                <Text style={styles.skipText}>Skip</Text>
-              </TouchableOpacity>
+      <TouchableOpacity style={styles.skipButton} onPress={onFinish}>
+        <Text style={styles.skipText}>{t('common.skip')}</Text>
+      </TouchableOpacity>
 
-        <TouchableOpacity style={styles.nextButton} onPress={onFinish}>
-              <LinearGradient colors={['red', 'red']} style={styles.gradient}>
-                <Icon name="arrow-forward" size={24} color="#fff" />
-              </LinearGradient>
-            </TouchableOpacity>
+      <TouchableOpacity style={styles.nextButton} onPress={onFinish}>
+        <LinearGradient colors={['red', 'red']} style={styles.gradient}>
+          <Icon name="arrow-forward" size={24} color="#fff" />
+        </LinearGradient>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -114,7 +115,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     overflow: 'hidden',
     elevation: 5,
-
   },
   gradient: {
     flex: 1,
@@ -133,7 +133,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#888',
   },
-
 });
 
 export default OnboardingScreen2;

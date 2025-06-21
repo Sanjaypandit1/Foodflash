@@ -14,9 +14,7 @@ import {
   Alert,
   RefreshControl,
   Animated,
-
   FlatList,
- 
 } from "react-native"
 import { useState } from "react"
 import { type RouteProp, useNavigation, useRoute } from "@react-navigation/native"
@@ -26,6 +24,7 @@ import Icon from "react-native-vector-icons/MaterialIcons"
 import type { ImageSourcePropType } from "react-native"
 import FavoriteButton from "../screens/favorite-button"
 import { getImageUri } from "../screens/favorite-helper"
+import { useTranslation } from 'react-i18next'
 
 // Get screen dimensions
 const { width, height } = Dimensions.get("window")
@@ -61,6 +60,7 @@ const FoodItemDetail = () => {
   const { item, restaurantName } = route.params
   const [quantity, setQuantity] = useState(1)
   const { addToCart } = useCart()
+  const { t } = useTranslation()
 
   // Convert price string to number for calculations
   const priceValue = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0
@@ -77,9 +77,9 @@ const FoodItemDetail = () => {
         price: `Rs.${priceValue}`,
         image: item.image,
         description: item.description,
-        tag: item.isVeg ? "Vegetarian" : "Non-Vegetarian",
+        tag: item.isVeg ? t('foodDetail.vegetarian') : t('foodDetail.nonVegetarian'),
         rating: parseFloat(item.rating) || 0,
-        restaurantName: restaurantName || "Unknown Restaurant",
+        restaurantName: restaurantName || t('foodDetail.unknownRestaurant'),
       }
 
       // Add to cart multiple times based on quantity
@@ -88,13 +88,13 @@ const FoodItemDetail = () => {
       }
 
       Alert.alert(
-        "Added to Cart",
-        `${quantity} x ${item.name} added to your cart!`,
-        [{ text: "OK" }]
+        t('foodDetail.addedToCart'),
+        t('foodDetail.addedToCartMessage', { quantity, itemName: item.name }),
+        [{ text: t('common.ok') }]
       )
     } catch (error) {
       console.error("Error adding to cart:", error)
-      Alert.alert("Error", "Failed to add item to cart. Please try again.")
+      Alert.alert(t('common.error'), t('foodDetail.addToCartError'))
     }
   }
 
@@ -106,7 +106,7 @@ const FoodItemDetail = () => {
       navigation.navigate("Cart")
     } catch (error) {
       console.error("Error in buy now:", error)
-      Alert.alert("Error", "Failed to process order. Please try again.")
+      Alert.alert(t('common.error'), t('foodDetail.buyNowError'))
     }
   }
 
@@ -133,7 +133,7 @@ const FoodItemDetail = () => {
     isVeg: item.isVeg,
     rating: item.rating,
     preparationTime: item.preparationTime,
-    restaurant: restaurantName || "Unknown Restaurant",
+    restaurant: restaurantName || t('foodDetail.unknownRestaurant'),
   }
 
   return (
@@ -150,15 +150,16 @@ const FoodItemDetail = () => {
           <TouchableOpacity 
             style={styles.backButton} 
             onPress={handleBackPress}
-            accessibilityLabel="Go back"
+            accessibilityLabel={t('common.goBack')}
             accessibilityRole="button"
           >
             <Icon name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
 
-
           <View style={[styles.badgeContainer, { backgroundColor: item.isVeg ? "#0f8a0f" : "#b30000" }]}>
-            <Text style={styles.badgeText}>{item.isVeg ? "VEG" : "NON-VEG"}</Text>
+            <Text style={styles.badgeText}>
+              {item.isVeg ? t('foodDetail.veg') : t('foodDetail.nonVeg')}
+            </Text>
           </View>
         </View>
 
@@ -202,19 +203,19 @@ const FoodItemDetail = () => {
 
           {/* Description */}
           <View style={styles.descriptionSection}>
-            <Text style={styles.sectionTitle}>Description</Text>
+            <Text style={styles.sectionTitle}>{t('foodDetail.description')}</Text>
             <Text style={styles.description}>{item.description}</Text>
           </View>
 
           {/* Quantity Selector */}
           <View style={styles.quantitySection}>
-            <Text style={styles.sectionTitle}>Quantity</Text>
+            <Text style={styles.sectionTitle}>{t('foodDetail.quantity')}</Text>
             <View style={styles.quantitySelector}>
               <TouchableOpacity
                 style={[styles.quantityButton, quantity <= 1 && styles.quantityButtonDisabled]}
                 onPress={() => quantity > 1 && setQuantity(quantity - 1)}
                 disabled={quantity <= 1}
-                accessibilityLabel="Decrease quantity"
+                accessibilityLabel={t('foodDetail.decreaseQuantity')}
               >
                 <Icon name="remove" size={20} color={quantity <= 1 ? "#ccc" : "#333"} />
               </TouchableOpacity>
@@ -224,7 +225,7 @@ const FoodItemDetail = () => {
               <TouchableOpacity 
                 style={styles.quantityButton} 
                 onPress={() => setQuantity(quantity + 1)}
-                accessibilityLabel="Increase quantity"
+                accessibilityLabel={t('foodDetail.increaseQuantity')}
               >
                 <Icon name="add" size={20} color="#333" />
               </TouchableOpacity>
@@ -233,7 +234,7 @@ const FoodItemDetail = () => {
 
           {/* Total */}
           <View style={styles.totalSection}>
-            <Text style={styles.totalLabel}>Total:</Text>
+            <Text style={styles.totalLabel}>{t('foodDetail.total')}:</Text>
             <Text style={styles.totalPrice}>Rs. {totalPrice}</Text>
           </View>
 
@@ -247,19 +248,19 @@ const FoodItemDetail = () => {
         <TouchableOpacity 
           style={[styles.actionButton, styles.addToCartButton]} 
           onPress={handleAddToCart}
-          accessibilityLabel={`Add ${quantity} ${item.name} to cart`}
+          accessibilityLabel={t('foodDetail.addToCartAccessibility', { quantity, itemName: item.name })}
         >
           <Icon name="shopping-cart" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Add to Cart</Text>
+          <Text style={styles.actionButtonText}>{t('foodDetail.addToCart')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
           style={[styles.actionButton, styles.buyNowButton]} 
           onPress={handleBuyNow}
-          accessibilityLabel={`Buy ${quantity} ${item.name} now`}
+          accessibilityLabel={t('foodDetail.buyNowAccessibility', { quantity, itemName: item.name })}
         >
           <Icon name="flash-on" size={20} color="white" />
-          <Text style={styles.actionButtonText}>Buy Now</Text>
+          <Text style={styles.actionButtonText}>{t('foodDetail.buyNow')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

@@ -17,11 +17,13 @@ import {
   Dimensions,
   Modal,
   Easing,
+  ScrollView,
 } from "react-native"
 import { useOrders } from "../components/OrderContext"
 import { useColorScheme } from "react-native"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import { useNavigation } from "@react-navigation/native"
+import { useTranslation } from 'react-i18next'
 
 // Define types for the order items and orders
 interface OrderItem {
@@ -29,7 +31,7 @@ interface OrderItem {
   name: string
   price: string
   quantity: number
-  image: any // Use more specific type if available
+  image: any
 }
 
 interface Order {
@@ -51,6 +53,7 @@ const OrdersScreen = () => {
   const colorScheme = useColorScheme()
   const isDarkMode = colorScheme === "dark"
   const navigation = useNavigation()
+  const { t } = useTranslation()
 
   // State for animations, filtering, and loading
   const [refreshing, setRefreshing] = useState(false)
@@ -108,12 +111,15 @@ const OrdersScreen = () => {
     }
   }
 
+  // Function to get translated status
+  const getTranslatedStatus = (status: string) => {
+    const statusKey = status.toLowerCase()
+    return t(`orders.status.${statusKey}`, status)
+  }
+
   // Function to handle order cancellation with confirmation
   const handleCancelOrder = (orderId: string) => {
-    // In a real app, you would show a confirmation dialog here
     setLoading(true)
-
-    // Simulate network request
     setTimeout(() => {
       cancelOrder(orderId)
       setLoading(false)
@@ -122,18 +128,13 @@ const OrdersScreen = () => {
 
   // Function to handle reorder
   const handleReorder = (order: Order) => {
-    // In a real app, you would navigate to cart with these items
     console.log("Reordering items from order:", order.id)
-    // navigation.navigate('Cart', { reorderItems: order.items });
   }
 
   // Function to handle pull-to-refresh
   const onRefresh = React.useCallback(() => {
     setRefreshing(true)
-
-    // Simulate network request
     setTimeout(() => {
-      // In a real app, you would fetch fresh data here
       setRefreshing(false)
     }, 1500)
   }, [])
@@ -158,10 +159,17 @@ const OrdersScreen = () => {
   const renderEmptyState = () => (
     <Animated.View style={[styles.emptyContainer, { opacity: fadeAnim }]}>
       <Icon name="receipt-long" size={80} color={isDarkMode ? "#555" : "#ddd"} />
-      <Text style={[styles.emptyTitle, isDarkMode && styles.darkText]}>No Orders Yet</Text>
-      <Text style={[styles.emptySubtitle, isDarkMode && styles.darkSubText]}>Your order history will appear here</Text>
-      <TouchableOpacity style={styles.browseButton} onPress={() => navigation.navigate("Home" as never)}>
-        <Text style={styles.browseButtonText}>Browse Restaurants</Text>
+      <Text style={[styles.emptyTitle, isDarkMode && styles.darkText]}>
+        {t('orders.empty')}
+      </Text>
+      <Text style={[styles.emptySubtitle, isDarkMode && styles.darkSubText]}>
+        {t('orders.emptySubtitle')}
+      </Text>
+      <TouchableOpacity 
+        style={styles.browseButton} 
+        onPress={() => navigation.navigate("Home" as never)}
+      >
+        <Text style={styles.browseButtonText}>{t('orders.browseRestaurants')}</Text>
       </TouchableOpacity>
     </Animated.View>
   )
@@ -171,7 +179,6 @@ const OrdersScreen = () => {
     setCurrentTrackedOrder(order)
     setTrackingModalVisible(true)
 
-    // Reset and start the animation
     trackingAnimation.setValue(0)
     Animated.timing(trackingAnimation, {
       toValue: 1,
@@ -194,15 +201,23 @@ const OrdersScreen = () => {
           { opacity: fadeAnim },
         ]}
       >
-        <TouchableOpacity style={styles.orderHeader} onPress={() => toggleOrderDetails(item.id)} activeOpacity={0.7}>
+        <TouchableOpacity 
+          style={styles.orderHeader} 
+          onPress={() => toggleOrderDetails(item.id)} 
+          activeOpacity={0.7}
+        >
           <View>
-            <Text style={[styles.orderDate, isDarkMode && styles.darkText]}>{formatDate(item.date)}</Text>
-            <Text style={[styles.orderId, isDarkMode && styles.darkSubText]}>Order #{item.id.slice(-6)}</Text>
+            <Text style={[styles.orderDate, isDarkMode && styles.darkText]}>
+              {formatDate(item.date)}
+            </Text>
+            <Text style={[styles.orderId, isDarkMode && styles.darkSubText]}>
+              {t('orders.orderNumber', { number: item.id.slice(-6) })}
+            </Text>
           </View>
           <View style={styles.headerRight}>
             <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + "20" }]}>
               <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
-                {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                {getTranslatedStatus(item.status)}
               </Text>
             </View>
             <Icon
@@ -217,7 +232,9 @@ const OrdersScreen = () => {
         {item.restaurant && (
           <View style={styles.restaurantRow}>
             <Icon name="store" size={16} color={isDarkMode ? "#aaa" : "#777"} />
-            <Text style={[styles.restaurantName, isDarkMode && styles.darkSubText]}>{item.restaurant}</Text>
+            <Text style={[styles.restaurantName, isDarkMode && styles.darkSubText]}>
+              {item.restaurant}
+            </Text>
           </View>
         )}
 
@@ -226,18 +243,27 @@ const OrdersScreen = () => {
             <View key={orderItem.id} style={styles.orderItem}>
               <Image source={orderItem.image} style={styles.itemImage} />
               <View style={styles.itemDetails}>
-                <Text style={[styles.itemName, isDarkMode && styles.darkText]}>{orderItem.name}</Text>
+                <Text style={[styles.itemName, isDarkMode && styles.darkText]}>
+                  {orderItem.name}
+                </Text>
                 <View style={styles.itemPriceRow}>
-                  <Text style={[styles.itemPrice, isDarkMode && styles.darkSubText]}>{orderItem.price}</Text>
-                  <Text style={[styles.itemQuantity, isDarkMode && styles.darkSubText]}>× {orderItem.quantity}</Text>
+                  <Text style={[styles.itemPrice, isDarkMode && styles.darkSubText]}>
+                    {orderItem.price}
+                  </Text>
+                  <Text style={[styles.itemQuantity, isDarkMode && styles.darkSubText]}>
+                    × {orderItem.quantity}
+                  </Text>
                 </View>
               </View>
             </View>
           ))}
           {!isExpanded && item.items.length > 2 && (
-            <TouchableOpacity style={styles.viewMoreButton} onPress={() => toggleOrderDetails(item.id)}>
+            <TouchableOpacity 
+              style={styles.viewMoreButton} 
+              onPress={() => toggleOrderDetails(item.id)}
+            >
               <Text style={[styles.viewMoreText, isDarkMode && styles.darkAccentText]}>
-                +{item.items.length - 2} more items
+                {t('orders.moreItems', { count: item.items.length - 2 })}
               </Text>
               <Icon name="keyboard-arrow-down" size={16} color={isDarkMode ? "#FF5722" : "#FF3F00"} />
             </TouchableOpacity>
@@ -249,14 +275,18 @@ const OrdersScreen = () => {
             {item.deliveryAddress && (
               <View style={styles.detailRow}>
                 <Icon name="location-on" size={16} color={isDarkMode ? "#aaa" : "#777"} />
-                <Text style={[styles.detailText, isDarkMode && styles.darkSubText]}>{item.deliveryAddress}</Text>
+                <Text style={[styles.detailText, isDarkMode && styles.darkSubText]}>
+                  {item.deliveryAddress}
+                </Text>
               </View>
             )}
 
             {item.paymentMethod && (
               <View style={styles.detailRow}>
                 <Icon name="payment" size={16} color={isDarkMode ? "#aaa" : "#777"} />
-                <Text style={[styles.detailText, isDarkMode && styles.darkSubText]}>Paid via {item.paymentMethod}</Text>
+                <Text style={[styles.detailText, isDarkMode && styles.darkSubText]}>
+                  {t('orders.paidVia', { method: item.paymentMethod })}
+                </Text>
               </View>
             )}
           </View>
@@ -264,8 +294,12 @@ const OrdersScreen = () => {
 
         <View style={styles.orderFooter}>
           <View>
-            <Text style={[styles.totalLabel, isDarkMode && styles.darkSubText]}>Total</Text>
-            <Text style={[styles.totalAmount, isDarkMode && styles.darkText]}>Rs.{item.total.toFixed(2)}</Text>
+            <Text style={[styles.totalLabel, isDarkMode && styles.darkSubText]}>
+              {t('common.total')}
+            </Text>
+            <Text style={[styles.totalAmount, isDarkMode && styles.darkText]}>
+              Rs.{item.total.toFixed(2)}
+            </Text>
           </View>
 
           <View style={styles.actionButtons}>
@@ -278,7 +312,7 @@ const OrdersScreen = () => {
                 {loading ? (
                   <ActivityIndicator size="small" color="#F44336" />
                 ) : (
-                  <Text style={styles.cancelButtonText}>Cancel Order</Text>
+                  <Text style={styles.cancelButtonText}>{t('orders.cancelOrder')}</Text>
                 )}
               </TouchableOpacity>
             )}
@@ -286,7 +320,7 @@ const OrdersScreen = () => {
             {item.status.toLowerCase() === "delivered" && (
               <TouchableOpacity style={styles.reorderButton} onPress={() => handleReorder(item)}>
                 <Icon name="replay" size={14} color="#fff" style={styles.buttonIcon} />
-                <Text style={styles.reorderButtonText}>Reorder</Text>
+                <Text style={styles.reorderButtonText}>{t('orders.reorder')}</Text>
               </TouchableOpacity>
             )}
 
@@ -305,7 +339,7 @@ const OrdersScreen = () => {
                 style={styles.buttonIcon}
               />
               <Text style={styles.trackButtonText}>
-                {item.status.toLowerCase() === "delivered" ? "Rate Order" : "Track Order"}
+                {item.status.toLowerCase() === "delivered" ? t('orders.rateOrder') : t('orders.trackOrder')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -348,7 +382,7 @@ const OrdersScreen = () => {
           <View style={[styles.trackingModalContent, isDarkMode && styles.darkTrackingModalContent]}>
             <View style={styles.trackingModalHeader}>
               <Text style={[styles.trackingModalTitle, isDarkMode && styles.darkText]}>
-                {isCancelled ? "Order Cancelled" : "Order Status"}
+                {isCancelled ? t('orders.orderCancelled') : t('orders.orderStatus')}
               </Text>
               <TouchableOpacity onPress={() => setTrackingModalVisible(false)}>
                 <Icon name="close" size={24} color={isDarkMode ? "#fff" : "#333"} />
@@ -357,7 +391,7 @@ const OrdersScreen = () => {
 
             <View style={styles.orderInfoCard}>
               <Text style={[styles.orderInfoTitle, isDarkMode && styles.darkText]}>
-                Order #{currentTrackedOrder.id.slice(-6)}
+                {t('orders.orderNumber', { number: currentTrackedOrder.id.slice(-6) })}
               </Text>
               <Text style={[styles.orderInfoDate, isDarkMode && styles.darkSubText]}>
                 {formatDate(currentTrackedOrder.date)}
@@ -373,7 +407,7 @@ const OrdersScreen = () => {
               <View style={styles.orderInfoRow}>
                 <Icon name="receipt" size={16} color={isDarkMode ? "#aaa" : "#777"} />
                 <Text style={[styles.orderInfoText, isDarkMode && styles.darkSubText]}>
-                  {currentTrackedOrder.items.length} items · Rs.{currentTrackedOrder.total.toFixed(2)}
+                  {currentTrackedOrder.items.length} {t('orders.items')} · Rs.{currentTrackedOrder.total.toFixed(2)}
                 </Text>
               </View>
             </View>
@@ -383,10 +417,12 @@ const OrdersScreen = () => {
                 <View style={styles.cancelledIconContainer}>
                   <Icon name="cancel" size={60} color="#F44336" />
                 </View>
-                <Text style={styles.cancelledTitle}>Order Cancelled</Text>
-                <Text style={styles.cancelledMessage}>This order was cancelled and will not be delivered.</Text>
+                <Text style={styles.cancelledTitle}>{t('orders.orderCancelled')}</Text>
+                <Text style={styles.cancelledMessage}>{t('orders.orderCancelledMessage')}</Text>
                 <View style={styles.cancelledDetails}>
-                  <Text style={[styles.cancelledLabel, isDarkMode && styles.darkSubText]}>Cancellation Date:</Text>
+                  <Text style={[styles.cancelledLabel, isDarkMode && styles.darkSubText]}>
+                    {t('orders.cancellationDate')}
+                  </Text>
                   <Text style={[styles.cancelledValue, isDarkMode && styles.darkText]}>
                     {formatDate(currentTrackedOrder.date)}
                   </Text>
@@ -399,7 +435,7 @@ const OrdersScreen = () => {
                   }}
                 >
                   <Icon name="replay" size={16} color="#fff" style={styles.buttonIcon} />
-                  <Text style={styles.reorderCancelledButtonText}>Reorder Items</Text>
+                  <Text style={styles.reorderCancelledButtonText}>{t('orders.reorderItems')}</Text>
                 </TouchableOpacity>
               </View>
             ) : (
@@ -425,13 +461,11 @@ const OrdersScreen = () => {
                           isDarkMode && styles.darkText,
                         ]}
                       >
-                        {isPending ? "Pending" : "Preparing"}
+                        {isPending ? t('orders.status.pending') : t('orders.status.processing')}
                       </Text>
                       {progressValue === 1 && (
                         <Text style={styles.currentStatusText}>
-                          {isPending
-                            ? "Your order is pending confirmation"
-                            : "Your order is being prepared by the restaurant"}
+                          {isPending ? t('orders.tracking.pending') : t('orders.tracking.preparing')}
                         </Text>
                       )}
                     </View>
@@ -451,10 +485,12 @@ const OrdersScreen = () => {
                           isDarkMode && styles.darkText,
                         ]}
                       >
-                        On the way
+                        {t('orders.status.onTheWay')}
                       </Text>
                       {progressValue === 2 && (
-                        <Text style={styles.currentStatusText}>Your order is on the way to your location</Text>
+                        <Text style={styles.currentStatusText}>
+                          {t('orders.tracking.onTheWay')}
+                        </Text>
                       )}
                     </View>
 
@@ -473,30 +509,34 @@ const OrdersScreen = () => {
                           isDarkMode && styles.darkText,
                         ]}
                       >
-                        Delivered
+                        {t('orders.status.delivered')}
                       </Text>
                       {progressValue === 3 && (
-                        <Text style={styles.currentStatusText}>Your order has been delivered successfully</Text>
+                        <Text style={styles.currentStatusText}>
+                          {t('orders.tracking.delivered')}
+                        </Text>
                       )}
                     </View>
                   </View>
                 </View>
 
                 <View style={styles.deliveryInfoContainer}>
-                  <Text style={[styles.deliveryInfoTitle, isDarkMode && styles.darkText]}>Delivery Details</Text>
+                  <Text style={[styles.deliveryInfoTitle, isDarkMode && styles.darkText]}>
+                    {t('orders.deliveryDetails')}
+                  </Text>
 
                   <View style={styles.deliveryInfoCard}>
                     <View style={styles.deliveryInfoRow}>
                       <Icon name="access-time" size={20} color="#FF3F00" />
                       <View style={styles.deliveryInfoTextContainer}>
                         <Text style={[styles.deliveryInfoLabel, isDarkMode && styles.darkSubText]}>
-                          {isDelivered ? "Delivered At" : "Estimated Delivery"}
+                          {isDelivered ? t('orders.deliveredAt') : t('orders.estimatedDelivery')}
                         </Text>
                         <Text style={[styles.deliveryInfoValue, isDarkMode && styles.darkText]}>
                           {isDelivered
                             ? formatDate(currentTrackedOrder.date)
                             : isPending
-                              ? "Waiting for confirmation"
+                              ? t('orders.waitingConfirmation')
                               : "30-45 minutes"}
                         </Text>
                       </View>
@@ -506,10 +546,10 @@ const OrdersScreen = () => {
                       <Icon name="location-on" size={20} color="#FF3F00" />
                       <View style={styles.deliveryInfoTextContainer}>
                         <Text style={[styles.deliveryInfoLabel, isDarkMode && styles.darkSubText]}>
-                          Delivery Address
+                          {t('orders.deliveryAddress')}
                         </Text>
                         <Text style={[styles.deliveryInfoValue, isDarkMode && styles.darkText]}>
-                          {currentTrackedOrder.deliveryAddress || "Address not available"}
+                          {currentTrackedOrder.deliveryAddress || t('orders.addressNotAvailable')}
                         </Text>
                       </View>
                     </View>
@@ -518,13 +558,13 @@ const OrdersScreen = () => {
                       <Icon name="person" size={20} color="#FF3F00" />
                       <View style={styles.deliveryInfoTextContainer}>
                         <Text style={[styles.deliveryInfoLabel, isDarkMode && styles.darkSubText]}>
-                          Delivery Partner
+                          {t('orders.deliveryPartner')}
                         </Text>
                         <Text style={[styles.deliveryInfoValue, isDarkMode && styles.darkText]}>
                           {isPending
-                            ? "Waiting for confirmation"
+                            ? t('orders.waitingConfirmation')
                             : isProcessing
-                              ? "Assigning delivery partner..."
+                              ? t('orders.assigningPartner')
                               : "Rahul S."}
                         </Text>
                       </View>
@@ -538,11 +578,10 @@ const OrdersScreen = () => {
               style={styles.supportButton}
               onPress={() => {
                 setTrackingModalVisible(false)
-                // In a real app, navigate to support screen
               }}
             >
               <Icon name="headset-mic" size={16} color="#fff" style={styles.buttonIcon} />
-              <Text style={styles.supportButtonText}>Contact Support</Text>
+              <Text style={styles.supportButtonText}>{t('orders.contactSupport')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -556,7 +595,7 @@ const OrdersScreen = () => {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>My Orders</Text>
+        <Text style={styles.headerTitle}>{t('orders.title')}</Text>
         <TouchableOpacity style={styles.searchButton}>
           <Icon name="search" size={24} color="white" />
         </TouchableOpacity>
@@ -583,7 +622,7 @@ const OrdersScreen = () => {
               onRefresh={onRefresh}
               colors={["#FF3F00"]}
               tintColor={isDarkMode ? "#FF5722" : "#FF3F00"}
-              title="Pull to refresh"
+              title={t('orders.pullToRefresh')}
               titleColor={isDarkMode ? "#aaa" : "#777"}
             />
           }
@@ -604,11 +643,13 @@ const ScrollableFilterTabs = ({
   onSelectFilter: (filter: FilterOption) => void
   isDarkMode: boolean
 }) => {
+  const { t } = useTranslation()
+  
   const filters: { value: FilterOption; label: string; icon: string }[] = [
-    { value: "all", label: "All Orders", icon: "receipt-long" },
-    { value: "pending", label: "Pending", icon: "pending" },
-    { value: "delivered", label: "Delivered", icon: "check-circle" },
-    { value: "cancelled", label: "Cancelled", icon: "cancel" },
+    { value: "all", label: t('orders.filters.all'), icon: "receipt-long" },
+    { value: "pending", label: t('orders.filters.pending'), icon: "pending" },
+    { value: "delivered", label: t('orders.filters.delivered'), icon: "check-circle" },
+    { value: "cancelled", label: t('orders.filters.cancelled'), icon: "cancel" },
   ]
 
   return (
@@ -648,11 +689,11 @@ const ScrollableFilterTabs = ({
   )
 }
 
+// Keep all your existing styles here
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f9f9f9",
-  
   },
   darkContainer: {
     backgroundColor: "#121212",
