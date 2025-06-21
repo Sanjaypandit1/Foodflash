@@ -312,14 +312,11 @@ const FirebaseAuthScreen: React.FC<FirebaseAuthScreenProps> = ({ onAuthSuccess }
         >
           {/* Header */}
           <View>
-            <Image
-              source={{
-                uri: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop",
-              }}
-              style={styles.logo}
-            />
-          </View>
-
+           <Image
+             source={require("../Assets/logo.jpg")}
+             style={styles.logo}
+           />
+         </View>
           {/* Form */}
           <View style={styles.formContainer}>
             <Text style={styles.title}>Sign In</Text>

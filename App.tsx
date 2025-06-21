@@ -396,36 +396,26 @@ export default function App() {
 
   // Keep all your existing logic exactly as it is
   useEffect(() => {
-// Add this debugging code to your App.tsx in the checkFirstLaunch function
-const checkFirstLaunch = async () => {
-  try {
-    const hasSelectedLanguage = await AsyncStorage.getItem("selectedLanguage")
-    const hasSeenOnboarding = await AsyncStorage.getItem("hasSeenOnboarding")
-    const hasSelectedLocation = await AsyncStorage.getItem("locationConfirmed")
+    const checkFirstLaunch = async () => {
+      try {
+        const hasSelectedLanguage = await AsyncStorage.getItem("selectedLanguage")
+        const hasSeenOnboarding = await AsyncStorage.getItem("hasSeenOnboarding")
+        const hasSelectedLocation = await AsyncStorage.getItem("locationConfirmed")
 
-    // Add these debug logs
-    console.log('Debug - hasSelectedLanguage:', hasSelectedLanguage);
-    console.log('Debug - hasSeenOnboarding:', hasSeenOnboarding);
-    console.log('Debug - hasSelectedLocation:', hasSelectedLocation);
-
-    if (!hasSelectedLanguage) {
-      console.log('Debug - Showing language screen');
-      setShowLanguageScreen(true)
-    } else if (!hasSeenOnboarding) {
-      console.log('Debug - Showing onboarding');
-      setShowOnboarding(true)
-    } else if (!hasSelectedLocation) {
-      console.log('Debug - Showing location selection');
-      setShowLocationSelection(true)
-    } else {
-      console.log('Debug - Going to main app');
+        if (!hasSelectedLanguage) {
+          setShowLanguageScreen(true)
+        } else if (!hasSeenOnboarding) {
+          setShowOnboarding(true)
+        } else if (!hasSelectedLocation) {
+          setShowLocationSelection(true)
+        }
+      } catch (error) {
+        console.error("Error reading AsyncStorage:", error)
+      } finally {
+        setIsLoading(false)
+      }
     }
-  } catch (error) {
-    console.error("Error reading AsyncStorage:", error)
-  } finally {
-    setIsLoading(false)
-  }
-}
+
     checkFirstLaunch()
   }, [])
 

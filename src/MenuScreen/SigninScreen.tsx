@@ -308,14 +308,12 @@ const FirebaseSignUpScreen: React.FC<FirebaseSignUpScreenProps> = ({ onAuthSucce
           keyboardShouldPersistTaps="handled"
         >
           {/* Header */}
-          <View>
-            <Image
-              source={{
-                uri: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop",
-              }}
-              style={styles.logo}
-            />
-          </View>
+        <View>
+  <Image
+    source={require("../Assets/logo.jpg")}
+    style={styles.logo}
+  />
+</View>
 
           {/* Form */}
           <View style={styles.formContainer}>
@@ -633,6 +631,7 @@ const styles = StyleSheet.create({
     color: "#FF8C00",
     fontWeight: "bold",
   },
+
 })
 
 export default FirebaseSignUpScreen

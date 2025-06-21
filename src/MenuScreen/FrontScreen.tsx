@@ -152,7 +152,7 @@ const FrontScreen: React.FC<FrontScreenProps> = ({ user: propUser, onSignOut }) 
 
     // Priority: displayName > name > email (before @) > "User"
     if (user.displayName) return user.displayName
-    if (user.name) return user.name
+    if (user.name) return user.firstname
     if (user.email) {
       const emailName = user.email.split("@")[0]
       return emailName.charAt(0).toUpperCase() + emailName.slice(1)
