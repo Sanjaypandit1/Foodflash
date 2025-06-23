@@ -24,22 +24,6 @@ FoodFlash is a mobile food delivery application developed using **React Native**
 - **Version Control:** Git & GitHub
 
 
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/Sanjaypandit1/Foodflash.git
-
-# Navigate to the project directory
-cd Foodflash
-
-# Install dependencies
-npm install
-
-# Run the app on Android
-npx react-native run-android
-
-
 
 > ## 📷 Screenshots
 
