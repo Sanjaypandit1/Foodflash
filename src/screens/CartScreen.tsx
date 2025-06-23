@@ -142,7 +142,7 @@ const CartScreen = () => {
                   <View style={styles.priceRow}>
                     <Text style={styles.itemPrice}>{item.price}</Text>
                     <Text style={styles.itemQuantity}>
-                      {t('cart.quantity', { count: item.quantity })}
+                      {  item.quantity }
                     </Text>
                   </View>
                 </View>
